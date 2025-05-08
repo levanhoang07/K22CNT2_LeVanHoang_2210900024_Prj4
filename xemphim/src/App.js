@@ -1,11 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import TrangChu from './trang/TrangChu';
-import ChiTietPhim from './trang/ChiTietPhim';
-import DatVe from './trang/DatVe';
-import GioVe from './trang/GioVe';
-import DangNhap from './trang/DangNhap';
-import DangKy from './trang/DangKy';
+import TrangChu from './components/TrangChu';
+import ChiTietPhim from './components/ChiTietPhim';
+import DatVe from './components/DatVe';
+import GioVe from './components/GioVe';
+import DangNhap from './components/DangNhap';
+import DangKy from './components/DangKy';
 import './App.css';
 function App() {
   return (
