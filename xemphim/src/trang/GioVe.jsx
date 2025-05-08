@@ -9,9 +9,9 @@ const danhSachPhim = [
   { id: 5, ten: 'Tiệc Trăng Máu' },
   { id: 6, ten: 'Ròm' },
   { id: 7, ten: 'Tháng Năm Rực Rỡ' },
-  { id: 8, ten: 'Lật Mặt: 48h' },
+  { id: 8, ten: 'Lật Mặt 77' },
   { id: 9, ten: 'Trạng Tí' },
-  { id: 10, ten: 'Song Song' },
+  { id: 10, ten: 'Avatar 22' },
 ];
 
 export default function GioVe() {

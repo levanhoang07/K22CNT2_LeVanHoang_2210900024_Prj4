@@ -1,31 +1,25 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import TrangChu from './trang/TrangChu';
 import ChiTietPhim from './trang/ChiTietPhim';
 import DatVe from './trang/DatVe';
 import GioVe from './trang/GioVe';
 import DangNhap from './trang/DangNhap';
 import DangKy from './trang/DangKy';
-
+import './App.css';
 function App() {
   return (
     <Router>
       <div className="App">
         <header className="App-header">
-          <h1>Ứng Dụng Xem Phim</h1>
+          <h1>Doremi Cinema</h1>
           <nav>
             <ul>
               <li>
                 <Link to="/">Trang Chủ</Link>
               </li>
               <li>
-                <Link to="/chitietphim">Chi Tiết Phim</Link>
-              </li>
-              <li>
-                <Link to="/datve">Đặt Vé</Link>
-              </li>
-              <li>
-                <Link to="/giove">Giỏ Vé</Link>
+                <Link to="/giove">🛒Giỏ Vé</Link>
               </li>
               <li>
                 <Link to="/dangnhap">Đăng Nhập</Link>
@@ -36,16 +30,18 @@ function App() {
             </ul>
           </nav>
         </header>
-
+       
         <main>
-          <Switch>
-            <Route path="/" exact component={TrangChu} />
-            <Route path="/chitietphim" component={ChiTietPhim} />
-            <Route path="/datve" component={DatVe} />
-            <Route path="/giove" component={GioVe} />
-            <Route path="/dangnhap" component={DangNhap} />
-            <Route path="/dangky" component={DangKy} />
-          </Switch>
+          <Routes>
+            <Route path="/" element={<TrangChu />} />
+            <Route path="/chitietphim" element={<ChiTietPhim />} />
+            <Route path="/phim/:id" element={<ChiTietPhim />} />
+            <Route path="/datve" element={<DatVe />} />
+            <Route path="/datve/:id" element={<DatVe />} />
+            <Route path="/giove" element={<GioVe />} />
+            <Route path="/dangnhap" element={<DangNhap />} />
+            <Route path="/dangky" element={<DangKy />} />
+          </Routes>
         </main>
       </div>
     </Router>
