@@ -16,7 +16,7 @@ const danhSachPhim = [
     moTa: 'Một bà mẹ đơn thân dấn thân vào thế giới ngầm để giải cứu con gái mình bị bắt cóc, đầy hành động và cảm xúc.',
     tacGia: 'Lê Văn Kiệt',
     thoiLuong: '98 phút',
-    anh: 'https://th.bing.com/th/id/R.52a8160aa3cf0afa720d31755c9c0b04?rik=BmNRA1LTlnolsw&pid=ImgRaw&r=0'
+    anh: 'https://th.bing.com/th/id/R.52a8160aa3cf0afa720d31755c9c0b04?rik=BmNRA1LTlnolsw&riu=http%3a%2f%2fwww.impawards.com%2fintl%2fvietnam%2f2019%2fposters%2fhai_phuong_ver2.jpg&ehk=yP51yBZZ8o4wHgUpd4C%2bPRgoMYPhVI8KWhYIZcvjAD0%3d&risl=&pid=ImgRaw&r=0' 
   },
   {
     id: 3,
@@ -99,7 +99,7 @@ export default function ChiTietPhim() {
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-flex', gap: '20px', padding: '20px' }}>
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px', padding: '20px' }}>
       <img
         src={phim.anh}
         alt={phim.ten}
