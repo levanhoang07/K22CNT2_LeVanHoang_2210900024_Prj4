@@ -8,6 +8,11 @@ import DangNhap from './components/DangNhap';
 import DangKy from './components/DangKy';
 import './App.css';
 import QuanTri from './components/quantri/QuanTri';
+import QuanLyNguoiDung from './components/quantri/QuanLyNguoiDung';
+import QuanLyPhim from './components/quantri/QuanLyPhim';
+import QuanLySuatChieu from './components/quantri/QuanLySuatChieu';
+import ThongKe from './components/quantri/ThongKe';
+
 function App() {
   return (
     <Router>
@@ -23,7 +28,10 @@ function App() {
             <Route path="/dangnhap" element={<DangNhap />} />
             <Route path="/dangky" element={<DangKy />} />
             <Route path="/quantri" element={<QuanTri />} />
-            
+              <Route path="/quantri/phim" element={<QuanLyPhim />} />
+              <Route path="/quantri/suatchieu" element={<QuanLySuatChieu />} />
+              <Route path="/quantri/nguoidung" element={<QuanLyNguoiDung />} />
+              <Route path="/quantri/thongke" element={<ThongKe />} />
           </Routes>
         </main>
       </div>

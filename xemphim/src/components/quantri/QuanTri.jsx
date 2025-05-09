@@ -1,62 +1,7 @@
-import React, { useState } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
-import QuanLyPhim from './QuanLyPhim';
-import QuanLySuatChieu from './QuanLySuatChieu';
-import QuanLyNguoiDung from './QuanLyNguoiDung';
-import ThongKe from './ThongKe';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function QuanTri() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (username === 'admin' && password === 'admin') {
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('Tài khoản hoặc mật khẩu không đúng!');
-    }
-  };
-
-  if (!isAuthenticated) {
-    return (
-      <div style={styles.loginContainer}>
-        <div style={styles.loginForm}>
-          <h2 style={styles.loginTitle}>Đăng Nhập Quản Trị</h2>
-          <form onSubmit={handleLogin}>
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>Tài khoản</label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                style={styles.input}
-                placeholder="Nhập tài khoản"
-                required
-              />
-            </div>
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>Mật khẩu</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={styles.input}
-                placeholder="Nhập mật khẩu"
-                required
-              />
-            </div>
-            {error && <p style={styles.error}>{error}</p>}
-            <button type="submit" style={styles.loginButton}>Đăng Nhập</button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
       <div style={styles.container}>
@@ -78,13 +23,7 @@ export default function QuanTri() {
           </nav>
         </div>
         <div style={styles.content}>
-          <h2 style={styles.greeting}>Chào mừng bạn đến với hệ thống Quản lý Phim</h2>
-          <Routes>
-            <Route path="/quantri/phim" element={<QuanLyPhim />} />
-            <Route path="/quantri/suatchieu" element={<QuanLySuatChieu />} />
-            <Route path="/quantri/nguoidung" element={<QuanLyNguoiDung />} />
-            <Route path="/quantri/thongke" element={<ThongKe />} />
-          </Routes>
+          <h2 style={styles.greeting}>Chào mừng bạn đến với hệ thống Quản lý Phim Doremi Cinema</h2>
         </div>
       </div>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
@@ -93,77 +32,6 @@ export default function QuanTri() {
 }
 
 const styles = {
-  // Login form styles
-  loginContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    background: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
-    fontFamily: "'Roboto', sans-serif",
-  },
-  loginForm: {
-    background: 'rgba(255, 255, 255, 0.95)',
-    padding: '40px',
-    borderRadius: '12px',
-    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
-    width: '100%',
-    maxWidth: '400px',
-    textAlign: 'center',
-  },
-  loginTitle: {
-    fontSize: '28px',
-    fontWeight: 'bold',
-    color: '#2e7d32',
-    marginBottom: '20px',
-    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.1)',
-  },
-  inputGroup: {
-    marginBottom: '20px',
-    textAlign: 'left',
-  },
-  label: {
-    fontSize: '16px',
-    color: '#1b5e20',
-    marginBottom: '8px',
-    display: 'block',
-  },
-  input: {
-    width: '100%',
-    padding: '12px',
-    fontSize: '16px',
-    border: '2px solid #81c784',
-    borderRadius: '8px',
-    outline: 'none',
-    transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
-  },
-  inputFocus: {
-    borderColor: '#2e7d32',
-    boxShadow: '0 0 8px rgba(46, 125, 50, 0.3)',
-  },
-  error: {
-    color: '#d32f2f',
-    fontSize: '14px',
-    marginBottom: '15px',
-  },
-  loginButton: {
-    width: '100%',
-    padding: '12px',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    color: '#ffffff',
-    background: '#2e7d32',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    transition: 'background 0.3s ease, transform 0.2s ease',
-  },
-  loginButtonHover: {
-    background: '#388e3c',
-    transform: 'scale(1.02)',
-  },
-
-  // Existing QuanTri styles
   container: {
     display: 'flex',
     minHeight: '100vh',
