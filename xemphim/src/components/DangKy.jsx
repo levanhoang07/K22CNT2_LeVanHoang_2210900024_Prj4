@@ -1,30 +1,53 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 export default function DangKy() {
   const [hoTen, setHoTen] = useState('');
   const [email, setEmail] = useState('');
+  const [sdt, setSdt] = useState('');
   const [matKhau, setMatKhau] = useState('');
   const [xacNhanMatKhau, setXacNhanMatKhau] = useState('');
   const [thongBao, setThongBao] = useState('');
+  const [dangXuLy, setDangXuLy] = useState(false);
 
-  const handleDangKy = (e) => {
+  const handleDangKy = async (e) => {
     e.preventDefault();
 
-    if (!hoTen || !email || !matKhau || !xacNhanMatKhau) {
-      setThongBao('Vui lòng nhập đầy đủ thông tin.');
+    if (!hoTen || !email || !sdt || !matKhau || !xacNhanMatKhau) {
+      setThongBao('❗ Vui lòng nhập đầy đủ thông tin.');
       return;
     }
 
     if (matKhau !== xacNhanMatKhau) {
-      setThongBao('Mật khẩu xác nhận không khớp.');
+      setThongBao('❗ Mật khẩu xác nhận không khớp.');
       return;
     }
 
-    setThongBao('Đăng ký thành công!');
-    setHoTen('');
-    setEmail('');
-    setMatKhau('');
-    setXacNhanMatKhau('');
+    try {
+      setDangXuLy(true);
+      const response = await axios.post('http://localhost:3000/api/dangky', {
+        hoTen,
+        email,
+        sdt,
+        matKhau,
+        role: 'user',
+      });
+
+      if (response.data.success) {
+        setThongBao('✅ Đăng ký thành công!');
+        setHoTen('');
+        setEmail('');
+        setSdt('');
+        setMatKhau('');
+        setXacNhanMatKhau('');
+      } else {
+        setThongBao(`❌ ${response.data.message || 'Đăng ký thất bại.'}`);
+      }
+    } catch (error) {
+      setThongBao(`❌ Lỗi kết nối hoặc lỗi máy chủ.`);
+    } finally {
+      setDangXuLy(false);
+    }
   };
 
   return (
@@ -55,6 +78,17 @@ export default function DangKy() {
         </div>
 
         <div className="input-group">
+          <label className="label">Số điện thoại:</label>
+          <input
+            type="text"
+            value={sdt}
+            onChange={(e) => setSdt(e.target.value)}
+            placeholder="Nhập số điện thoại"
+            className="input"
+          />
+        </div>
+
+        <div className="input-group">
           <label className="label">Mật khẩu:</label>
           <input
             type="password"
@@ -76,8 +110,8 @@ export default function DangKy() {
           />
         </div>
 
-        <button type="submit" className="dang-nhap-button">
-          Đăng Ký
+        <button type="submit" className="dang-nhap-button" disabled={dangXuLy}>
+          {dangXuLy ? 'Đang xử lý...' : 'Đăng Ký'}
         </button>
 
         {thongBao && (
@@ -85,6 +119,10 @@ export default function DangKy() {
             {thongBao}
           </p>
         )}
+
+        <p className="dang-nhap-link">
+          Đã có tài khoản? <a href="/dangnhap">Đăng nhập</a>
+        </p>
       </form>
 
       <style>
@@ -179,6 +217,22 @@ export default function DangKy() {
 
           .thong-bao.error {
             color: #d32f2f;
+          }
+
+          .dang-nhap-link {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+          }
+
+          .dang-nhap-link a {
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: 500;
+          }
+
+          .dang-nhap-link a:hover {
+            text-decoration: underline;
           }
 
           @media (max-width: 480px) {

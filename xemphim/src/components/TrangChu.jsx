@@ -1,23 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
-const danhSachPhim = [
-  { id: 1, ten: 'Mắt Biếc', moTa: 'Phim tình cảm học đường.', anh: 'https://th.bing.com/th/id/R.ced5017cb4ee94fe71611036f6a89a36?rik=XGQVDZCpFRmYsw&pid=ImgRaw&r=0' },
-  { id: 2, ten: 'Hai Phượng', moTa: 'Phim hành động Việt Nam.', anh: 'https://th.bing.com/th/id/R.52a8160aa3cf0afa720d31755c9c0b04?rik=BmNRA1LTlnolsw&riu=http%3a%2f%2fwww.impawards.com%2fintl%2fvietnam%2f2019%2fposters%2fhai_phuong_ver2.jpg&ehk=yP51yBZZ8o4wHgUpd4C%2bPRgoMYPhVI8KWhYIZcvjAD0%3d&risl=&pid=ImgRaw&r=0' },
-  { id: 3, ten: 'Em Chưa 18', moTa: 'Phim hài lãng mạn tuổi teen.', anh: 'https://static.tuoitre.vn/tto/i/s626/2017/04/06/1-1491445646.jpg' },
-  { id: 4, ten: 'Bố Già', moTa: 'Phim gia đình cảm động.', anh: 'https://th.bing.com/th/id/OIP.o9DHR35-qyyhNEhhiI8nlQHaK-?rs=1&pid=ImgDetMain' },
-  { id: 5, ten: 'Tiệc Trăng Máu', moTa: 'Phim tâm lý xã hội.', anh: 'https://th.bing.com/th/id/OIP.wBnourAYqCKkpYk0tqm_NwAAAA?rs=1&pid=ImgDetMain' },
-  { id: 6, ten: 'Ròm', moTa: 'Phim về tuổi trẻ và đường phố.', anh: 'https://th.bing.com/th/id/OIP.vLOAqQuI9p8eghlQsvzXAgHaK-?rs=1&pid=ImgDetMain' },
-  { id: 7, ten: 'Tháng Năm Rực Rỡ', moTa: 'Phim thanh xuân nữ sinh.', anh: 'https://th.bing.com/th/id/OIP.SaMkkU3u5qmFGVagrNMeJgHaK-?rs=1&pid=ImgDetMain' },
-  { id: 8, ten: 'Lật Mặt 7', moTa: 'Phim tình cảm gia đình.', anh: 'https://th.bing.com/th/id/OIP.zvN3Ljo5Cz94IMPkEVP31AHaLH?rs=1&pid=ImgDetMain' },
-  { id: 9, ten: 'Trạng Tí', moTa: 'Phim phiêu lưu hài hước.', anh: 'https://touchcinema.com/uploads/phim-2021/61b4633451b0a2eefba1-poster.jpg' },
-  { id: 10, ten: 'Avatar 22', moTa: 'Phim khoa học viễn tưởng.', anh: 'https://th.bing.com/th/id/R.88386fe549d83e6ae16b49f8543e4baa?rik=lEi3KbbTR1V1hw&pid=ImgRaw&r=0' },
-];
 
 export default function TrangChu() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [phimList, setPhimList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredPhim = danhSachPhim.filter(phim =>
+  // Fetch phim from API
+  useEffect(() => {
+    fetch('http://localhost:5000/api/phim') // Đảm bảo URL này trỏ đến API backend của bạn
+      .then((response) => response.json())
+      .then((data) => {
+        setPhimList(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Lỗi khi lấy dữ liệu phim: ", error);
+        setLoading(false);
+      });
+  }, []);
+
+  const filteredPhim = phimList.filter(phim =>
     phim.ten.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -52,8 +55,8 @@ export default function TrangChu() {
           </nav>
         </header>
       </div>
+
       <div className="trangchu-container">
-        
         <h1>Phim Đang Chiếu</h1>
         <div className="search-bar">
           <input
@@ -63,8 +66,11 @@ export default function TrangChu() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+
         <div className="phim-grid">
-          {filteredPhim.length > 0 ? (
+          {loading ? (
+            <p>Đang tải dữ liệu...</p>
+          ) : filteredPhim.length > 0 ? (
             filteredPhim.map(phim => (
               <div key={phim.id} className="phim-card">
                 <img src={phim.anh} alt={phim.ten} />
@@ -78,6 +84,8 @@ export default function TrangChu() {
           )}
         </div>
       </div>
+
+      {/* Footer */}
       <footer className="footer">
         <div className="footer-container">
           <div className="footer-section">
@@ -96,8 +104,8 @@ export default function TrangChu() {
           <div className="footer-section">
             <h4>Liên hệ</h4>
             <p>Email: support@doremicinema.com</p>
-            <p>Điện thoại: 0123 456 789</p>
-            <p>Địa chỉ: 123 Đường Điện Ảnh, TP. Hồ Chí Minh</p>
+            <p>Điện thoại: 0982121680</p>
+            <p>Địa chỉ: Tòa nhà Thủy Lợi 28A Lê Trọng Tấn, Hà Đông, Hà Nội</p>
           </div>
           <div className="footer-section">
             <h4>Theo dõi chúng tôi</h4>
@@ -113,7 +121,7 @@ export default function TrangChu() {
           <p>© 2025 Doremi Cinema. All Rights Reserved.</p>
         </div>
       </footer>
-
+      
       <style>
         {`
           .trangchu-container {
@@ -302,7 +310,7 @@ export default function TrangChu() {
           }
         `}
       </style>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     </>
+    
   );
 }

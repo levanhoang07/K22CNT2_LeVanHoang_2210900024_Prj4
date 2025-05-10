@@ -1,24 +1,34 @@
 import React, { useState } from 'react';
+import axios from 'axios'; // Gửi request đến backend
 
 export default function DangNhap() {
-  const [email, setEmail] = useState('');
+  const [tenDangNhap, setTenDangNhap] = useState('');
   const [matKhau, setMatKhau] = useState('');
   const [thongBao, setThongBao] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Kiểm tra đơn giản
-    if (!email || !matKhau) {
-      setThongBao('Vui lòng nhập đầy đủ email và mật khẩu.');
+    if (!tenDangNhap || !matKhau) {
+      setThongBao('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.');
       return;
     }
 
-    // Giả sử kiểm tra đúng thông tin
-    if (email === 'user@example.com' && matKhau === '123456') {
-      setThongBao('Đăng nhập thành công!');
-    } else {
-      setThongBao('Sai email hoặc mật khẩu.');
+    try {
+      const response = await axios.post('http://localhost:3001/api/dangnhap', {
+        tenDangNhap,
+        matKhau
+      });
+
+      if (response.data.success) {
+        setThongBao('Đăng nhập thành công!');
+        // Có thể lưu thông tin user vào localStorage hoặc điều hướng trang
+      } else {
+        setThongBao('Sai tên đăng nhập hoặc mật khẩu.');
+      }
+    } catch (error) {
+      console.error(error);
+      setThongBao('Lỗi kết nối đến máy chủ.');
     }
   };
 
@@ -29,12 +39,12 @@ export default function DangNhap() {
           <h1 className="dang-nhap-title">🔐 Đăng Nhập</h1>
           <form onSubmit={handleSubmit}>
             <div className="input-group">
-              <label className="label">Email</label>
+              <label className="label">Tên đăng nhập</label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Nhập email"
+                type="text"
+                value={tenDangNhap}
+                onChange={(e) => setTenDangNhap(e.target.value)}
+                placeholder="Nhập tên đăng nhập"
                 className="input"
                 required
               />
@@ -57,6 +67,9 @@ export default function DangNhap() {
               {thongBao}
             </p>
           )}
+          <p className="chua-co-tai-khoan">
+            Nếu bạn chưa có tài khoản, vui lòng <a href="/dangky">Đăng ký</a>.
+          </p>
         </div>
       </div>
 
@@ -152,6 +165,22 @@ export default function DangNhap() {
 
           .thong-bao.error {
             color: #d32f2f;
+          }
+
+          .chua-co-tai-khoan {
+            margin-top: 16px;
+            font-size: 14px;
+            color: #555;
+          }
+
+          .chua-co-tai-khoan a {
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: bold;
+          }
+
+          .chua-co-tai-khoan a:hover {
+            text-decoration: underline;
           }
 
           @media (max-width: 480px) {
