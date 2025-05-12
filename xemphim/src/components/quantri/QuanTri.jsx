@@ -1,32 +1,38 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom'; // Thêm Outlet để render các Route con
 
 export default function QuanTri() {
   return (
     <>
       <div style={styles.container}>
+        {/* Sidebar */}
         <div style={styles.sidebar}>
           <h2 style={styles.sidebarTitle}>Quản Trị</h2>
           <nav style={styles.nav}>
-            <Link to="/quantri/phim" style={styles.navLink}>
-              <i className="fas fa-film" style={styles.icon}></i> Quản lý phim
-            </Link>
-            <Link to="/quantri/suatchieu" style={styles.navLink}>
-              <i className="fas fa-clock" style={styles.icon}></i> Quản lý suất chiếu
-            </Link>
-            <Link to="/quantri/nguoidung" style={styles.navLink}>
-              <i className="fas fa-users" style={styles.icon}></i> Quản lý người dùng
-            </Link>
-            <Link to="/quantri/thongke" style={styles.navLink}>
-              <i className="fas fa-chart-bar" style={styles.icon}></i> Thống kê
-            </Link>
+            {/* Các liên kết cho các route con */}
+            <Link to="nguoidung" style={styles.navLink}>Quản lý người dùng</Link>
+            <Link to="phim" style={styles.navLink}>Quản lý phim</Link>
+            <Link to="suatchieu" style={styles.navLink}>Quản lý suất chiếu</Link>
+            <Link to="phongchieu" style={styles.navLink}>Quản lý phòng chiếu</Link>
+            <Link to="ghe" style={styles.navLink}>Quản lý ghế</Link>
+            <Link to="vedat" style={styles.navLink}>Quản lý vé đặt</Link>
           </nav>
         </div>
+
+        {/* Nội dung chính */}
         <div style={styles.content}>
           <h2 style={styles.greeting}>Chào mừng bạn đến với hệ thống Quản lý Phim Doremi Cinema</h2>
+
+          {/* Đây là nơi các route con sẽ được render */}
+          <Outlet />
         </div>
       </div>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+      {/* Thêm Font Awesome nếu cần */}
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      />
     </>
   );
 }

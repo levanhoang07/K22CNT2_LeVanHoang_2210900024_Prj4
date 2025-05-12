@@ -1,187 +1,205 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
-export default function QuanLyNguoiDung() {
-  const [danhSach, setDanhSach] = useState([
-    { id: 1, ten: 'Nguyễn Văn A', email: 'a@example.com', matKhau: '123456', vaiTro: 'Admin' },
-    { id: 2, ten: 'Trần Thị B', email: 'b@example.com', matKhau: 'abcdef', vaiTro: 'User' },
-  ]);
+const QuanLyNguoiDung = () => {
+  const [nguoiDungList, setNguoiDungList] = useState([]);
+  const [form, setForm] = useState({
+    ten_dang_nhap: '',
+    mat_khau: '',
+    ho_ten: '',
+    email: '',
+    so_dien_thoai: '',
+    la_quan_tri: false,
+  });
+  const [loading, setLoading] = useState(false);
 
-  const [nguoiDungMoi, setNguoiDungMoi] = useState({ ten: '', email: '', matKhau: '', vaiTro: 'User' });
-  const [dangSuaId, setDangSuaId] = useState(null);
-
-  // Track the last used ID
-  const [lastId, setLastId] = useState(2);
-
-  const handleThayDoi = (e) => {
-    setNguoiDungMoi({ ...nguoiDungMoi, [e.target.name]: e.target.value });
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get('/api/nguoidung');
+      setNguoiDungList(res.data);
+    } catch (err) {
+      console.error('Lỗi khi tải danh sách:', err);
+      alert('Không thể tải danh sách người dùng.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleThem = () => {
-    if (!nguoiDungMoi.ten || !nguoiDungMoi.email || !nguoiDungMoi.matKhau) return;
-    setDanhSach([
-      ...danhSach,
-      {
-        ...nguoiDungMoi,
-        id: lastId + 1, // Use the last ID and increment it
-      },
-    ]);
-    setLastId(lastId + 1); // Update the last used ID
-    setNguoiDungMoi({ ten: '', email: '', matKhau: '', vaiTro: 'User' });
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
   };
 
-  const handleXoa = (id) => {
-    setDanhSach(danhSach.filter((u) => u.id !== id));
-  };
-
-  const handleSua = (nguoiDung) => {
-    setDangSuaId(nguoiDung.id);
-    setNguoiDungMoi({
-      ten: nguoiDung.ten,
-      email: nguoiDung.email,
-      matKhau: nguoiDung.matKhau,
-      vaiTro: nguoiDung.vaiTro,
-    });
-  };
-
-  const handleCapNhat = () => {
-    setDanhSach(
-      danhSach.map((u) =>
-        u.id === dangSuaId ? { ...u, ...nguoiDungMoi } : u
-      )
-    );
-    setDangSuaId(null);
-    setNguoiDungMoi({ ten: '', email: '', matKhau: '', vaiTro: 'User' });
-  };
-
-  const styles = {
-    container: { padding: '20px', fontFamily: 'Arial, sans-serif' },
-    form: { marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' },
-    input: { padding: '8px', border: '1px solid #ccc', borderRadius: '4px' },
-    button: {
-      padding: '8px 16px',
-      border: 'none',
-      borderRadius: '4px',
-      backgroundColor: '#007bff',
-      color: 'white',
-      cursor: 'pointer',
-    },
-    table: {
-      width: '100%',
-      borderCollapse: 'collapse',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    },
-    th: {
-      backgroundColor: '#f4f4f4',
-      padding: '10px',
-      textAlign: 'left',
-      borderBottom: '2px solid #ddd',
-      borderRight: '1px solid #ddd',
-    },
-    td: {
-      padding: '10px',
-      borderBottom: '1px solid #ddd',
-      borderRight: '1px solid #ddd', // Add right border for columns
-    },
-    actionBtn: {
-      marginRight: '5px',
-      padding: '5px 10px',
-      border: 'none',
-      borderRadius: '4px',
-      cursor: 'pointer',
-    },
-    editBtn: { backgroundColor: '#ffc107', color: 'black' },
-    deleteBtn: { backgroundColor: '#dc3545', color: 'white' },
-    formContainer: { marginBottom: '20px' }, // Space between form and table
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('/api/nguoidung', form);
+      setForm({
+        ten_dang_nhap: '',
+        mat_khau: '',
+        ho_ten: '',
+        email: '',
+        so_dien_thoai: '',
+        la_quan_tri: false,
+      });
+      fetchData();
+    } catch (err) {
+      console.error('Lỗi khi thêm người dùng:', err);
+      alert('Không thể thêm người dùng.');
+    }
   };
 
   return (
-    <div style={styles.container}>
-      <h2>Quản Lý Người Dùng</h2>
+    <div className="container">
+      <h2 className="heading">Quản Lý Người Dùng</h2>
 
-      <div style={styles.formContainer}>
-        <div style={styles.form}>
+      <form onSubmit={handleSubmit} className="form-grid">
+        <input
+          name="ten_dang_nhap"
+          placeholder="Tên đăng nhập"
+          value={form.ten_dang_nhap}
+          onChange={handleChange}
+          required
+        />
+        <input
+          name="mat_khau"
+          type="password"
+          placeholder="Mật khẩu"
+          value={form.mat_khau}
+          onChange={handleChange}
+          required
+        />
+        <input
+          name="ho_ten"
+          placeholder="Họ tên"
+          value={form.ho_ten}
+          onChange={handleChange}
+        />
+        <input
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+        />
+        <input
+          name="so_dien_thoai"
+          placeholder="Số điện thoại"
+          value={form.so_dien_thoai}
+          onChange={handleChange}
+        />
+        <label className="checkbox-label">
           <input
-            style={styles.input}
-            type="text"
-            name="ten"
-            placeholder="Tên"
-            value={nguoiDungMoi.ten}
-            onChange={handleThayDoi}
+            type="checkbox"
+            name="la_quan_tri"
+            checked={form.la_quan_tri}
+            onChange={handleChange}
           />
-          <input
-            style={styles.input}
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={nguoiDungMoi.email}
-            onChange={handleThayDoi}
-          />
-          <input
-            style={styles.input}
-            type="text" // Change this from 'password' to 'text'
-            name="matKhau"
-            placeholder="Mật khẩu"
-            value={nguoiDungMoi.matKhau}
-            onChange={handleThayDoi}
-          />
-          <select
-            name="vaiTro"
-            value={nguoiDungMoi.vaiTro}
-            onChange={handleThayDoi}
-            style={styles.input}
-          >
-            <option value="User">User</option>
-            <option value="Admin">Admin</option>
-          </select>
-          {dangSuaId ? (
-            <button style={{ ...styles.button, backgroundColor: '#28a745' }} onClick={handleCapNhat}>
-              Cập nhật
-            </button>
-          ) : (
-            <button style={styles.button} onClick={handleThem}>
-              Thêm
-            </button>
-          )}
-        </div>
-      </div>
+          Quản trị
+        </label>
+        <button type="submit">Thêm người dùng</button>
+      </form>
 
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th style={styles.th}>ID</th>
-            <th style={styles.th}>Tên</th>
-            <th style={styles.th}>Email</th>
-            <th style={styles.th}>Mật khẩu</th>
-            <th style={styles.th}>Vai trò</th>
-            <th style={styles.th}>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          {danhSach.map((nguoiDung) => (
-            <tr key={nguoiDung.id}>
-              <td style={styles.td}>{nguoiDung.id}</td>
-              <td style={styles.td}>{nguoiDung.ten}</td>
-              <td style={styles.td}>{nguoiDung.email}</td>
-              <td style={styles.td}>{nguoiDung.matKhau}</td>
-              <td style={styles.td}>{nguoiDung.vaiTro}</td>
-              <td style={styles.td}>
-                <button
-                  style={{ ...styles.actionBtn, ...styles.editBtn }}
-                  onClick={() => handleSua(nguoiDung)}
-                >
-                  Sửa
-                </button>
-                <button
-                  style={{ ...styles.actionBtn, ...styles.deleteBtn }}
-                  onClick={() => handleXoa(nguoiDung.id)}
-                >
-                  Xóa
-                </button>
-              </td>
+      {loading ? (
+        <p>Đang tải...</p>
+      ) : (
+        <table className="styled-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tên đăng nhập</th>
+              <th>Họ tên</th>
+              <th>Email</th>
+              <th>SĐT</th>
+              <th>Quản trị</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {nguoiDungList.map((nd) => (
+              <tr key={nd.nguoidung_id}>
+                <td>{nd.nguoidung_id}</td>
+                <td>{nd.ten_dang_nhap}</td>
+                <td>{nd.ho_ten}</td>
+                <td>{nd.email}</td>
+                <td>{nd.so_dien_thoai}</td>
+                <td>{nd.la_quan_tri ? '✔️' : '❌'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {/* CSS nội tuyến đưa cuối file */}
+      <style>{`
+        .container {
+          padding: 20px;
+          font-family: Arial, sans-serif;
+        }
+
+        .heading {
+          text-align: center;
+          color:rgb(0, 170, 20);
+        }
+
+        .form-grid {
+          margin-bottom: 20px;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 10px;
+        }
+
+        .form-grid input,
+        .form-grid button {
+          padding: 8px;
+          border-radius: 4px;
+          border: 1px solid #ccc;
+        }
+
+        .form-grid button {
+          grid-column: span 2;
+          background-color:  #27ae60;
+          color: white;
+          border: none;
+          cursor: pointer;
+          transition: background 0.3s ease;
+        }
+
+        .form-grid button:hover {
+          background-color: #1e8449;
+        }
+
+        .checkbox-label {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+
+        .styled-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        .styled-table th,
+        .styled-table td {
+          padding: 10px;
+          border: 1px solid #ddd;
+          text-align: center;
+        }
+
+        .styled-table th {
+          background-color: #f2f2f2;
+        }
+
+        .styled-table tr:nth-child(even) {
+          background-color: #f9f9f9;
+        }
+      `}</style>
     </div>
   );
-}
+};
+
+export default QuanLyNguoiDung;
