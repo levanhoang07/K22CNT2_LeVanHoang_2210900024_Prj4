@@ -6,9 +6,8 @@ export default function TrangChu() {
   const [phimList, setPhimList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch phim from API
   useEffect(() => {
-    fetch('http://localhost:5000/api/phim') // Đảm bảo URL này trỏ đến API backend của bạn
+    fetch('http://localhost:5000/api/phim')
       .then((response) => response.json())
       .then((data) => {
         setPhimList(data);

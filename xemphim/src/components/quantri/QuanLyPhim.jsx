@@ -8,6 +8,8 @@ export default function QuanLyPhim() {
   const [thoiLuong, setThoiLuong] = useState('');
   const [giaTien, setGiaTien] = useState('');
   const [anh, setAnh] = useState('');
+  const [editing, setEditing] = useState(false);
+  const [currentPhim, setCurrentPhim] = useState(null); // To track the movie being edited
 
   useEffect(() => {
     axios.get('/api/phim')
@@ -28,19 +30,52 @@ export default function QuanLyPhim() {
     e.preventDefault();
     const newPhim = { ten, tacGia, thoiLuong, giaTien, anh };
 
-    axios.post('/api/phim', newPhim)
-      .then(res => {
-        setPhimList([...phimList, res.data]);
-        setTen('');
-        setTacGia('');
-        setThoiLuong('');
-        setGiaTien('');
-        setAnh('');
-      })
-      .catch(err => {
-        console.error('Lỗi khi thêm phim:', err);
-        alert('Không thể thêm phim.');
-      });
+    if (editing) {
+      // Update existing movie
+      axios.put(`/api/phim/${currentPhim.id}`, newPhim)
+        .then(res => {
+          const updatedPhimList = phimList.map(phim =>
+            phim.id === currentPhim.id ? res.data : phim
+          );
+          setPhimList(updatedPhimList);
+          setEditing(false);
+          setCurrentPhim(null);
+          resetForm();
+        })
+        .catch(err => {
+          console.error('Lỗi khi cập nhật phim:', err);
+          alert('Không thể cập nhật phim.');
+        });
+    } else {
+      // Add new movie
+      axios.post('/api/phim', newPhim)
+        .then(res => {
+          setPhimList([...phimList, res.data]);
+          resetForm();
+        })
+        .catch(err => {
+          console.error('Lỗi khi thêm phim:', err);
+          alert('Không thể thêm phim.');
+        });
+    }
+  };
+
+  const handleEditPhim = (phim) => {
+    setEditing(true);
+    setCurrentPhim(phim);
+    setTen(phim.ten);
+    setTacGia(phim.tacGia);
+    setThoiLuong(phim.thoiLuong);
+    setGiaTien(phim.giaTien);
+    setAnh(phim.anh);
+  };
+
+  const resetForm = () => {
+    setTen('');
+    setTacGia('');
+    setThoiLuong('');
+    setGiaTien('');
+    setAnh('');
   };
 
   return (
@@ -48,7 +83,7 @@ export default function QuanLyPhim() {
       <h3 className="title">Quản lý Phim</h3>
 
       <div className="form-container">
-        <h4>Thêm Phim Mới</h4>
+        <h4>{editing ? 'Cập nhật Phim' : 'Thêm Phim Mới'}</h4>
         <form onSubmit={handleThemPhim} className="form-grid">
           <input
             type="text"
@@ -85,7 +120,7 @@ export default function QuanLyPhim() {
             onChange={(e) => setAnh(e.target.value)}
             required
           />
-          <button type="submit">Lưu Phim</button>
+          <button type="submit">{editing ? 'Cập nhật Phim' : 'Lưu Phim'}</button>
         </form>
       </div>
 
@@ -109,6 +144,9 @@ export default function QuanLyPhim() {
                 <td>{phim.thoiLuong}</td>
                 <td>{phim.giaTien}</td>
                 <td>
+                  <button className="edit-button" onClick={() => handleEditPhim(phim)}>
+                    Sửa
+                  </button>
                   <button className="delete-button" onClick={() => handleXoaPhim(phim.id)}>
                     Xóa
                   </button>
@@ -182,6 +220,19 @@ export default function QuanLyPhim() {
 
         .styled-table tr:nth-child(even) {
           background-color: #f9f9f9;
+        }
+
+        .edit-button {
+          color: white;
+          background-color: orange;
+          border: none;
+          padding: 6px 12px;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+
+        .edit-button:hover {
+          background-color: darkorange;
         }
 
         .delete-button {

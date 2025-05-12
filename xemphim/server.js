@@ -8,7 +8,7 @@ app.use(cors());
 const config = {
   user: 'lvh2210900024',
   password: 'hoang123',
-  server: 'localhost',
+  server: 'LEVANHOANG\LEVANHOANG',
   database: 'VeXemPhim1',
   connectionTimeout: 30000,
   requestTimeout: 30000,
@@ -18,7 +18,7 @@ const config = {
   },
 };
 
-app.get('/api/phim', async (req, res) => {
+app.get('/api/phim/', async (req, res) => {
   try {
     await sql.connect(config);
     const result = await sql.query('SELECT * FROM phim');

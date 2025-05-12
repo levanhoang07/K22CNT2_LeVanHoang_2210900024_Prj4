@@ -12,6 +12,8 @@ const QuanLySuatChieu = () => {
     gio_bat_dau: '',
     gia_ve: ''
   });
+  const [editing, setEditing] = useState(false);
+  const [currentSuat, setCurrentSuat] = useState(null);  // Store the current showtime being edited
 
   const fetchSuatChieu = () => {
     axios.get('/api/suatchieu')
@@ -45,20 +47,49 @@ const QuanLySuatChieu = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/suatchieu', form);
+      if (editing) {
+        // Update existing showtime
+        await axios.put(`/api/suatchieu/${currentSuat.suat_chieu_id}`, form);
+        setEditing(false);  // Reset edit mode
+      } else {
+        // Create new showtime
+        await axios.post('/api/suatchieu', form);
+      }
       setForm({ phim_id: '', phong_id: '', ngay_chieu: '', gio_bat_dau: '', gia_ve: '' });
       fetchSuatChieu();
     } catch (err) {
-      console.error('Lỗi khi thêm suất chiếu:', err);
-      alert('Không thể thêm suất chiếu.');
+      console.error('Lỗi khi thêm hoặc cập nhật suất chiếu:', err);
+      alert('Không thể thêm hoặc cập nhật suất chiếu.');
+    }
+  };
+
+  const handleEdit = (suat) => {
+    setEditing(true);
+    setCurrentSuat(suat);
+    setForm({
+      phim_id: suat.phim_id,
+      phong_id: suat.phong_id,
+      ngay_chieu: suat.ngay_chieu,
+      gio_bat_dau: suat.gio_bat_dau,
+      gia_ve: suat.gia_ve
+    });
+  };
+
+  const handleDelete = async (suat_id) => {
+    try {
+      await axios.delete(`/api/suatchieu/${suat_id}`);
+      fetchSuatChieu();
+    } catch (err) {
+      console.error('Lỗi khi xóa suất chiếu:', err);
+      alert('Không thể xóa suất chiếu.');
     }
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div className="container">
       <h2>Quản Lý Suất Chiếu</h2>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
+      <form onSubmit={handleSubmit}>
         <select
           name="phim_id"
           value={form.phim_id}
@@ -109,10 +140,10 @@ const QuanLySuatChieu = () => {
           onChange={handleChange}
           required
         />
-        <button type="submit">Thêm suất chiếu</button>
+        <button type="submit">{editing ? 'Cập nhật suất chiếu' : 'Thêm suất chiếu'}</button>
       </form>
 
-      <table border="1" cellPadding="8" cellSpacing="0">
+      <table>
         <thead>
           <tr>
             <th>ID</th>
@@ -121,6 +152,7 @@ const QuanLySuatChieu = () => {
             <th>Ngày chiếu</th>
             <th>Giờ bắt đầu</th>
             <th>Giá vé</th>
+            <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
@@ -135,11 +167,82 @@ const QuanLySuatChieu = () => {
                 <td>{suat.ngay_chieu}</td>
                 <td>{suat.gio_bat_dau}</td>
                 <td>{parseInt(suat.gia_ve).toLocaleString()} đ</td>
+                <td>
+                  <button onClick={() => handleEdit(suat)}>Sửa</button>
+                  <button onClick={() => handleDelete(suat.suat_chieu_id)}>Xóa</button>
+                </td>
               </tr>
             );
           })}
         </tbody>
       </table>
+
+      <style jsx>{`
+        .container {
+          padding: 20px;
+          font-family: Arial, sans-serif;
+        }
+
+        h2 {
+          color: #333;
+          margin-bottom: 20px;
+        }
+
+        form {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          margin-bottom: 20px;
+        }
+
+        select, input, button {
+          padding: 8px;
+          font-size: 16px;
+          border-radius: 5px;
+          border: 1px solid #ddd;
+        }
+
+        select:focus, input:focus {
+          outline-color: #4CAF50;
+        }
+
+        button {
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          cursor: pointer;
+          font-size: 16px;
+        }
+
+        button:hover {
+          background-color: #45a049;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+        }
+
+        th, td {
+          padding: 10px;
+          text-align: center;
+          border: 1px solid #ddd;
+        }
+
+        th {
+          background-color: #f4f4f4;
+          font-weight: bold;
+        }
+
+        td {
+          background-color: #fff;
+        }
+
+        td:nth-child(odd) {
+          background-color: #f9f9f9;
+        }
+      `}</style>
     </div>
   );
 };

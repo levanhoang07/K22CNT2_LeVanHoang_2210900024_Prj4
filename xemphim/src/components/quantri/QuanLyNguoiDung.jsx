@@ -12,7 +12,10 @@ const QuanLyNguoiDung = () => {
     la_quan_tri: false,
   });
   const [loading, setLoading] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null); // Store the user being edited
 
+  // Fetch users from the backend
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -38,7 +41,15 @@ const QuanLyNguoiDung = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/nguoidung', form);
+      if (editing) {
+        // Update the existing user
+        await axios.put(`/api/nguoidung/${currentUser.nguoidung_id}`, form);
+        setEditing(false); // Reset to create mode
+        setCurrentUser(null);
+      } else {
+        // Create a new user
+        await axios.post('/api/nguoidung', form);
+      }
       setForm({
         ten_dang_nhap: '',
         mat_khau: '',
@@ -47,10 +58,33 @@ const QuanLyNguoiDung = () => {
         so_dien_thoai: '',
         la_quan_tri: false,
       });
+      fetchData(); // Refresh the user list
+    } catch (err) {
+      console.error('Lỗi khi thêm hoặc cập nhật người dùng:', err);
+      alert('Không thể thêm hoặc cập nhật người dùng.');
+    }
+  };
+
+  const handleEdit = (user) => {
+    setEditing(true);
+    setCurrentUser(user);
+    setForm({
+      ten_dang_nhap: user.ten_dang_nhap,
+      mat_khau: user.mat_khau,
+      ho_ten: user.ho_ten,
+      email: user.email,
+      so_dien_thoai: user.so_dien_thoai,
+      la_quan_tri: user.la_quan_tri,
+    });
+  };
+
+  const handleDelete = async (userId) => {
+    try {
+      await axios.delete(`/api/nguoidung/${userId}`);
       fetchData();
     } catch (err) {
-      console.error('Lỗi khi thêm người dùng:', err);
-      alert('Không thể thêm người dùng.');
+      console.error('Lỗi khi xóa người dùng:', err);
+      alert('Không thể xóa người dùng.');
     }
   };
 
@@ -101,7 +135,7 @@ const QuanLyNguoiDung = () => {
           />
           Quản trị
         </label>
-        <button type="submit">Thêm người dùng</button>
+        <button type="submit">{editing ? 'Cập nhật người dùng' : 'Thêm người dùng'}</button>
       </form>
 
       {loading ? (
@@ -116,6 +150,7 @@ const QuanLyNguoiDung = () => {
               <th>Email</th>
               <th>SĐT</th>
               <th>Quản trị</th>
+              <th>Hành động</th>
             </tr>
           </thead>
           <tbody>
@@ -127,6 +162,10 @@ const QuanLyNguoiDung = () => {
                 <td>{nd.email}</td>
                 <td>{nd.so_dien_thoai}</td>
                 <td>{nd.la_quan_tri ? '✔️' : '❌'}</td>
+                <td>
+                  <button onClick={() => handleEdit(nd)}>Sửa</button>
+                  <button onClick={() => handleDelete(nd.nguoidung_id)}>Xóa</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -196,6 +235,18 @@ const QuanLyNguoiDung = () => {
 
         .styled-table tr:nth-child(even) {
           background-color: #f9f9f9;
+        }
+
+        .styled-table button {
+          background-color: #f39c12;
+          color: white;
+          border: none;
+          padding: 5px 10px;
+          cursor: pointer;
+        }
+
+        .styled-table button:hover {
+          background-color: #e67e22;
         }
       `}</style>
     </div>

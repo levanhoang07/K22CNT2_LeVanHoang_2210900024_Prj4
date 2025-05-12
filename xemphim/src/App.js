@@ -21,6 +21,7 @@ function App() {
       <div className="App">
         <main>
           <Routes>
+            {/* Các route chính */}
             <Route path="/" element={<TrangChu />} />
             <Route path="/phim/:id" element={<ChiTietPhim />} />
             <Route path="/datve/:id" element={<DatVe />} />
