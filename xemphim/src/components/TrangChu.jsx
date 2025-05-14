@@ -117,7 +117,7 @@ export default function TrangChu() {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>© 2025 Doremi Cinema. All Rights Reserved.</p>
+          <p>© 2025 Doremi Cinema. Nơi dâng trào cảm xúc.</p>
         </div>
       </footer>
       

@@ -83,7 +83,6 @@ export default function QuanLyPhim() {
       <h3 className="title">Quản lý Phim</h3>
 
       <div className="form-container">
-        <h4>{editing ? 'Cập nhật Phim' : 'Thêm Phim Mới'}</h4>
         <form onSubmit={handleThemPhim} className="form-grid">
           <input
             type="text"
