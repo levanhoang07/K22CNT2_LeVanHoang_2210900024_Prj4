@@ -8,14 +8,15 @@ app.use(cors());
 const config = {
   user: 'lvh2210900024',
   password: 'hoang123',
-  server: 'LEVANHOANG\LEVANHOANG',
+  server: 'LEVANHOANG',  // server name (máy chủ)
   database: 'VeXemPhim1',
-  connectionTimeout: 30000,
-  requestTimeout: 30000,
   options: {
-    encrypt: true,
+    instanceName: 'LEVANHOANG',  // instance name
+    encrypt: false,
     trustServerCertificate: true,
   },
+  connectionTimeout: 30000,
+  requestTimeout: 30000,
 };
 
 app.get('/api/phim/', async (req, res) => {
@@ -25,7 +26,7 @@ app.get('/api/phim/', async (req, res) => {
     res.json(result.recordset);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Có lỗi xảy ra khi lấy dữ liệu.');
+    res.status(500).json({ error: err.message });
   }
 });
 

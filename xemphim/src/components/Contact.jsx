@@ -1,30 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
-export default function TrangChu() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [phimList, setPhimList] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('http://localhost:5000/api/phim')
-      .then((response) => response.json())
-      .then((data) => {
-        setPhimList(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Lỗi khi lấy dữ liệu phim: ", error);
-        setLoading(false);
-      });
-  }, []);
-
-  const filteredPhim = phimList.filter(phim =>
-    phim.ten.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+export default function Contact() {
   return (
     <>
+
       <div className="App">
         <header className="App-header">
           <div className="nav-left">
@@ -48,35 +28,66 @@ export default function TrangChu() {
         </header>
       </div>
 
-      <div className="trangchu-container">
-        <h1>Phim Đang Chiếu</h1>
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Tìm kiếm phim..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      <div className="contact-container">
+        <h1>Liên Hệ Với Chúng Tôi</h1>
+        <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn. Hãy liên hệ với Doremi Cinema qua các kênh sau:</p>
+
+        <div className="contact-info-grid">
+          <div className="contact-info-item">
+            <i className="fas fa-map-marker-alt icon"></i>
+            <div>
+              <h3>Địa chỉ</h3>
+              <p>28A Lê Trọng Tấn, Hà Đông, Hà Nội</p>
+            </div>
+          </div>
+          <div className="contact-info-item">
+            <i className="fas fa-envelope icon"></i>
+            <div>
+              <h3>Email</h3>
+              <p><a href="mailto:support@doremicinema.com">support@doremicinema.com</a></p>
+            </div>
+          </div>
+          <div className="contact-info-item">
+            <i className="fas fa-phone-alt icon"></i>
+            <div>
+              <h3>Điện thoại</h3>
+              <p><a href="tel:0982121680">0982 121 680</a></p>
+            </div>
+          </div>
+          <div className="contact-info-item">
+            <i className="fas fa-clock icon"></i>
+            <div>
+              <h3>Giờ mở cửa</h3>
+              <p>09:00 - 22:00 (Thứ 2 - Chủ nhật)</p>
+            </div>
+          </div>
+          <div className="contact-info-item">
+            <i className="fab fa-facebook-f icon"></i>
+            <div>
+              <h3>Fanpage Facebook</h3>
+              <p>
+                <a href="https://www.facebook.com/doremicinema" target="_blank" rel="noopener noreferrer">
+                  facebook.com/doremicinema
+                </a>
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="phim-grid">
-          {loading ? (
-            <p>Đang tải dữ liệu...</p>
-          ) : filteredPhim.length > 0 ? (
-            filteredPhim.map(phim => (
-              <div key={phim.id} className="phim-card">
-                <img src={phim.anh} alt={phim.ten} />
-                <h2>{phim.ten}</h2>
-                <p>{phim.moTa}</p>
-                <Link to={`/phim/${phim.id}`}>Xem chi tiết</Link>
-              </div>
-            ))
-          ) : (
-            <p>Không tìm thấy phim nào.</p>
-          )}
+        <h2>Bản Đồ</h2>
+        <div className="map-container">
+          <iframe
+            title="Bản đồ Doremi Cinema"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.378420578216!2d105.7462676!3d20.9710027!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3134531d639eaaab%3A0x1b23ce48070fe314!2zMjhBIMSQLiBMw6ogVHLhu5NuZyBU4bqnbiwgRMawxqFuZyBLaW5oLCBIw6AgxJDhu5FuZywgSMOgIE7hu5lpLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1715766261140!5m2!1svi!2s"
+            width="100%"
+            height="300"
+            style={{ border: 0, borderRadius: '8px' }}
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            />
         </div>
       </div>
-
       <footer className="footer">
         <div className="footer-container">
           <div className="footer-section">
@@ -154,96 +165,82 @@ export default function TrangChu() {
             text-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
           }
 
-          .trangchu-container {
-            padding: 40px;
+          .contact-container {
+            width: 100vw;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
             background: linear-gradient(to right, #d0f0c0, #e0f7df);
-            color: #2e7d32;
+            box-sizing: border-box;
+            color: #333;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
+            line-height: 1.6;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
           }
 
-          .trangchu-container h1 {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+          .contact-container h1 {
+            color: rgb(3, 136, 32);
+            margin-bottom: 15px;
+            font-weight: 700;
           }
 
-          .search-bar {
-            display: flex;
-            justify-content: center;
+          .contact-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
             margin-bottom: 30px;
           }
 
-          .search-bar input {
-            width: 100%;
-            max-width: 400px;
-            padding: 12px 16px;
-            font-size: 1rem;
-            border: 2px solid #2e7d32;
-            border-radius: 8px;
-            outline: none;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+          .contact-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            transition: box-shadow 0.3s;
           }
 
-          .search-bar input:focus {
-            border-color: #1b5e20;
-            box-shadow: 0 0 8px rgba(46, 125, 50, 0.3);
+          .contact-info-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
           }
 
-          .search-bar input::placeholder {
-            color: #81c784;
-          }
-
-          .phim-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 24px;
-          }
-
-          .phim-card {
-            background-color: #ffffffcc;
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            animation: fadeInUp 0.8s ease forwards;
-            opacity: 0;
-          }
-
-          .phim-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 12px 20px rgba(0,0,0,0.25);
-          }
-
-          .phim-card img {
-            width: 100%;
-            border-radius: 8px;
-            margin-bottom: 12px;
-          }
-
-          .phim-card h2 {
-            font-size: 1.2rem;
-            margin-bottom: 8px;
-            color: #388e3c;
-          }
-
-          .phim-card p {
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-          }
-
-          .phim-card a {
-            text-decoration: none;
+          .icon {
+            font-size: 1.8rem;
             color: #2e7d32;
-            font-weight: bold;
-            transition: color 0.2s;
+            margin-top: 4px;
+            min-width: 28px;
           }
 
-          .phim-card a:hover {
+          .contact-info-item h3 {
+            margin: 0 0 6px;
             color: #1b5e20;
-            text-shadow: 0 0 6px #a5d6a7;
+          }
+
+          .contact-info-item p {
+            margin: 0;
+            font-size: 1rem;
+          }
+
+          .contact-info-item a {
+            color: #1b5e20;
+            text-decoration: none;
+            font-weight: 600;
+          }
+
+          .contact-info-item a:hover {
+            color: #388e3c;
+            text-decoration: underline;
+          }
+
+          .map-container {
+            width: 100%;
+            height: 350px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
           }
 
           .footer {
@@ -271,14 +268,13 @@ export default function TrangChu() {
           }
 
           .footer-section ul li {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
           }
 
           .footer-section ul li a {
-            text-decoration: none;
             color: #1b5e20;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
+            text-decoration: none;
+            font-weight: 500;
           }
 
           .footer-section ul li a:hover {
@@ -288,40 +284,40 @@ export default function TrangChu() {
 
           .social-links {
             display: flex;
-            gap: 15px;
+            gap: 10px;
           }
 
           .social-icon {
-            color: #1b5e20;
-            font-size: 1.5rem;
-            transition: transform 0.3s ease, color 0.3s ease;
+            display: inline-block;
+            background-color: #2e7d32;
+            color: white;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            text-align: center;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            transition: background-color 0.3s;
           }
 
           .social-icon:hover {
-            color: #388e3c;
-            transform: scale(1.2);
+            background-color: #1b5e20;
           }
 
           .footer-bottom {
             text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #81c784;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #145214;
           }
 
-          .footer-bottom p {
-            font-size: 0.85rem;
-            color: #1b5e20;
-          }
-
-          @keyframes fadeInUp {
-            from {
-              transform: translateY(40px);
-              opacity: 0;
+          @media (max-width: 600px) {
+            .nav-links {
+              flex-direction: column;
+              gap: 10px;
             }
-            to {
-              transform: translateY(0);
-              opacity: 1;
+            .footer-container {
+              grid-template-columns: 1fr;
             }
           }
         `}

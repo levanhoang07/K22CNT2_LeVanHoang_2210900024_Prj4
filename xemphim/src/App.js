@@ -1,6 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TrangChu from './components/TrangChu';
+import About from './components/About';
+import Contact from './components/Contact';
+import Locations from './components/Locations';
 import ChiTietPhim from './components/ChiTietPhim';
 import DatVe from './components/DatVe';
 import GioVe from './components/GioVe';
@@ -24,6 +27,9 @@ function App() {
           <Routes>
             {/* Các route chính */}
             <Route path="/" element={<TrangChu />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/locations" element={<Locations />} />
             <Route path="/phim/:id" element={<ChiTietPhim />} />
             <Route path="/datve/:id" element={<DatVe />} />
             <Route path="/giove" element={<GioVe />} />
