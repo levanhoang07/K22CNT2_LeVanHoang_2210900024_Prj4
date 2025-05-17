@@ -1,27 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-
-const danhSachPhim = [
-  { id: 1, ten: 'Mắt Biếc' },
-  { id: 2, ten: 'Hai Phượng' },
-  { id: 3, ten: 'Em Chưa 18' },
-  { id: 4, ten: 'Bố Già' },
-  { id: 5, ten: 'Tiệc Trăng Máu' },
-  { id: 6, ten: 'Ròm' },
-  { id: 7, ten: 'Tháng Năm Rực Rỡ' },
-  { id: 8, ten: 'Lật Mặt 7' },
-  { id: 9, ten: 'Trạng Tí' },
-  { id: 10, ten: 'Avatar 2' },
-];
 
 export default function DatVe() {
   const { id } = useParams();
-  const phim = danhSachPhim.find(p => p.id === parseInt(id));
+
+  const [danhSachPhim, setDanhSachPhim] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [rap, setRap] = useState('');
   const [suatChieu, setSuatChieu] = useState('');
   const [gheDaChon, setGheDaChon] = useState([]);
 
+  // Lấy danh sách phim từ API khi component mount
+  useEffect(() => {
+    async function fetchPhim() {
+      try {
+        const response = await fetch('http://127.0.0.1:3000/api/phim'); // Thay URL bằng API thực tế
+        if (!response.ok) {
+          throw new Error('Lỗi khi lấy dữ liệu phim');
+        }
+        const data = await response.json();
+        setDanhSachPhim(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPhim();
+  }, []);
+
+  if (loading) return <p>Đang tải danh sách phim...</p>;
+  if (error) return <p style={{color: 'red'}}>Lỗi: {error}</p>;
+
+  // Tìm phim theo id trong danhSachPhim lấy từ API
+  const phim = danhSachPhim.find(p => p.id === parseInt(id));
   if (!phim) {
     return <p>Không tìm thấy phim.</p>;
   }
@@ -68,45 +82,39 @@ export default function DatVe() {
       </div>
 
       <div style={{ marginBottom: '10px', textAlign: 'center' }}>
-  <div style={{ marginBottom: '10px', fontSize: '20px', fontWeight: 'bold' }}>Màn Hình</div>
-  <div style={{ width: '25%', height: '20px', backgroundColor: '#ccc', margin: '0 auto' }}></div>
-</div>
-
-
-      <div style={{ marginBottom: '10px', textAlign: 'center' }}>
-</div>
-
-<div style={{ marginBottom: '10px' }}>
-  <label>💺 Chọn ghế:&nbsp;</label>
-  <div style={{ textAlign: 'center' }}>
-    {gheList.map((hang, index) => (
-      <div key={index} style={{ marginBottom: '10px' }}>
-        {hang.map((ghe, i) => (
-          <button
-            key={ghe}
-            onClick={() => handleChonGhe(ghe)}
-            style={{
-              margin: '5px',
-              padding: '10px',
-              backgroundColor: gheDaChon.includes(ghe) ? 'green' : 'lightgray',
-              color: gheDaChon.includes(ghe) ? 'white' : 'black',
-              border: '1px solid #ccc',
-              borderRadius: '5px',
-              cursor: 'pointer',
-            }}
-          >
-            {ghe}
-          </button>
-        ))}
-        
-        {index === 5 && (
-          <div style={{ marginLeft: '10px', display: 'inline-block', fontSize: '16px', color: 'brown' }}> Lối vào🚪</div>
-        )}
+        <div style={{ marginBottom: '10px', fontSize: '20px', fontWeight: 'bold' }}>Màn Hình</div>
+        <div style={{ width: '25%', height: '20px', backgroundColor: '#ccc', margin: '0 auto' }}></div>
       </div>
-    ))}
-  </div>
-</div>
 
+      <div style={{ marginBottom: '10px' }}>
+        <label>💺 Chọn ghế:&nbsp;</label>
+        <div style={{ textAlign: 'center' }}>
+          {gheList.map((hang, index) => (
+            <div key={index} style={{ marginBottom: '10px' }}>
+              {hang.map((ghe) => (
+                <button
+                  key={ghe}
+                  onClick={() => handleChonGhe(ghe)}
+                  style={{
+                    margin: '5px',
+                    padding: '10px',
+                    backgroundColor: gheDaChon.includes(ghe) ? 'green' : 'lightgray',
+                    color: gheDaChon.includes(ghe) ? 'white' : 'black',
+                    border: '1px solid #ccc',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {ghe}
+                </button>
+              ))}
+              {index === 5 && (
+                <div style={{ marginLeft: '10px', display: 'inline-block', fontSize: '16px', color: 'brown' }}> Lối vào🚪</div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div style={{ marginTop: '20px' }}>
         {rap && suatChieu && gheDaChon.length > 0 ? (

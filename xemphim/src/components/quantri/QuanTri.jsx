@@ -5,11 +5,10 @@ export default function QuanTri() {
   return (
     <>
       <div style={styles.container}>
-        {/* Sidebar */}
         <div style={styles.sidebar}>
-          <h2 style={styles.sidebarTitle}>Quản Trị</h2>
+          <h2 style={styles.sidebarTitle}>🎬Doremi Cinema</h2>
           <nav style={styles.nav}>
-            {/* Các liên kết cho các route con */}
+
             <Link to="nguoidung" style={styles.navLink}>Quản lý người dùng</Link>
             <Link to="phim" style={styles.navLink}>Quản lý phim</Link>
             <Link to="suatchieu" style={styles.navLink}>Quản lý suất chiếu</Link>

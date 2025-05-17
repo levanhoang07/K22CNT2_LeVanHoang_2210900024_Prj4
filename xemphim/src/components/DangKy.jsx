@@ -25,7 +25,7 @@ export default function DangKy() {
 
     try {
       setDangXuLy(true);
-      const response = await axios.post('http://localhost:3000/api/dangky', {
+      const response = await axios.post('http://127.0.0.1:3000/api/dangky', {
         hoTen,
         email,
         sdt,

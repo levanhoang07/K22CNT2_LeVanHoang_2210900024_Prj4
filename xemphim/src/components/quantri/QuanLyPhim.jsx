@@ -9,7 +9,8 @@ export default function QuanLyPhim() {
   const [giaTien, setGiaTien] = useState('');
   const [anh, setAnh] = useState('');
   const [editing, setEditing] = useState(false);
-  const [currentPhim, setCurrentPhim] = useState(null); // To track the movie being edited
+  const [currentPhim, setCurrentPhim] = useState(null); // movie đang sửa
+  const [detailPhim, setDetailPhim] = useState(null);   // movie đang xem chi tiết
 
   useEffect(() => {
     axios.get('/api/phim')
@@ -20,8 +21,10 @@ export default function QuanLyPhim() {
   const handleXoaPhim = (id) => {
     axios.delete(`/api/phim/${id}`)
       .then(() => {
-        const updatedList = phimList.filter(phim => phim.id !== id);
-        setPhimList(updatedList);
+        setPhimList(phimList.filter(phim => phim.id !== id));
+        if (detailPhim && detailPhim.id === id) {
+          setDetailPhim(null); // xóa chi tiết nếu đang xem phim này
+        }
       })
       .catch(err => console.error('Lỗi khi xóa phim:', err));
   };
@@ -31,23 +34,21 @@ export default function QuanLyPhim() {
     const newPhim = { ten, tacGia, thoiLuong, giaTien, anh };
 
     if (editing) {
-      // Update existing movie
       axios.put(`/api/phim/${currentPhim.id}`, newPhim)
         .then(res => {
-          const updatedPhimList = phimList.map(phim =>
-            phim.id === currentPhim.id ? res.data : phim
-          );
-          setPhimList(updatedPhimList);
+          setPhimList(phimList.map(phim => (phim.id === currentPhim.id ? res.data : phim)));
           setEditing(false);
           setCurrentPhim(null);
           resetForm();
+          if (detailPhim && detailPhim.id === res.data.id) {
+            setDetailPhim(res.data); // cập nhật chi tiết nếu đang xem
+          }
         })
         .catch(err => {
           console.error('Lỗi khi cập nhật phim:', err);
           alert('Không thể cập nhật phim.');
         });
     } else {
-      // Add new movie
       axios.post('/api/phim', newPhim)
         .then(res => {
           setPhimList([...phimList, res.data]);
@@ -68,6 +69,11 @@ export default function QuanLyPhim() {
     setThoiLuong(phim.thoiLuong);
     setGiaTien(phim.giaTien);
     setAnh(phim.anh);
+  };
+
+  // Xem chi tiết phim
+  const handleViewPhim = (phim) => {
+    setDetailPhim(phim);
   };
 
   const resetForm = () => {
@@ -143,12 +149,9 @@ export default function QuanLyPhim() {
                 <td>{phim.thoiLuong}</td>
                 <td>{phim.giaTien}</td>
                 <td>
-                  <button className="edit-button" onClick={() => handleEditPhim(phim)}>
-                    Sửa
-                  </button>
-                  <button className="delete-button" onClick={() => handleXoaPhim(phim.id)}>
-                    Xóa
-                  </button>
+                  <button className="view-button" onClick={() => handleViewPhim(phim)}>Xem</button>
+                  <button className="edit-button" onClick={() => handleEditPhim(phim)}>Sửa</button>
+                  <button className="delete-button" onClick={() => handleXoaPhim(phim.id)}>Xóa</button>
                 </td>
               </tr>
             ))}
@@ -156,35 +159,42 @@ export default function QuanLyPhim() {
         </table>
       </div>
 
-      {/* CSS nội tuyến đưa ra cuối trang */}
+      {/* Hiển thị thông tin phim chi tiết nếu có */}
+      {detailPhim && (
+        <div className="detail-container">
+          <h4>Thông tin chi tiết phim</h4>
+          <p><strong>Tên Phim:</strong> {detailPhim.ten}</p>
+          <p><strong>Tác Giả:</strong> {detailPhim.tacGia}</p>
+          <p><strong>Thời Lượng:</strong> {detailPhim.thoiLuong}</p>
+          <p><strong>Giá Vé:</strong> {detailPhim.giaTien}</p>
+          <img src={detailPhim.anh} alt={detailPhim.ten} style={{ maxWidth: '300px', borderRadius: '8px' }} />
+          <button onClick={() => setDetailPhim(null)} style={{ marginTop: '10px' }}>Đóng</button>
+        </div>
+      )}
+
       <style>{`
         .container {
           padding: 20px;
           font-family: Arial, sans-serif;
         }
-
         .title {
           text-align: center;
           color: #2c3e50;
         }
-
         .form-container {
           margin-bottom: 30px;
         }
-
         .form-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
           gap: 10px;
         }
-
         .form-grid input,
         .form-grid button {
           padding: 8px;
           border-radius: 4px;
           border: 1px solid #ccc;
         }
-
         .form-grid button {
           background-color: #27ae60;
           color: white;
@@ -192,35 +202,28 @@ export default function QuanLyPhim() {
           cursor: pointer;
           transition: background 0.3s ease;
         }
-
         .form-grid button:hover {
           background-color: #1e8449;
         }
-
         .table-container {
           margin-top: 20px;
         }
-
         .styled-table {
           width: 100%;
           border-collapse: collapse;
         }
-
         .styled-table th,
         .styled-table td {
           padding: 10px;
           border: 1px solid #ddd;
           text-align: center;
         }
-
         .styled-table th {
           background-color: #f5f5f5;
         }
-
         .styled-table tr:nth-child(even) {
           background-color: #f9f9f9;
         }
-
         .edit-button {
           color: white;
           background-color: orange;
@@ -228,12 +231,11 @@ export default function QuanLyPhim() {
           padding: 6px 12px;
           border-radius: 4px;
           cursor: pointer;
+          margin-left: 5px;
         }
-
         .edit-button:hover {
           background-color: darkorange;
         }
-
         .delete-button {
           color: white;
           background-color: red;
@@ -241,10 +243,30 @@ export default function QuanLyPhim() {
           padding: 6px 12px;
           border-radius: 4px;
           cursor: pointer;
+          margin-left: 5px;
         }
-
         .delete-button:hover {
           background-color: darkred;
+        }
+        .view-button {
+          color: white;
+          background-color: #2980b9;
+          border: none;
+          padding: 6px 12px;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        .view-button:hover {
+          background-color: #1f618d;
+        }
+        .detail-container {
+          margin-top: 30px;
+          padding: 15px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          max-width: 400px;
+          background-color: #fafafa;
+          box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
       `}</style>
     </div>

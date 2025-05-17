@@ -7,7 +7,7 @@ export default function TrangChu() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/phim')
+    fetch('http://127.0.0.1:3000/api/phim')
       .then((response) => response.json())
       .then((data) => {
         setPhimList(data);

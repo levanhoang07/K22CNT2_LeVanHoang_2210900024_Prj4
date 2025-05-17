@@ -17,7 +17,6 @@ import QuanLyPhongChieu from './components/quantri/QuanLyPhongChieu';
 import QuanLyGhe from './components/quantri/QuanLyGhe';
 import QuanLyVeDat from './components/quantri/QuanLyVeDat';
 import './App.css';
-import logo from './logo.svg'
 
 function App() {
   return (

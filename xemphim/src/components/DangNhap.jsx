@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import axios from 'axios'; // Gửi request đến backend
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export default function DangNhap() {
   const [tenDangNhap, setTenDangNhap] = useState('');
   const [matKhau, setMatKhau] = useState('');
   const [thongBao, setThongBao] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,14 +17,17 @@ export default function DangNhap() {
     }
 
     try {
-      const response = await axios.post('http://localhost:3001/api/dangnhap', {
+      const response = await axios.post('http://127.0.0.1:3000/api/dangnhap', {
         tenDangNhap,
         matKhau
       });
 
       if (response.data.success) {
         setThongBao('Đăng nhập thành công!');
-        // Có thể lưu thông tin user vào localStorage hoặc điều hướng trang
+        // Chuyển hướng sau 1 giây
+        setTimeout(() => {
+          navigate('/');
+        }, 1000);
       } else {
         setThongBao('Sai tên đăng nhập hoặc mật khẩu.');
       }
