@@ -9,33 +9,39 @@ export default function DangNhap() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!tenDangNhap || !matKhau) {
-      setThongBao('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.');
-      return;
-    }
+  if (!tenDangNhap || !matKhau) {
+    setThongBao('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.');
+    return;
+  }
 
-    try {
-      const response = await axios.post('http://127.0.0.1:3000/api/dangnhap', {
-        tenDangNhap,
-        matKhau
-      });
+  try {
+    const response = await axios.post('http://127.0.0.1:3000/api/dangnhap', {
+      tenDangNhap,
+      matKhau
+    });
 
-      if (response.data.success) {
-        setThongBao('Đăng nhập thành công!');
-        // Chuyển hướng sau 1 giây
-        setTimeout(() => {
+    if (response.data.success) {
+      setThongBao('Đăng nhập thành công!');
+
+      // Chuyển hướng theo quyền
+      setTimeout(() => {
+        if (response.data.la_quan_tri) {
+          navigate('/quantri');
+        } else {
           navigate('/');
-        }, 1000);
-      } else {
-        setThongBao('Sai tên đăng nhập hoặc mật khẩu.');
-      }
-    } catch (error) {
-      console.error(error);
-      setThongBao('Lỗi kết nối đến máy chủ.');
+        }
+      }, 1000);
+    } else {
+      setThongBao('Sai tên đăng nhập hoặc mật khẩu.');
     }
-  };
+  } catch (error) {
+    console.error(error);
+    setThongBao('Lỗi kết nối đến máy chủ.');
+  }
+};
+
 
   return (
     <>

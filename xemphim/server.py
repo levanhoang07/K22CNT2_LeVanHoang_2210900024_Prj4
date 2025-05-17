@@ -89,7 +89,6 @@ def dang_ky():
         return flask.jsonify({'success': False, 'message': f'Lỗi cơ sở dữ liệu: {str(e)}'}), 500
     except Exception as e:
         return flask.jsonify({'success': False, 'message': f'Lỗi không xác định: {str(e)}'}), 500
-
 @app.route('/api/dangnhap', methods=['POST'])
 def dang_nhap():
     data = flask.request.get_json()
@@ -121,14 +120,15 @@ def dang_nhap():
             conn.close()
             return flask.jsonify({'success': False, 'message': 'Mật khẩu không đúng'}), 401
 
+        # Đưa la_quan_tri lên cấp cao nhất trong JSON trả về
         response = {
             'success': True,
             'message': 'Đăng nhập thành công',
+            'la_quan_tri': bool(user.la_quan_tri),  # Chuyển về kiểu bool rõ ràng
             'user': {
                 'id': user.nguoidung_id,
                 'ten_dang_nhap': user.ten_dang_nhap,
-                'ho_ten': user.ho_ten,
-                'la_quan_tri': user.la_quan_tri
+                'ho_ten': user.ho_ten
             }
         }
 
