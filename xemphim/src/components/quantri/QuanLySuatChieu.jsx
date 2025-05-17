@@ -16,7 +16,7 @@ const QuanLySuatChieu = () => {
   const [currentSuat, setCurrentSuat] = useState(null);  // Store the current showtime being edited
 
   const fetchSuatChieu = () => {
-    axios.get('/api/suatchieu')
+    axios.get('http://127.0.0.1:3000/api/suatchieu')
       .then(res => setSuatList(res.data))
       .catch(err => console.error('Lỗi khi tải suất chiếu:', err));
   };

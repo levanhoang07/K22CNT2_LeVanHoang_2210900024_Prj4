@@ -17,10 +17,10 @@ const QuanLyVeDat = () => {
   const [currentVe, setCurrentVe] = useState(null);
 
   const fetchAll = () => {
-    axios.get('/api/vedat').then(res => setVeList(res.data)).catch(console.error);
-    axios.get('/api/nguoidung').then(res => setNguoiDungList(res.data)).catch(console.error);
-    axios.get('/api/suatchieu').then(res => setSuatChieuList(res.data)).catch(console.error);
-    axios.get('/api/ghe').then(res => setGheList(res.data)).catch(console.error);
+    axios.get('http://127.0.0.1:3000/api/vedat').then(res => setVeList(res.data)).catch(console.error);
+    axios.get('http://127.0.0.1:3000/api/nguoidung').then(res => setNguoiDungList(res.data)).catch(console.error);
+    axios.get('http://127.0.0.1:3000/api/suatchieu').then(res => setSuatChieuList(res.data)).catch(console.error);
+    axios.get('http://127.0.0.1:3000/api/ghe').then(res => setGheList(res.data)).catch(console.error);
   };
 
   useEffect(() => {

@@ -13,7 +13,7 @@ export default function QuanLyPhim() {
   const [detailPhim, setDetailPhim] = useState(null);   // movie đang xem chi tiết
 
   useEffect(() => {
-    axios.get('/api/phim')
+    axios.get('http://127.0.0.1:3000/api/phim')
       .then(res => setPhimList(res.data))
       .catch(err => console.error('Lỗi khi tải danh sách phim:', err));
   }, []);

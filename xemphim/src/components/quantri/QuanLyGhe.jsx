@@ -13,13 +13,13 @@ const QuanLyGhe = () => {
   const [currentGhe, setCurrentGhe] = useState(null);
 
   const fetchGhe = () => {
-    axios.get('/api/ghe')
+    axios.get('http://127.0.0.1:3000/api/ghe')
       .then(res => setGheList(res.data))
       .catch(err => console.error('Lỗi khi tải danh sách ghế:', err));
   };
 
   const fetchPhong = () => {
-    axios.get('/api/phongchieu')
+    axios.get('http://127.0.0.1:3000/api/phongchieu')
       .then(res => setPhongList(res.data))
       .catch(err => console.error('Lỗi khi tải phòng:', err));
   };
@@ -38,12 +38,10 @@ const QuanLyGhe = () => {
     e.preventDefault();
     try {
       if (editing) {
-        // If in edit mode, update the seat
         await axios.put(`/api/ghe/${currentGhe.ghe_id}`, form);
         setEditing(false);
         setCurrentGhe(null);
       } else {
-        // Add new seat
         await axios.post('/api/ghe', form);
       }
       setForm({ phong_id: '', so_ghe: '', loai_ghe: '' });

@@ -14,14 +14,14 @@ const QuanLyPhongChieu = () => {
 
   // Fetch room list from database
   const fetchPhongChieu = () => {
-    axios.get('/api/phongchieu')
+    axios.get('http://127.0.0.1:3000/api/phongchieu')
       .then(res => setPhongList(res.data))
       .catch(err => console.error('Lỗi khi tải phòng chiếu:', err));
   };
 
   // Fetch movie list for selection in room creation
   const fetchPhim = () => {
-    axios.get('/api/phim')
+    axios.get('http://127.0.0.1:3000/api/phim')
       .then(res => setPhimList(res.data))
       .catch(err => console.error('Lỗi khi tải phim:', err));
   };
@@ -41,7 +41,7 @@ const QuanLyPhongChieu = () => {
     try {
       if (editing) {
         // If in editing mode, update room
-        await axios.put(`/api/phongchieu/${currentPhong.phong_id}`, form);
+        await axios.put(`http://127.0.0.1:3000/api/phongchieu/${currentPhong.phong_id}`, form);
         setEditing(false);
         setCurrentPhong(null);
       } else {

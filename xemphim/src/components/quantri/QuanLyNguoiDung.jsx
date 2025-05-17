@@ -19,7 +19,7 @@ const QuanLyNguoiDung = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/nguoidung');
+      const res = await axios.get('http://127.0.0.1:3000/api/nguoidung');
       setNguoiDungList(res.data);
     } catch (err) {
       console.error('Lỗi khi tải danh sách:', err);
@@ -42,12 +42,10 @@ const QuanLyNguoiDung = () => {
     e.preventDefault();
     try {
       if (editing) {
-        // Update the existing user
         await axios.put(`/api/nguoidung/${currentUser.nguoidung_id}`, form);
-        setEditing(false); // Reset to create mode
+        setEditing(false);
         setCurrentUser(null);
       } else {
-        // Create a new user
         await axios.post('/api/nguoidung', form);
       }
       setForm({
@@ -58,7 +56,7 @@ const QuanLyNguoiDung = () => {
         so_dien_thoai: '',
         la_quan_tri: false,
       });
-      fetchData(); // Refresh the user list
+      fetchData(); 
     } catch (err) {
       console.error('Lỗi khi thêm hoặc cập nhật người dùng:', err);
       alert('Không thể thêm hoặc cập nhật người dùng.');
@@ -171,8 +169,6 @@ const QuanLyNguoiDung = () => {
           </tbody>
         </table>
       )}
-
-      {/* CSS nội tuyến đưa cuối file */}
       <style>{`
         .container {
           padding: 20px;
