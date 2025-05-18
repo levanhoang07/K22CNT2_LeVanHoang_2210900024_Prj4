@@ -218,32 +218,30 @@ const QuanLyVeDat = () => {
           background-color: #f9f9f9;
         }
 
+        .edit-button, .delete-button {
+          padding: 5px 10px;
+          border-radius: 4px;
+          border: none;
+          cursor: pointer;
+        }
+
         .edit-button {
-    background-color: #f39c12;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    margin-right: 5px;
-    cursor: pointer;
-  }
+          background-color: #f39c12;
+          color: white;
+        }
 
-  .edit-button:hover {
-    background-color: #e67e22;
-  }
+        .edit-button:hover {
+          background-color: #e67e22;
+        }
 
-  .delete-button {
-    background-color: #e74c3c;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+        .delete-button {
+          background-color: #e74c3c;
+          color: white;
+        }
 
-  .delete-button:hover {
-    background-color: #c0392b;
-  }
+        .delete-button:hover {
+          background-color: #c0392b;
+        }
       `}</style>
     </div>
   );

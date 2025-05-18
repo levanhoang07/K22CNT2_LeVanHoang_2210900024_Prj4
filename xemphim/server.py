@@ -8,7 +8,7 @@ CORS(app)
 def get_db_connection():
     conn_str = (
         "Driver={SQL Server};"
-        "Server=LEVANHOANG\\SQLEXPRESS;"  # Lưu ý dấu \\ cho escape trong chuỗi
+        "Server=LEVANHOANG\\SQLEXPRESS;"
         "Database=VeXemPhim;"
         "Trusted_Connection=yes;"
     )
@@ -89,6 +89,7 @@ def dang_ky():
         return flask.jsonify({'success': False, 'message': f'Lỗi cơ sở dữ liệu: {str(e)}'}), 500
     except Exception as e:
         return flask.jsonify({'success': False, 'message': f'Lỗi không xác định: {str(e)}'}), 500
+
 @app.route('/api/dangnhap', methods=['POST'])
 def dang_nhap():
     data = flask.request.get_json()
@@ -111,20 +112,15 @@ def dang_nhap():
         user = cursor.fetchone()
 
         if not user:
-            cursor.close()
-            conn.close()
             return flask.jsonify({'success': False, 'message': 'Tên đăng nhập hoặc email không tồn tại'}), 401
 
         if user.mat_khau != mat_khau:
-            cursor.close()
-            conn.close()
             return flask.jsonify({'success': False, 'message': 'Mật khẩu không đúng'}), 401
 
-        # Đưa la_quan_tri lên cấp cao nhất trong JSON trả về
         response = {
             'success': True,
             'message': 'Đăng nhập thành công',
-            'la_quan_tri': bool(user.la_quan_tri),  # Chuyển về kiểu bool rõ ràng
+            'la_quan_tri': bool(user.la_quan_tri),
             'user': {
                 'id': user.nguoidung_id,
                 'ten_dang_nhap': user.ten_dang_nhap,
@@ -172,13 +168,12 @@ def get_all_suat_chieu():
 def get_all_ve_dat():
     return flask.jsonify(fetch_all('ve_dat'))
 
-# Endpoint đặt vé
 @app.route('/api/datve', methods=['POST'])
 def dat_ve():
     data = flask.request.get_json()
     nguoi_dung_id = data.get('nguoiDungId')
     suat_chieu_id = data.get('suatChieuId')
-    danh_sach_ghe = data.get('danhSachGhe')  # danh sách các ghe_id, ví dụ: [1, 2, 3]
+    danh_sach_ghe = data.get('danhSachGhe')
 
     if not nguoi_dung_id or not suat_chieu_id or not danh_sach_ghe or not isinstance(danh_sach_ghe, list):
         return flask.jsonify({'success': False, 'message': 'Dữ liệu đặt vé không hợp lệ'}), 400
@@ -187,9 +182,9 @@ def dat_ve():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Kiểm tra từng ghế xem đã được đặt cho suất chiếu đó chưa
         ghe_chua_dat = []
         ghe_da_dat = []
+
         for ghe_id in danh_sach_ghe:
             cursor.execute("""
                 SELECT * FROM ve_dat 
@@ -201,14 +196,8 @@ def dat_ve():
                 ghe_chua_dat.append(ghe_id)
 
         if ghe_da_dat:
-            cursor.close()
-            conn.close()
-            return flask.jsonify({
-                'success': False,
-                'message': f'Ghế đã được đặt: {ghe_da_dat}'
-            }), 400
+            return flask.jsonify({'success': False, 'message': f'Ghế đã được đặt: {ghe_da_dat}'}), 400
 
-        # Nếu tất cả ghế đều chưa đặt, tiến hành đặt vé
         for ghe_id in ghe_chua_dat:
             cursor.execute("""
                 INSERT INTO ve_dat (nguoi_dung_id, suat_chieu_id, ghe_id)

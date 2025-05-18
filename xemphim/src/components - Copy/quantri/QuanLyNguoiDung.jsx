@@ -13,8 +13,9 @@ const QuanLyNguoiDung = () => {
   });
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null); // Store the user being edited
 
+  // Fetch users from the backend
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -55,7 +56,7 @@ const QuanLyNguoiDung = () => {
         so_dien_thoai: '',
         la_quan_tri: false,
       });
-      fetchData();
+      fetchData(); 
     } catch (err) {
       console.error('Lỗi khi thêm hoặc cập nhật người dùng:', err);
       alert('Không thể thêm hoặc cập nhật người dùng.');
@@ -76,7 +77,6 @@ const QuanLyNguoiDung = () => {
   };
 
   const handleDelete = async (userId) => {
-    if (!window.confirm('Bạn có chắc muốn xóa người dùng này?')) return;
     try {
       await axios.delete(`/api/nguoidung/${userId}`);
       fetchData();
@@ -84,19 +84,6 @@ const QuanLyNguoiDung = () => {
       console.error('Lỗi khi xóa người dùng:', err);
       alert('Không thể xóa người dùng.');
     }
-  };
-
-  const handleCancelEdit = () => {
-    setEditing(false);
-    setCurrentUser(null);
-    setForm({
-      ten_dang_nhap: '',
-      mat_khau: '',
-      ho_ten: '',
-      email: '',
-      so_dien_thoai: '',
-      la_quan_tri: false,
-    });
   };
 
   return (
@@ -147,11 +134,6 @@ const QuanLyNguoiDung = () => {
           Quản trị
         </label>
         <button type="submit">{editing ? 'Cập nhật người dùng' : 'Thêm người dùng'}</button>
-        {editing && (
-          <button type="button" className="form-cancel" onClick={handleCancelEdit}>
-            Huỷ chỉnh sửa
-          </button>
-        )}
       </form>
 
       {loading ? (
@@ -162,7 +144,6 @@ const QuanLyNguoiDung = () => {
             <tr>
               <th>ID</th>
               <th>Tên đăng nhập</th>
-              <th>Mật khẩu</th>
               <th>Họ tên</th>
               <th>Email</th>
               <th>SĐT</th>
@@ -175,21 +156,19 @@ const QuanLyNguoiDung = () => {
               <tr key={nd.nguoidung_id}>
                 <td>{nd.nguoidung_id}</td>
                 <td>{nd.ten_dang_nhap}</td>
-                <td>{nd.mat_khau}</td>
                 <td>{nd.ho_ten}</td>
                 <td>{nd.email}</td>
                 <td>{nd.so_dien_thoai}</td>
                 <td>{nd.la_quan_tri ? '✔️' : '❌'}</td>
                 <td>
-                  <button className="btn-sua" onClick={() => handleEdit(nd)}>Sửa</button>
-                  <button className="btn-xoa" onClick={() => handleDelete(nd.nguoidung_id)}>Xóa</button>
+                  <button onClick={() => handleEdit(nd)}>Sửa</button>
+                  <button onClick={() => handleDelete(nd.nguoidung_id)}>Xóa</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
-
       <style>{`
         .container {
           padding: 20px;
@@ -198,7 +177,7 @@ const QuanLyNguoiDung = () => {
 
         .heading {
           text-align: center;
-          color: rgb(0, 170, 20);
+          color:rgb(0, 170, 20);
         }
 
         .form-grid {
@@ -217,7 +196,7 @@ const QuanLyNguoiDung = () => {
 
         .form-grid button {
           grid-column: span 2;
-          background-color: #27ae60;
+          background-color:  #27ae60;
           color: white;
           border: none;
           cursor: pointer;
@@ -226,21 +205,6 @@ const QuanLyNguoiDung = () => {
 
         .form-grid button:hover {
           background-color: #1e8449;
-        }
-
-        .form-cancel {
-          grid-column: span 2;
-          background-color: #95a5a6;
-          color: white;
-          border: none;
-          padding: 8px;
-          border-radius: 4px;
-          cursor: pointer;
-          transition: background 0.3s ease;
-        }
-
-        .form-cancel:hover {
-          background-color: #7f8c8d;
         }
 
         .checkbox-label {
@@ -269,31 +233,16 @@ const QuanLyNguoiDung = () => {
           background-color: #f9f9f9;
         }
 
-        .btn-sua {
+        .styled-table button {
           background-color: #f39c12;
           color: white;
           border: none;
           padding: 5px 10px;
-          margin-right: 5px;
           cursor: pointer;
-          border-radius: 4px;
         }
 
-        .btn-sua:hover {
+        .styled-table button:hover {
           background-color: #e67e22;
-        }
-
-        .btn-xoa {
-          background-color: #e74c3c;
-          color: white;
-          border: none;
-          padding: 5px 10px;
-          cursor: pointer;
-          border-radius: 4px;
-        }
-
-        .btn-xoa:hover {
-          background-color: #c0392b;
         }
       `}</style>
     </div>
