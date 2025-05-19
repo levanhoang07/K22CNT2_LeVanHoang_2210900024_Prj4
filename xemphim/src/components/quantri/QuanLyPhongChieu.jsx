@@ -9,17 +9,17 @@ const QuanLyPhongChieu = () => {
     phim_id: '',
     so_ghe: ''
   });
-  const [editing, setEditing] = useState(false); // Flag to toggle edit mode
-  const [currentPhong, setCurrentPhong] = useState(null); // Store the room being edited
+  const [editing, setEditing] = useState(false);
+  const [currentPhong, setCurrentPhong] = useState(null);
 
-  // Fetch room list from database
+  // Hàm lấy dữ liệu phòng chiếu
   const fetchPhongChieu = () => {
     axios.get('http://127.0.0.1:3000/api/phongchieu')
       .then(res => setPhongList(res.data))
       .catch(err => console.error('Lỗi khi tải phòng chiếu:', err));
   };
 
-  // Fetch movie list for selection in room creation
+  // Hàm lấy danh sách phim
   const fetchPhim = () => {
     axios.get('http://127.0.0.1:3000/api/phim')
       .then(res => setPhimList(res.data))
@@ -33,23 +33,21 @@ const QuanLyPhongChieu = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editing) {
-        // If in editing mode, update room
         await axios.put(`http://127.0.0.1:3000/api/phongchieu/${currentPhong.phong_id}`, form);
         setEditing(false);
         setCurrentPhong(null);
       } else {
-        // Add new room
-        await axios.post('/api/phongchieu', form);
+        await axios.post('http://127.0.0.1:3000/api/phongchieu', form);
       }
       setForm({ ten_phong: '', phim_id: '', so_ghe: '' });
-      fetchPhongChieu();
+      fetchPhongChieu();  // Cập nhật lại dữ liệu
     } catch (err) {
       console.error('Lỗi khi thêm hoặc cập nhật phòng chiếu:', err);
       alert('Không thể thêm hoặc cập nhật phòng chiếu.');
@@ -62,14 +60,23 @@ const QuanLyPhongChieu = () => {
     setForm({
       ten_phong: phong.ten_phong,
       phim_id: phong.phim_id,
-      so_ghe: phong.so_ghe
+      so_ghe: phong.so_ghe.toString() // Đảm bảo là chuỗi để select nhận đúng
     });
   };
 
+  const handleCancel = () => {
+    setEditing(false);
+    setCurrentPhong(null);
+    setForm({ ten_phong: '', phim_id: '', so_ghe: '' });
+  };
+
   const handleDelete = async (phong_id) => {
+    // Xác nhận trước khi xóa
+    if (!window.confirm('Bạn có chắc chắn muốn xóa phòng chiếu này?')) return;
+
     try {
-      await axios.delete(`/api/phongchieu/${phong_id}`);
-      fetchPhongChieu();
+      await axios.delete(`http://127.0.0.1:3000/api/phongchieu/${phong_id}`);
+      fetchPhongChieu(); // Cập nhật lại dữ liệu sau khi xóa
     } catch (err) {
       console.error('Lỗi khi xóa phòng chiếu:', err);
       alert('Không thể xóa phòng chiếu.');
@@ -81,20 +88,16 @@ const QuanLyPhongChieu = () => {
       <h2>Quản Lý Phòng Chiếu</h2>
 
       <form onSubmit={handleSubmit} className="form-container">
-        <select
+        <input
+          type="text"
           name="ten_phong"
           value={form.ten_phong}
           onChange={handleChange}
+          placeholder="Tên phòng"
           required
           className="input-field"
-        >
-          <option value="">-- Chọn phòng --</option>
-          {phongList.map(phong => (
-            <option key={phong.phong_id} value={phong.ten_phong}>
-              {phong.ten_phong}
-            </option>
-          ))}
-        </select>
+          disabled={editing} // Không cho sửa tên phòng khi edit (có thể bỏ nếu muốn)
+        />
 
         <select
           name="phim_id"
@@ -126,9 +129,27 @@ const QuanLyPhongChieu = () => {
           ))}
         </select>
 
-        <button type="submit" className="submit-button">
-          {editing ? 'Cập nhật phòng chiếu' : 'Thêm phòng chiếu'}
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button type="submit" className="submit-button">
+            {editing ? 'Cập nhật phòng chiếu' : 'Thêm phòng chiếu'}
+          </button>
+
+          {editing && (
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="cancel-button"
+            >
+              Hủy
+            </button>
+          )}
+        </div>
+
+        {editing && currentPhong && (
+          <p>
+            Đang chỉnh sửa phòng: <strong>{currentPhong.ten_phong}</strong> - Phim: <strong>{phimList.find(p => p.phim_id === currentPhong.phim_id)?.ten_phim || 'Chưa xác định'}</strong>
+          </p>
+        )}
       </form>
 
       <table className="styled-table">
@@ -203,6 +224,20 @@ const QuanLyPhongChieu = () => {
           background-color: #45a049;
         }
 
+        .cancel-button {
+          background-color: #888;
+          color: white;
+          border: none;
+          cursor: pointer;
+          font-size: 16px;
+          padding: 10px;
+          border-radius: 5px;
+        }
+
+        .cancel-button:hover {
+          background-color: #555;
+        }
+
         .styled-table {
           width: 100%;
           border-collapse: collapse;
@@ -236,31 +271,25 @@ const QuanLyPhongChieu = () => {
         }
 
         .edit-button {
-    background-color: #f39c12;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    margin-right: 5px;
-    cursor: pointer;
-  }
+          background-color: #f39c12;
+          color: white;
+          padding: 8px 12px;
+          margin-right: 5px;
+        }
 
-  .edit-button:hover {
-    background-color: #e67e22;
-  }
+        .edit-button:hover {
+          background-color: #e67e22;
+        }
 
-  .delete-button {
-    background-color: #e74c3c;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+        .delete-button {
+          background-color: #e74c3c;
+          color: white;
+          padding: 8px 12px;
+        }
 
-  .delete-button:hover {
-    background-color: #c0392b;
-  }
+        .delete-button:hover {
+          background-color: #c0392b;
+        }
       `}</style>
     </div>
   );

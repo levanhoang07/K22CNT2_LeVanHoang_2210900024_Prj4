@@ -11,15 +11,19 @@ const QuanLyGhe = () => {
   });
   const [editing, setEditing] = useState(false);
   const [currentGhe, setCurrentGhe] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Set baseURL để gọi api ngắn gọn hơn
+  axios.defaults.baseURL = 'http://127.0.0.1:3000/api';
 
   const fetchGhe = () => {
-    axios.get('http://127.0.0.1:3000/api/ghe')
+    axios.get('/ghe')
       .then(res => setGheList(res.data))
       .catch(err => console.error('Lỗi khi tải danh sách ghế:', err));
   };
 
   const fetchPhong = () => {
-    axios.get('http://127.0.0.1:3000/api/phongchieu')
+    axios.get('/phongchieu')
       .then(res => setPhongList(res.data))
       .catch(err => console.error('Lỗi khi tải phòng:', err));
   };
@@ -36,19 +40,22 @@ const QuanLyGhe = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       if (editing) {
-        await axios.put(`/api/ghe/${currentGhe.ghe_id}`, form);
+        await axios.put(`/ghe/${currentGhe.ghe_id}`, form);
         setEditing(false);
         setCurrentGhe(null);
       } else {
-        await axios.post('/api/ghe', form);
+        await axios.post('/ghe', form);
       }
       setForm({ phong_id: '', so_ghe: '', loai_ghe: '' });
       fetchGhe();
     } catch (err) {
       console.error('Lỗi khi thêm hoặc cập nhật ghế:', err);
       alert('Không thể thêm hoặc cập nhật ghế.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,9 +69,18 @@ const QuanLyGhe = () => {
     });
   };
 
+  const handleCancelEdit = () => {
+    setEditing(false);
+    setCurrentGhe(null);
+    setForm({ phong_id: '', so_ghe: '', loai_ghe: '' });
+  };
+
   const handleDelete = async (ghe_id) => {
+    const confirmDelete = window.confirm('Bạn có chắc chắn muốn xóa ghế này không?');
+    if (!confirmDelete) return;
+
     try {
-      await axios.delete(`/api/ghe/${ghe_id}`);
+      await axios.delete(`/ghe/${ghe_id}`);
       fetchGhe();
     } catch (err) {
       console.error('Lỗi khi xóa ghế:', err);
@@ -77,6 +93,12 @@ const QuanLyGhe = () => {
       <h2>Quản Lý Ghế</h2>
 
       <form onSubmit={handleSubmit} className="form-container">
+        {editing && currentGhe && (
+          <div className="editing-info">
+            Đang chỉnh sửa ghế ID: <strong>{currentGhe.ghe_id}</strong>
+          </div>
+        )}
+
         <select
           name="phong_id"
           value={form.phong_id}
@@ -110,9 +132,21 @@ const QuanLyGhe = () => {
           <option value="Thuong">Thường</option>
           <option value="VIP">VIP</option>
         </select>
-        <button type="submit" className="submit-button">
-          {editing ? 'Cập nhật ghế' : 'Thêm ghế'}
-        </button>
+        <div className="button-group">
+          <button type="submit" disabled={loading} className="submit-button">
+            {loading ? 'Đang xử lý...' : editing ? 'Cập nhật ghế' : 'Thêm ghế'}
+          </button>
+          {editing && (
+            <button
+              type="button"
+              onClick={handleCancelEdit}
+              className="cancel-button"
+              disabled={loading}
+            >
+              Hủy
+            </button>
+          )}
+        </div>
       </form>
 
       <table className="styled-table">
@@ -162,6 +196,12 @@ const QuanLyGhe = () => {
           margin-bottom: 20px;
         }
 
+        .editing-info {
+          color: #e67e22; /* vàng cam */
+          font-size: 14px;
+          margin-bottom: 5px;
+        }
+
         .input-field {
           padding: 8px;
           font-size: 16px;
@@ -173,18 +213,45 @@ const QuanLyGhe = () => {
           outline-color: #4CAF50;
         }
 
+        .button-group {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+        }
+
         .submit-button {
           background-color: #4CAF50;
           color: white;
           border: none;
           cursor: pointer;
           font-size: 16px;
-          padding: 10px;
+          padding: 10px 20px;
           border-radius: 5px;
         }
 
-        .submit-button:hover {
+        .submit-button:hover:enabled {
           background-color: #45a049;
+        }
+
+        .submit-button:disabled {
+          background-color: #a5d6a7;
+          cursor: not-allowed;
+        }
+
+        .cancel-button {
+          background-color: #95a5a6;
+          color: white;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+        .cancel-button:hover:enabled {
+          background-color: #7f8c8d;
+        }
+        .cancel-button:disabled {
+          cursor: not-allowed;
+          opacity: 0.7;
         }
 
         .styled-table {
@@ -213,31 +280,31 @@ const QuanLyGhe = () => {
         }
 
         .edit-button {
-    background-color: #f39c12;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    margin-right: 5px;
-    cursor: pointer;
-  }
+          background-color: #f39c12;
+          color: white;
+          padding: 8px 12px;
+          border: none;
+          border-radius: 5px;
+          margin-right: 5px;
+          cursor: pointer;
+        }
 
-  .edit-button:hover {
-    background-color: #e67e22;
-  }
+        .edit-button:hover {
+          background-color: #e67e22;
+        }
 
-  .delete-button {
-    background-color: #e74c3c;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+        .delete-button {
+          background-color: #e74c3c;
+          color: white;
+          padding: 8px 12px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
 
-  .delete-button:hover {
-    background-color: #c0392b;
-  }
+        .delete-button:hover {
+          background-color: #c0392b;
+        }
       `}</style>
     </div>
   );

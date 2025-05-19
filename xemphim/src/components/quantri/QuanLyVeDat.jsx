@@ -35,12 +35,10 @@ const QuanLyVeDat = () => {
     e.preventDefault();
     try {
       if (editing) {
-        // If in edit mode, update the ticket
         await axios.put(`/api/vedat/${currentVe.ve_id}`, form);
         setEditing(false);
         setCurrentVe(null);
       } else {
-        // Add new ticket
         await axios.post('/api/vedat', form);
       }
       setForm({ nguoi_dung_id: '', suat_chieu_id: '', ghe_id: '', thoi_gian_dat: '', trang_thai: '' });
@@ -63,19 +61,33 @@ const QuanLyVeDat = () => {
     });
   };
 
+  const handleCancelEdit = () => {
+    setEditing(false);
+    setCurrentVe(null);
+    setForm({ nguoi_dung_id: '', suat_chieu_id: '', ghe_id: '', thoi_gian_dat: '', trang_thai: '' });
+  };
+
   const handleDelete = async (ve_id) => {
-    try {
-      await axios.delete(`/api/vedat/${ve_id}`);
-      fetchAll();
-    } catch (err) {
-      console.error('Lỗi khi xóa vé:', err);
-      alert('Không thể xóa vé.');
+    if (window.confirm('Bạn có chắc chắn muốn xóa vé này không?')) {
+      try {
+        await axios.delete(`/api/vedat/${ve_id}`);
+        fetchAll();
+      } catch (err) {
+        console.error('Lỗi khi xóa vé:', err);
+        alert('Không thể xóa vé.');
+      }
     }
   };
 
   return (
     <div className="container">
       <h2>Quản Lý Vé Đặt</h2>
+
+      {editing && currentVe && (
+        <div style={{ marginBottom: '10px', padding: '10px', border: '1px solid #f39c12', backgroundColor: '#fff3e0' }}>
+          <strong>Đang chỉnh sửa vé ID: {currentVe.ve_id}</strong>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="form-container">
         <select name="nguoi_dung_id" value={form.nguoi_dung_id} onChange={handleChange} required>
@@ -119,7 +131,10 @@ const QuanLyVeDat = () => {
           <option value="Hủy">Hủy</option>
         </select>
 
-        <button type="submit">{editing ? 'Cập nhật vé' : 'Đặt vé'}</button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button type="submit">{editing ? 'Cập nhật vé' : 'Đặt vé'}</button>
+          {editing && <button type="button" onClick={handleCancelEdit} style={{ backgroundColor: '#ccc', color: '#000' }}>Hủy</button>}
+        </div>
       </form>
 
       <table className="styled-table">
@@ -175,7 +190,7 @@ const QuanLyVeDat = () => {
           margin-bottom: 20px;
         }
 
-        .input-field, select, button {
+        select, input, button {
           padding: 8px;
           font-size: 16px;
           border-radius: 5px;
@@ -219,31 +234,31 @@ const QuanLyVeDat = () => {
         }
 
         .edit-button {
-    background-color: #f39c12;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    margin-right: 5px;
-    cursor: pointer;
-  }
+          background-color: #f39c12;
+          color: white;
+          padding: 8px 12px;
+          border: none;
+          border-radius: 5px;
+          margin-right: 5px;
+          cursor: pointer;
+        }
 
-  .edit-button:hover {
-    background-color: #e67e22;
-  }
+        .edit-button:hover {
+          background-color: #e67e22;
+        }
 
-  .delete-button {
-    background-color: #e74c3c;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+        .delete-button {
+          background-color: #e74c3c;
+          color: white;
+          padding: 8px 12px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
 
-  .delete-button:hover {
-    background-color: #c0392b;
-  }
+        .delete-button:hover {
+          background-color: #c0392b;
+        }
       `}</style>
     </div>
   );

@@ -9,9 +9,10 @@ export default function QuanLyPhim() {
   const [tacGia, setTacGia] = useState('');
   const [thoiLuong, setThoiLuong] = useState('');
   const [anh, setAnh] = useState('');
-  const [moTa, setMoTa] = useState('');  // state mới cho mô tả
+  const [moTa, setMoTa] = useState('');
   const [editing, setEditing] = useState(false);
   const [currentPhim, setCurrentPhim] = useState(null);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -23,15 +24,23 @@ export default function QuanLyPhim() {
       .catch(err => console.error('Lỗi khi tải danh sách phim:', err));
   };
 
+  const showMessage = (msg) => {
+    setMessage(msg);
+    setTimeout(() => setMessage(''), 3000);
+  };
+
   const handleXoaPhim = (id) => {
-    axios.delete(`${API_BASE}/${id}`)
-      .then(() => {
-        setPhimList(phimList.filter(phim => phim.id !== id));
-      })
-      .catch(err => {
-        console.error('Lỗi khi xóa phim:', err);
-        alert('Không thể xóa phim.');
-      });
+    if (window.confirm('Bạn có chắc muốn xóa phim này không?')) {
+      axios.delete(`${API_BASE}/${id}`)
+        .then(() => {
+          fetchData();
+          showMessage('✅ Đã xóa phim thành công!');
+        })
+        .catch(err => {
+          console.error('Lỗi khi xóa phim:', err);
+          alert('❌ Không thể xóa phim.');
+        });
+    }
   };
 
   const handleThemPhim = (e) => {
@@ -40,25 +49,27 @@ export default function QuanLyPhim() {
 
     if (editing) {
       axios.put(`${API_BASE}/${currentPhim.id}`, newPhim)
-        .then(res => {
-          setPhimList(phimList.map(phim => (phim.id === currentPhim.id ? res.data : phim)));
+        .then(() => {
+          fetchData();
+          showMessage('✅ Cập nhật phim thành công!');
           setEditing(false);
           setCurrentPhim(null);
           resetForm();
         })
         .catch(err => {
           console.error('Lỗi khi cập nhật phim:', err);
-          alert('Không thể cập nhật phim.');
+          alert('❌ Không thể cập nhật phim.');
         });
     } else {
       axios.post(API_BASE, newPhim)
-        .then(res => {
-          setPhimList([...phimList, res.data]);
+        .then(() => {
+          fetchData();
+          showMessage('✅ Thêm phim thành công!');
           resetForm();
         })
         .catch(err => {
           console.error('Lỗi khi thêm phim:', err);
-          alert('Không thể thêm phim.');
+          alert('❌ Không thể thêm phim.');
         });
     }
   };
@@ -70,7 +81,7 @@ export default function QuanLyPhim() {
     setTacGia(phim.tacGia);
     setThoiLuong(phim.thoiLuong);
     setAnh(phim.anh);
-    setMoTa(phim.moTa); // set mô tả khi sửa
+    setMoTa(phim.moTa);
   };
 
   const resetForm = () => {
@@ -79,11 +90,20 @@ export default function QuanLyPhim() {
     setThoiLuong('');
     setAnh('');
     setMoTa('');
+    setEditing(false);
+    setCurrentPhim(null);
   };
 
   return (
     <div className="container">
-      <h3 className="title">Quản lý Phim</h3>
+      <h3 className="title">🎬 Quản lý Phim</h3>
+
+      {message && <div className="message">{message}</div>}
+      {editing && (
+        <p className="editing-info">
+          🔧 Đang chỉnh sửa phim: <strong>{currentPhim?.ten}</strong>
+        </p>
+      )}
 
       <form onSubmit={handleThemPhim} className="form-grid">
         <input type="text" placeholder="Tên Phim" value={ten} onChange={(e) => setTen(e.target.value)} required />
@@ -92,6 +112,9 @@ export default function QuanLyPhim() {
         <input type="text" placeholder="Link ảnh" value={anh} onChange={(e) => setAnh(e.target.value)} required />
         <input type="text" placeholder="Mô Tả" value={moTa} onChange={(e) => setMoTa(e.target.value)} required />
         <button type="submit">{editing ? 'Cập nhật Phim' : 'Lưu Phim'}</button>
+        {editing && (
+          <button type="button" onClick={resetForm} className="cancel-button">Hủy</button>
+        )}
       </form>
 
       <table className="styled-table">
@@ -137,6 +160,19 @@ export default function QuanLyPhim() {
           text-align: center;
           color: #2c3e50;
         }
+        .message {
+          background-color: #dff0d8;
+          color: #3c763d;
+          padding: 10px;
+          margin: 10px 0;
+          border-radius: 5px;
+          text-align: center;
+        }
+        .editing-info {
+          text-align: center;
+          color: #e67e22;
+          margin-bottom: 10px;
+        }
         .form-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -157,6 +193,12 @@ export default function QuanLyPhim() {
         }
         .form-grid button:hover {
           background-color: #1e8449;
+        }
+        .cancel-button {
+          background-color: #7f8c8d !important;
+        }
+        .cancel-button:hover {
+          background-color: #606c76 !important;
         }
         .styled-table {
           width: 100%;

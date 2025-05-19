@@ -16,6 +16,7 @@ const QuanLyNguoiDung = () => {
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [message, setMessage] = useState('');
 
   const fetchData = async () => {
     setLoading(true);
@@ -34,6 +35,11 @@ const QuanLyNguoiDung = () => {
     fetchData();
   }, []);
 
+  const showMessage = (msg) => {
+    setMessage(msg);
+    setTimeout(() => setMessage(''), 3000);
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
@@ -42,13 +48,12 @@ const QuanLyNguoiDung = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log('Form gửi đi:', form); // Log kiểm tra
       if (editing) {
         await axios.put(`${API_BASE}/${currentUser.nguoidung_id}`, form);
-        setEditing(false);
-        setCurrentUser(null);
+        showMessage('✅ Cập nhật người dùng thành công!');
       } else {
         await axios.post(API_BASE, form);
+        showMessage('✅ Thêm người dùng thành công!');
       }
       setForm({
         ten_dang_nhap: '',
@@ -58,6 +63,8 @@ const QuanLyNguoiDung = () => {
         so_dien_thoai: '',
         la_quan_tri: false,
       });
+      setEditing(false);
+      setCurrentUser(null);
       fetchData();
     } catch (err) {
       console.error('Lỗi khi thêm/cập nhật:', err.response?.data || err.message);
@@ -82,6 +89,7 @@ const QuanLyNguoiDung = () => {
     if (!window.confirm('Bạn có chắc muốn xóa người dùng này?')) return;
     try {
       await axios.delete(`${API_BASE}/${userId}`);
+      showMessage('✅ Đã xóa người dùng!');
       fetchData();
     } catch (err) {
       console.error('Lỗi khi xóa người dùng:', err.response?.data || err.message);
@@ -105,6 +113,13 @@ const QuanLyNguoiDung = () => {
   return (
     <div className="container">
       <h2 className="heading">Quản Lý Người Dùng</h2>
+
+      {message && <div className="message">{message}</div>}
+      {editing && (
+        <p className="editing-info">
+          🔧 Đang chỉnh sửa tài khoản: <strong>{currentUser?.ten_dang_nhap}</strong>
+        </p>
+      )}
 
       <form onSubmit={handleSubmit} className="form-grid">
         <input name="ten_dang_nhap" placeholder="Tên đăng nhập" value={form.ten_dang_nhap} onChange={handleChange} required />
@@ -166,6 +181,21 @@ const QuanLyNguoiDung = () => {
         .heading {
           text-align: center;
           color: rgb(0, 170, 20);
+        }
+
+        .message {
+          background-color: #dff0d8;
+          color: #3c763d;
+          padding: 10px;
+          margin-bottom: 15px;
+          text-align: center;
+          border-radius: 4px;
+        }
+
+        .editing-info {
+          text-align: center;
+          color: #e67e22;
+          margin-bottom: 10px;
         }
 
         .form-grid {

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const API_BASE_URL = 'http://127.0.0.1:3000/api'; // Đặt base URL chung
+const API_BASE_URL = 'http://127.0.0.1:3000/api';
 
 const QuanLySuatChieu = () => {
   const [suatList, setSuatList] = useState([]);
@@ -26,19 +28,28 @@ const QuanLySuatChieu = () => {
   const fetchSuatChieu = () => {
     axios.get(`${API_BASE_URL}/suatchieu`)
       .then(res => setSuatList(res.data))
-      .catch(err => console.error('Lỗi khi tải suất chiếu:', err));
+      .catch(err => {
+        console.error('Lỗi khi tải suất chiếu:', err);
+        toast.error('Không thể tải danh sách suất chiếu.');
+      });
   };
 
   const fetchPhim = () => {
     axios.get(`${API_BASE_URL}/phim`)
       .then(res => setPhimList(res.data))
-      .catch(err => console.error('Lỗi khi tải phim:', err));
+      .catch(err => {
+        console.error('Lỗi khi tải phim:', err);
+        toast.error('Không thể tải danh sách phim.');
+      });
   };
 
   const fetchPhong = () => {
     axios.get(`${API_BASE_URL}/phongchieu`)
       .then(res => setPhongList(res.data))
-      .catch(err => console.error('Lỗi khi tải phòng chiếu:', err));
+      .catch(err => {
+        console.error('Lỗi khi tải phòng chiếu:', err);
+        toast.error('Không thể tải danh sách phòng chiếu.');
+      });
   };
 
   const handleChange = (e) => {
@@ -51,9 +62,12 @@ const QuanLySuatChieu = () => {
     try {
       if (editing) {
         await axios.put(`${API_BASE_URL}/suatchieu/${currentSuat.suat_chieu_id}`, form);
+        toast.success('Cập nhật suất chiếu thành công!');
         setEditing(false);
+        setCurrentSuat(null);
       } else {
         await axios.post(`${API_BASE_URL}/suatchieu`, form);
+        toast.success('Thêm suất chiếu thành công!');
       }
       setForm({
         phim_id: '',
@@ -65,7 +79,7 @@ const QuanLySuatChieu = () => {
       fetchSuatChieu();
     } catch (err) {
       console.error('Lỗi khi thêm hoặc cập nhật suất chiếu:', err);
-      alert('Không thể thêm hoặc cập nhật suất chiếu.');
+      toast.error('Không thể thêm hoặc cập nhật suất chiếu.');
     }
   };
 
@@ -82,13 +96,27 @@ const QuanLySuatChieu = () => {
   };
 
   const handleDelete = async (suat_id) => {
+    if (!window.confirm('Bạn có chắc muốn xóa suất chiếu này?')) return;
     try {
       await axios.delete(`${API_BASE_URL}/suatchieu/${suat_id}`);
+      toast.success('Xóa suất chiếu thành công!');
       fetchSuatChieu();
     } catch (err) {
       console.error('Lỗi khi xóa suất chiếu:', err);
-      alert('Không thể xóa suất chiếu.');
+      toast.error('Không thể xóa suất chiếu.');
     }
+  };
+
+  const handleCancelEdit = () => {
+    setEditing(false);
+    setCurrentSuat(null);
+    setForm({
+      phim_id: '',
+      phong_id: '',
+      ngay_chieu: '',
+      gio_bat_dau: '',
+      gia_ve: ''
+    });
   };
 
   return (
@@ -138,6 +166,9 @@ const QuanLySuatChieu = () => {
           min="0"
         />
         <button type="submit">{editing ? 'Cập nhật suất chiếu' : 'Thêm suất chiếu'}</button>
+        {editing && (
+          <button type="button" className="form-cancel" onClick={handleCancelEdit}>Huỷ chỉnh sửa</button>
+        )}
       </form>
 
       <table>
@@ -174,6 +205,8 @@ const QuanLySuatChieu = () => {
         </tbody>
       </table>
 
+      <ToastContainer position="top-right" autoClose={3000} />
+
       <style jsx>{`
         .container {
           padding: 20px;
@@ -201,6 +234,18 @@ const QuanLySuatChieu = () => {
         button {
           font-size: 16px;
           cursor: pointer;
+        }
+        .form-cancel {
+          background-color: #95a5a6;
+          color: white;
+          border: none;
+          padding: 8px;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: background 0.3s ease;
+        }
+        .form-cancel:hover {
+          background-color: #7f8c8d;
         }
         .btn-edit {
           background-color: orange;
