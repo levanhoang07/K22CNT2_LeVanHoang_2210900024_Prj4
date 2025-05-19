@@ -5,6 +5,7 @@ from flask_cors import CORS
 app = flask.Flask(__name__)
 CORS(app)
 
+# -------------------- KẾT NỐI DATABASE --------------------
 def get_db_connection():
     conn_str = (
         "Driver={SQL Server};"
@@ -18,6 +19,7 @@ def get_db_connection():
         print(f"Lỗi kết nối cơ sở dữ liệu: {str(e)}")
         raise
 
+# -------------------- HÀM DÙNG CHUNG: LẤY DỮ LIỆU --------------------
 def fetch_all(table_name):
     try:
         conn = get_db_connection()
@@ -33,6 +35,7 @@ def fetch_all(table_name):
         print(f"Lỗi khi lấy dữ liệu: {str(e)}")
         return []
 
+# -------------------- ĐĂNG KÝ NGƯỜI DÙNG --------------------
 @app.route('/api/dangky', methods=['POST'])
 def dang_ky():
     data = flask.request.get_json()
@@ -44,10 +47,8 @@ def dang_ky():
 
     if not all([ho_ten, email, sdt, mat_khau]):
         return flask.jsonify({'success': False, 'message': 'Vui lòng nhập đầy đủ thông tin'}), 400
-
     if '@' not in email or '.' not in email:
         return flask.jsonify({'success': False, 'message': 'Email không hợp lệ'}), 400
-
     if len(mat_khau) < 6:
         return flask.jsonify({'success': False, 'message': 'Mật khẩu phải có ít nhất 6 ký tự'}), 400
 
@@ -85,11 +86,10 @@ def dang_ky():
         conn.close()
         return flask.jsonify(response), 201
 
-    except pyodbc.Error as e:
-        return flask.jsonify({'success': False, 'message': f'Lỗi cơ sở dữ liệu: {str(e)}'}), 500
     except Exception as e:
-        return flask.jsonify({'success': False, 'message': f'Lỗi không xác định: {str(e)}'}), 500
+        return flask.jsonify({'success': False, 'message': f'Lỗi: {str(e)}'}), 500
 
+# -------------------- ĐĂNG NHẬP NGƯỜI DÙNG --------------------
 @app.route('/api/dangnhap', methods=['POST'])
 def dang_nhap():
     data = flask.request.get_json()
@@ -97,7 +97,7 @@ def dang_nhap():
     mat_khau = data.get('matKhau')
 
     if not ten_dang_nhap or not mat_khau:
-        return flask.jsonify({'success': False, 'message': 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu'}), 400
+        return flask.jsonify({'success': False, 'message': 'Vui lòng nhập đầy đủ thông tin'}), 400
 
     try:
         conn = get_db_connection()
@@ -110,10 +110,8 @@ def dang_nhap():
         """, (ten_dang_nhap, ten_dang_nhap))
 
         user = cursor.fetchone()
-
         if not user:
-            return flask.jsonify({'success': False, 'message': 'Tên đăng nhập hoặc email không tồn tại'}), 401
-
+            return flask.jsonify({'success': False, 'message': 'Tài khoản không tồn tại'}), 401
         if user.mat_khau != mat_khau:
             return flask.jsonify({'success': False, 'message': 'Mật khẩu không đúng'}), 401
 
@@ -132,11 +130,78 @@ def dang_nhap():
         conn.close()
         return flask.jsonify(response), 200
 
-    except pyodbc.Error as e:
-        return flask.jsonify({'success': False, 'message': f'Lỗi cơ sở dữ liệu: {str(e)}'}), 500
     except Exception as e:
-        return flask.jsonify({'success': False, 'message': f'Lỗi không xác định: {str(e)}'}), 500
+        return flask.jsonify({'success': False, 'message': str(e)}), 500
 
+# -------------------- CRUD NGƯỜI DÙNG --------------------
+@app.route('/api/nguoidung', methods=['GET'])
+def get_all_nguoi_dung():
+    return flask.jsonify(fetch_all('nguoi_dung'))
+
+@app.route('/api/nguoidung', methods=['POST'])
+def them_nguoi_dung():
+    data = flask.request.get_json()
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO nguoi_dung (ten_dang_nhap, mat_khau, ho_ten, email, so_dien_thoai, la_quan_tri)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            data['ten_dang_nhap'],
+            data['mat_khau'],
+            data.get('ho_ten'),
+            data.get('email'),
+            data.get('so_dien_thoai'),
+            int(data.get('la_quan_tri', False))
+        ))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return flask.jsonify({'success': True, 'message': 'Thêm người dùng thành công'}), 201
+    except Exception as e:
+        return flask.jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/nguoidung/<int:nguoidung_id>', methods=['PUT'])
+def sua_nguoi_dung(nguoidung_id):
+    data = flask.request.get_json()
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE nguoi_dung
+            SET ten_dang_nhap = ?, mat_khau = ?, ho_ten = ?, email = ?, so_dien_thoai = ?, la_quan_tri = ?
+            WHERE nguoidung_id = ?
+        """, (
+            data['ten_dang_nhap'],
+            data['mat_khau'],
+            data.get('ho_ten'),
+            data.get('email'),
+            data.get('so_dien_thoai'),
+            int(data.get('la_quan_tri', False)),
+            nguoidung_id
+        ))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return flask.jsonify({'success': True, 'message': 'Cập nhật người dùng thành công'}), 200
+    except Exception as e:
+        return flask.jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/nguoidung/<int:nguoidung_id>', methods=['DELETE'])
+def xoa_nguoi_dung(nguoidung_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM nguoi_dung WHERE nguoidung_id = ?", (nguoidung_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return flask.jsonify({'success': True, 'message': 'Xóa người dùng thành công'}), 200
+    except Exception as e:
+        return flask.jsonify({'success': False, 'message': str(e)}), 500
+
+# -------------------- DANH SÁCH CÁC BẢNG KHÁC --------------------
 @app.route('/api/phim', methods=['GET'])
 def get_all_phim():
     phim_data = fetch_all('phim')
@@ -147,10 +212,6 @@ def get_all_phim():
         phim['thoiLuong'] = phim.pop('thoi_luong')
         phim['tacGia'] = phim.pop('tac_gia')
     return flask.jsonify(phim_data)
-
-@app.route('/api/nguoidung', methods=['GET'])
-def get_all_nguoi_dung():
-    return flask.jsonify(fetch_all('nguoi_dung'))
 
 @app.route('/api/phongchieu', methods=['GET'])
 def get_all_phong_chieu():
@@ -168,56 +229,71 @@ def get_all_suat_chieu():
 def get_all_ve_dat():
     return flask.jsonify(fetch_all('ve_dat'))
 
-@app.route('/api/datve', methods=['POST'])
-def dat_ve():
+# Thêm phim mới
+@app.route('/api/phim', methods=['POST'])
+def them_phim():
     data = flask.request.get_json()
-    nguoi_dung_id = data.get('nguoiDungId')
-    suat_chieu_id = data.get('suatChieuId')
-    danh_sach_ghe = data.get('danhSachGhe')
+    ten_phim = data.get('ten')
+    mo_ta = data.get('moTa')
+    thoi_luong = data.get('thoiLuong')
+    tac_gia = data.get('tacGia')
 
-    if not nguoi_dung_id or not suat_chieu_id or not danh_sach_ghe or not isinstance(danh_sach_ghe, list):
-        return flask.jsonify({'success': False, 'message': 'Dữ liệu đặt vé không hợp lệ'}), 400
+    if not ten_phim:
+        return flask.jsonify({'success': False, 'message': 'Tên phim không được để trống'}), 400
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-
-        ghe_chua_dat = []
-        ghe_da_dat = []
-
-        for ghe_id in danh_sach_ghe:
-            cursor.execute("""
-                SELECT * FROM ve_dat 
-                WHERE suat_chieu_id = ? AND ghe_id = ?
-            """, (suat_chieu_id, ghe_id))
-            if cursor.fetchone():
-                ghe_da_dat.append(ghe_id)
-            else:
-                ghe_chua_dat.append(ghe_id)
-
-        if ghe_da_dat:
-            return flask.jsonify({'success': False, 'message': f'Ghế đã được đặt: {ghe_da_dat}'}), 400
-
-        for ghe_id in ghe_chua_dat:
-            cursor.execute("""
-                INSERT INTO ve_dat (nguoi_dung_id, suat_chieu_id, ghe_id)
-                VALUES (?, ?, ?)
-            """, (nguoi_dung_id, suat_chieu_id, ghe_id))
-
+        cursor.execute("""
+            INSERT INTO phim (ten_phim, mo_ta, thoi_luong, tac_gia)
+            VALUES (?, ?, ?, ?)
+        """, (ten_phim, mo_ta, thoi_luong, tac_gia))
         conn.commit()
         cursor.close()
         conn.close()
-
-        return flask.jsonify({
-            'success': True,
-            'message': 'Đặt vé thành công',
-            'danhSachGheDat': ghe_chua_dat
-        }), 201
-
-    except pyodbc.Error as e:
-        return flask.jsonify({'success': False, 'message': f'Lỗi cơ sở dữ liệu: {str(e)}'}), 500
+        return flask.jsonify({'success': True, 'message': 'Thêm phim thành công'}), 201
     except Exception as e:
-        return flask.jsonify({'success': False, 'message': f'Lỗi không xác định: {str(e)}'}), 500
+        print("Lỗi thêm phim:", e)
+        return flask.jsonify({'success': False, 'message': str(e)}), 500
 
+# Sửa phim
+@app.route('/api/phim/<int:phim_id>', methods=['PUT'])
+def sua_phim(phim_id):
+    data = flask.request.get_json()
+    ten_phim = data.get('ten')
+    mo_ta = data.get('moTa')
+    thoi_luong = data.get('thoiLuong')
+    tac_gia = data.get('tacGia')
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE phim
+            SET ten_phim = ?, mo_ta = ?, thoi_luong = ?, tac_gia = ?
+            WHERE phim_id = ?
+        """, (ten_phim, mo_ta, thoi_luong, tac_gia, phim_id))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return flask.jsonify({'success': True, 'message': 'Cập nhật phim thành công'}), 200
+    except Exception as e:
+        return flask.jsonify({'success': False, 'message': str(e)}), 500
+
+# Xóa phim
+@app.route('/api/phim/<int:phim_id>', methods=['DELETE'])
+def xoa_phim(phim_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM phim WHERE phim_id = ?", (phim_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return flask.jsonify({'success': True, 'message': 'Xóa phim thành công'}), 200
+    except Exception as e:
+        return flask.jsonify({'success': False, 'message': str(e)}), 500
+
+# -------------------- CHẠY APP --------------------
 if __name__ == '__main__':
     app.run(debug=True, port=3000)

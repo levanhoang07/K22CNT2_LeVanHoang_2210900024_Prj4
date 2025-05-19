@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = 'http://127.0.0.1:3000/api'; // Đặt base URL chung
+
 const QuanLySuatChieu = () => {
   const [suatList, setSuatList] = useState([]);
   const [phimList, setPhimList] = useState([]);
@@ -22,36 +24,36 @@ const QuanLySuatChieu = () => {
   }, []);
 
   const fetchSuatChieu = () => {
-    axios.get('http://127.0.0.1:3000/api/suatchieu')
+    axios.get(`${API_BASE_URL}/suatchieu`)
       .then(res => setSuatList(res.data))
       .catch(err => console.error('Lỗi khi tải suất chiếu:', err));
   };
 
   const fetchPhim = () => {
-    axios.get('/api/phim')
+    axios.get(`${API_BASE_URL}/phim`)
       .then(res => setPhimList(res.data))
       .catch(err => console.error('Lỗi khi tải phim:', err));
   };
 
   const fetchPhong = () => {
-    axios.get('/api/phongchieu')
+    axios.get(`${API_BASE_URL}/phongchieu`)
       .then(res => setPhongList(res.data))
       .catch(err => console.error('Lỗi khi tải phòng chiếu:', err));
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editing) {
-        await axios.put(`/api/suatchieu/${currentSuat.suat_chieu_id}`, form);
+        await axios.put(`${API_BASE_URL}/suatchieu/${currentSuat.suat_chieu_id}`, form);
         setEditing(false);
       } else {
-        await axios.post('/api/suatchieu', form);
+        await axios.post(`${API_BASE_URL}/suatchieu`, form);
       }
       setForm({
         phim_id: '',
@@ -81,7 +83,7 @@ const QuanLySuatChieu = () => {
 
   const handleDelete = async (suat_id) => {
     try {
-      await axios.delete(`/api/suatchieu/${suat_id}`);
+      await axios.delete(`${API_BASE_URL}/suatchieu/${suat_id}`);
       fetchSuatChieu();
     } catch (err) {
       console.error('Lỗi khi xóa suất chiếu:', err);
@@ -133,6 +135,7 @@ const QuanLySuatChieu = () => {
           value={form.gia_ve}
           onChange={handleChange}
           required
+          min="0"
         />
         <button type="submit">{editing ? 'Cập nhật suất chiếu' : 'Thêm suất chiếu'}</button>
       </form>
@@ -164,7 +167,6 @@ const QuanLySuatChieu = () => {
                 <td>
                   <button className="btn-edit" onClick={() => handleEdit(suat)}>Sửa</button>
                   <button className="btn-delete" onClick={() => handleDelete(suat.suat_chieu_id)}>Xóa</button>
-
                 </td>
               </tr>
             );
@@ -173,69 +175,68 @@ const QuanLySuatChieu = () => {
       </table>
 
       <style jsx>{`
-  .container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-  }
-  h2 {
-    color: #333;
-    margin-bottom: 20px;
-  }
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-bottom: 20px;
-  }
-  select, input, button {
-    padding: 8px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-  }
-  select:focus, input:focus {
-    outline-color: #4CAF50;
-  }
-  button {
-    font-size: 16px;
-    cursor: pointer;
-  }
-  .btn-edit {
-    background-color: orange;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    margin-right: 5px;
-  }
-  .btn-edit:hover {
-    background-color: darkorange;
-  }
-  .btn-delete {
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-  }
-  .btn-delete:hover {
-    background-color: darkred;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  th, td {
-    padding: 10px;
-    text-align: center;
-    border: 1px solid #ddd;
-  }
-  th {
-    background-color: #f4f4f4;
-  }
-  tr:nth-child(even) td {
-    background-color: #f9f9f9;
-  }
-`}</style>
-
+        .container {
+          padding: 20px;
+          font-family: Arial, sans-serif;
+        }
+        h2 {
+          color: #333;
+          margin-bottom: 20px;
+        }
+        form {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          margin-bottom: 20px;
+        }
+        select, input, button {
+          padding: 8px;
+          font-size: 16px;
+          border-radius: 5px;
+          border: 1px solid #ddd;
+        }
+        select:focus, input:focus {
+          outline-color: #4CAF50;
+        }
+        button {
+          font-size: 16px;
+          cursor: pointer;
+        }
+        .btn-edit {
+          background-color: orange;
+          color: white;
+          border: none;
+          padding: 8px 12px;
+          margin-right: 5px;
+        }
+        .btn-edit:hover {
+          background-color: darkorange;
+        }
+        .btn-delete {
+          background-color: red;
+          color: white;
+          border: none;
+          padding: 8px 12px;
+        }
+        .btn-delete:hover {
+          background-color: darkred;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        th, td {
+          padding: 10px;
+          text-align: center;
+          border: 1px solid #ddd;
+        }
+        th {
+          background-color: #f4f4f4;
+        }
+        tr:nth-child(even) td {
+          background-color: #f9f9f9;
+        }
+      `}</style>
     </div>
   );
 };

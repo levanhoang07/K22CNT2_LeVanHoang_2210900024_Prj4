@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_BASE = 'http://127.0.0.1:3000/api/nguoidung';
+
 const QuanLyNguoiDung = () => {
   const [nguoiDungList, setNguoiDungList] = useState([]);
   const [form, setForm] = useState({
@@ -18,7 +20,7 @@ const QuanLyNguoiDung = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://127.0.0.1:3000/api/nguoidung');
+      const res = await axios.get(API_BASE);
       setNguoiDungList(res.data);
     } catch (err) {
       console.error('Lỗi khi tải danh sách:', err);
@@ -40,12 +42,13 @@ const QuanLyNguoiDung = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log('Form gửi đi:', form); // Log kiểm tra
       if (editing) {
-        await axios.put(`/api/nguoidung/${currentUser.nguoidung_id}`, form);
+        await axios.put(`${API_BASE}/${currentUser.nguoidung_id}`, form);
         setEditing(false);
         setCurrentUser(null);
       } else {
-        await axios.post('/api/nguoidung', form);
+        await axios.post(API_BASE, form);
       }
       setForm({
         ten_dang_nhap: '',
@@ -57,7 +60,7 @@ const QuanLyNguoiDung = () => {
       });
       fetchData();
     } catch (err) {
-      console.error('Lỗi khi thêm hoặc cập nhật người dùng:', err);
+      console.error('Lỗi khi thêm/cập nhật:', err.response?.data || err.message);
       alert('Không thể thêm hoặc cập nhật người dùng.');
     }
   };
@@ -78,10 +81,10 @@ const QuanLyNguoiDung = () => {
   const handleDelete = async (userId) => {
     if (!window.confirm('Bạn có chắc muốn xóa người dùng này?')) return;
     try {
-      await axios.delete(`/api/nguoidung/${userId}`);
+      await axios.delete(`${API_BASE}/${userId}`);
       fetchData();
     } catch (err) {
-      console.error('Lỗi khi xóa người dùng:', err);
+      console.error('Lỗi khi xóa người dùng:', err.response?.data || err.message);
       alert('Không thể xóa người dùng.');
     }
   };
@@ -104,53 +107,17 @@ const QuanLyNguoiDung = () => {
       <h2 className="heading">Quản Lý Người Dùng</h2>
 
       <form onSubmit={handleSubmit} className="form-grid">
-        <input
-          name="ten_dang_nhap"
-          placeholder="Tên đăng nhập"
-          value={form.ten_dang_nhap}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="mat_khau"
-          type="password"
-          placeholder="Mật khẩu"
-          value={form.mat_khau}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="ho_ten"
-          placeholder="Họ tên"
-          value={form.ho_ten}
-          onChange={handleChange}
-        />
-        <input
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-        />
-        <input
-          name="so_dien_thoai"
-          placeholder="Số điện thoại"
-          value={form.so_dien_thoai}
-          onChange={handleChange}
-        />
+        <input name="ten_dang_nhap" placeholder="Tên đăng nhập" value={form.ten_dang_nhap} onChange={handleChange} required />
+        <input name="mat_khau" type="password" placeholder="Mật khẩu" value={form.mat_khau} onChange={handleChange} required />
+        <input name="ho_ten" placeholder="Họ tên" value={form.ho_ten} onChange={handleChange} />
+        <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
+        <input name="so_dien_thoai" placeholder="Số điện thoại" value={form.so_dien_thoai} onChange={handleChange} />
         <label className="checkbox-label">
-          <input
-            type="checkbox"
-            name="la_quan_tri"
-            checked={form.la_quan_tri}
-            onChange={handleChange}
-          />
-          Quản trị
+          <input type="checkbox" name="la_quan_tri" checked={form.la_quan_tri} onChange={handleChange} /> Quản trị
         </label>
         <button type="submit">{editing ? 'Cập nhật người dùng' : 'Thêm người dùng'}</button>
         {editing && (
-          <button type="button" className="form-cancel" onClick={handleCancelEdit}>
-            Huỷ chỉnh sửa
-          </button>
+          <button type="button" className="form-cancel" onClick={handleCancelEdit}>Huỷ chỉnh sửa</button>
         )}
       </form>
 

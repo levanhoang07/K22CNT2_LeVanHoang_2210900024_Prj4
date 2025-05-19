@@ -1,21 +1,36 @@
 // src/components/Navigation.js
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "./context/AuthContext";
 
 export default function Navigation() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [hoveredLink, setHoveredLink] = useState(null);
+  const [isLogoutHover, setLogoutHover] = useState(false);
 
   const handleLogout = () => {
-    logout(); // Xóa thông tin người dùng
-    navigate("/"); // Chuyển hướng về trang chủ
+    logout();
+    navigate("/");
   };
+
+  const navLinksData = [
+    { path: "/dangnhap", label: "Đăng nhập" },
+    { path: "/dangky", label: "Đăng ký" },
+  ];
 
   return (
     <nav style={styles.nav}>
       <div style={styles.logo}>
-        <Link to="/" style={styles.logoLink}>
+        <Link
+          to="/"
+          style={{
+            ...styles.logoLink,
+            color: hoveredLink === "logo" ? "#a5d6a7" : "#fff",
+          }}
+          onMouseEnter={() => setHoveredLink("logo")}
+          onMouseLeave={() => setHoveredLink(null)}
+        >
           Doremi Cinema
         </Link>
       </div>
@@ -23,68 +38,98 @@ export default function Navigation() {
         {user ? (
           <>
             <span style={styles.greeting}>Xin chào, {user.ho_ten}</span>
-            <button onClick={handleLogout} style={styles.logoutButton}>
+            <button
+              onClick={handleLogout}
+              style={{
+                ...styles.logoutButton,
+                ...(isLogoutHover ? styles.logoutButtonHover : {}),
+              }}
+              onMouseEnter={() => setLogoutHover(true)}
+              onMouseLeave={() => setLogoutHover(false)}
+            >
               Đăng xuất
             </button>
           </>
         ) : (
-          <>
-            <Link to="/dangnhap" style={styles.navLink}>
-              Đăng nhập
+          navLinksData.map(({ path, label }) => (
+            <Link
+              key={path}
+              to={path}
+              style={{
+                ...styles.navLink,
+                ...(hoveredLink === path ? styles.navLinkHover : {}),
+              }}
+              onMouseEnter={() => setHoveredLink(path)}
+              onMouseLeave={() => setHoveredLink(null)}
+            >
+              {label}
             </Link>
-            <Link to="/dangky" style={styles.navLink}>
-              Đăng ký
-            </Link>
-          </>
+          ))
         )}
       </div>
     </nav>
   );
 }
-
 const styles = {
   nav: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "15px 30px",
-    background: "#2e7d32",
-    color: "#ffffff",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    padding: "15px 40px",
+    background: "linear-gradient(135deg, #0f3443 0%, #34e89e 100%)", // gradient nền mới
+    color: "#fff",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
   },
   logo: {
-    fontSize: "24px",
-    fontWeight: "bold",
+    fontSize: "28px",
+    fontWeight: "700",
+    letterSpacing: "1.5px",
   },
   logoLink: {
-    color: "#ffffff",
+    color: "#fff",
     textDecoration: "none",
+    transition: "color 0.3s ease",
+    cursor: "pointer",
   },
   navLinks: {
     display: "flex",
     alignItems: "center",
-    gap: "20px",
+    gap: "25px",
   },
   navLink: {
-    color: "#ffffff",
+    color: "#e0e0e0",
     textDecoration: "none",
-    fontSize: "16px",
-    fontWeight: "500",
-    transition: "color 0.3s ease",
+    fontSize: "17px",
+    fontWeight: "600",
+    padding: "8px 14px",
+    borderRadius: "6px",
+    transition: "background-color 0.3s ease, color 0.3s ease",
+    cursor: "pointer",
+  },
+  navLinkHover: {
+    backgroundColor: "#34e89e", // xanh sáng gradient phía dưới khi hover
+    color: "#0f3443", // chữ tối gradient phía trên khi hover
   },
   greeting: {
-    fontSize: "16px",
-    fontWeight: "500",
+    fontSize: "17px",
+    fontWeight: "600",
+    marginRight: "12px",
   },
   logoutButton: {
-    background: "#d32f2f",
-    color: "#ffffff",
+    backgroundColor: "#d32f2f",
+    color: "#fff",
     border: "none",
-    padding: "8px 16px",
-    borderRadius: "5px",
+    padding: "9px 20px",
+    borderRadius: "8px",
     cursor: "pointer",
     fontSize: "16px",
-    fontWeight: "500",
-    transition: "background 0.3s ease",
+    fontWeight: "600",
+    boxShadow: "0 3px 8px rgba(211, 47, 47, 0.6)",
+    transition: "background-color 0.3s ease, box-shadow 0.3s ease",
+  },
+  logoutButtonHover: {
+    backgroundColor: "#b71c1c",
+    boxShadow: "0 5px 15px rgba(183, 28, 28, 0.8)",
   },
 };

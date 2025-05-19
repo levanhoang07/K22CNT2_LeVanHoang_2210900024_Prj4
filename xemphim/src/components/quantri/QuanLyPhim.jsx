@@ -2,35 +2,44 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 export default function QuanLyPhim() {
+  const API_BASE = 'http://127.0.0.1:3000/api/phim';
+
   const [phimList, setPhimList] = useState([]);
   const [ten, setTen] = useState('');
   const [tacGia, setTacGia] = useState('');
   const [thoiLuong, setThoiLuong] = useState('');
-  const [giaTien, setGiaTien] = useState('');
   const [anh, setAnh] = useState('');
+  const [moTa, setMoTa] = useState('');  // state mới cho mô tả
   const [editing, setEditing] = useState(false);
   const [currentPhim, setCurrentPhim] = useState(null);
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:3000/api/phim')
-      .then(res => setPhimList(res.data))
-      .catch(err => console.error('Lỗi khi tải danh sách phim:', err));
+    fetchData();
   }, []);
 
+  const fetchData = () => {
+    axios.get(API_BASE)
+      .then(res => setPhimList(res.data))
+      .catch(err => console.error('Lỗi khi tải danh sách phim:', err));
+  };
+
   const handleXoaPhim = (id) => {
-    axios.delete(`/api/phim/${id}`)
+    axios.delete(`${API_BASE}/${id}`)
       .then(() => {
         setPhimList(phimList.filter(phim => phim.id !== id));
       })
-      .catch(err => console.error('Lỗi khi xóa phim:', err));
+      .catch(err => {
+        console.error('Lỗi khi xóa phim:', err);
+        alert('Không thể xóa phim.');
+      });
   };
 
   const handleThemPhim = (e) => {
     e.preventDefault();
-    const newPhim = { ten, tacGia, thoiLuong, giaTien, anh };
+    const newPhim = { ten, tacGia, thoiLuong, anh, moTa };
 
     if (editing) {
-      axios.put(`/api/phim/${currentPhim.id}`, newPhim)
+      axios.put(`${API_BASE}/${currentPhim.id}`, newPhim)
         .then(res => {
           setPhimList(phimList.map(phim => (phim.id === currentPhim.id ? res.data : phim)));
           setEditing(false);
@@ -42,7 +51,7 @@ export default function QuanLyPhim() {
           alert('Không thể cập nhật phim.');
         });
     } else {
-      axios.post('/api/phim', newPhim)
+      axios.post(API_BASE, newPhim)
         .then(res => {
           setPhimList([...phimList, res.data]);
           resetForm();
@@ -60,16 +69,16 @@ export default function QuanLyPhim() {
     setTen(phim.ten);
     setTacGia(phim.tacGia);
     setThoiLuong(phim.thoiLuong);
-    setGiaTien(phim.giaTien);
     setAnh(phim.anh);
+    setMoTa(phim.moTa); // set mô tả khi sửa
   };
 
   const resetForm = () => {
     setTen('');
     setTacGia('');
     setThoiLuong('');
-    setGiaTien('');
     setAnh('');
+    setMoTa('');
   };
 
   return (
@@ -80,8 +89,8 @@ export default function QuanLyPhim() {
         <input type="text" placeholder="Tên Phim" value={ten} onChange={(e) => setTen(e.target.value)} required />
         <input type="text" placeholder="Tác Giả" value={tacGia} onChange={(e) => setTacGia(e.target.value)} required />
         <input type="text" placeholder="Thời Lượng" value={thoiLuong} onChange={(e) => setThoiLuong(e.target.value)} required />
-        <input type="text" placeholder="Giá Vé" value={giaTien} onChange={(e) => setGiaTien(e.target.value)} required />
         <input type="text" placeholder="Link ảnh" value={anh} onChange={(e) => setAnh(e.target.value)} required />
+        <input type="text" placeholder="Mô Tả" value={moTa} onChange={(e) => setMoTa(e.target.value)} required />
         <button type="submit">{editing ? 'Cập nhật Phim' : 'Lưu Phim'}</button>
       </form>
 
@@ -91,7 +100,8 @@ export default function QuanLyPhim() {
             <th>Tên Phim</th>
             <th>Tác Giả</th>
             <th>Thời Lượng</th>
-            <th>Giá Vé</th>
+            <th>Ảnh</th>
+            <th>Mô Tả</th>
             <th>Hành Động</th>
           </tr>
         </thead>
@@ -101,7 +111,14 @@ export default function QuanLyPhim() {
               <td>{phim.ten}</td>
               <td>{phim.tacGia}</td>
               <td>{phim.thoiLuong}</td>
-              <td>{phim.giaTien}</td>
+              <td>
+                {phim.anh ? (
+                  <img src={phim.anh} alt={phim.ten} style={{ width: '80px', height: 'auto' }} />
+                ) : (
+                  'Chưa có ảnh'
+                )}
+              </td>
+              <td>{phim.moTa}</td>
               <td>
                 <button className="edit-button" onClick={() => handleEditPhim(phim)}>Sửa</button>
                 <button className="delete-button" onClick={() => handleXoaPhim(phim.id)}>Xóa</button>
@@ -150,6 +167,7 @@ export default function QuanLyPhim() {
           padding: 10px;
           border: 1px solid #ddd;
           text-align: center;
+          vertical-align: middle;
         }
         .styled-table th {
           background-color: #f5f5f5;
