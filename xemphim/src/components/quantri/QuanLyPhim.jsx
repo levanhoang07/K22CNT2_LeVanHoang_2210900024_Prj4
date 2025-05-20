@@ -96,7 +96,7 @@ export default function QuanLyPhim() {
 
   return (
     <div className="container">
-      <h3 className="title">🎬 Quản lý Phim</h3>
+      <h3 className="title">Quản lý Phim</h3>
 
       {message && <div className="message">{message}</div>}
       {editing && (

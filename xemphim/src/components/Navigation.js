@@ -31,7 +31,7 @@ export default function Navigation() {
           onMouseEnter={() => setHoveredLink("logo")}
           onMouseLeave={() => setHoveredLink(null)}
         >
-          Doremi Cinema
+         🎬Doremi Cinema
         </Link>
       </div>
       <div style={styles.navLinks}>
@@ -76,7 +76,7 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     padding: "15px 40px",
-    background: "linear-gradient(135deg, #0f3443 0%, #34e89e 100%)", // gradient nền mới
+    background: "linear-gradient(135deg, #0f3443 0%, #34e89e 100%)",
     color: "#fff",
     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
@@ -108,8 +108,8 @@ const styles = {
     cursor: "pointer",
   },
   navLinkHover: {
-    backgroundColor: "#34e89e", // xanh sáng gradient phía dưới khi hover
-    color: "#0f3443", // chữ tối gradient phía trên khi hover
+    backgroundColor: "#34e89e", 
+    color: "#0f3443", 
   },
   greeting: {
     fontSize: "17px",
