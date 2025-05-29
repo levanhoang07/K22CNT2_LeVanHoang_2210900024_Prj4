@@ -13,6 +13,8 @@ export default function QuanLyPhim() {
   const [editing, setEditing] = useState(false);
   const [currentPhim, setCurrentPhim] = useState(null);
   const [message, setMessage] = useState('');
+  const [trailer, setTrailer] = useState('');
+
 
   useEffect(() => {
     fetchData();
@@ -29,23 +31,18 @@ export default function QuanLyPhim() {
     setTimeout(() => setMessage(''), 3000);
   };
 
-  const handleXoaPhim = (id) => {
-    if (window.confirm('Bạn có chắc muốn xóa phim này không?')) {
-      axios.delete(`${API_BASE}/${id}`)
-        .then(() => {
-          fetchData();
-          showMessage('✅ Đã xóa phim thành công!');
-        })
-        .catch(err => {
-          console.error('Lỗi khi xóa phim:', err);
-          alert('❌ Không thể xóa phim.');
-        });
-    }
-  };
-
   const handleThemPhim = (e) => {
     e.preventDefault();
-    const newPhim = { ten, tacGia, thoiLuong, anh, moTa };
+    const newPhim = {
+      ten: ten,
+      tacGia: tacGia,
+      thoiLuong: thoiLuong,
+      moTa: moTa,
+      anh: anh,
+      trailer: trailer
+    };
+
+
 
     if (editing) {
       axios.put(`${API_BASE}/${currentPhim.id}`, newPhim)
@@ -68,8 +65,22 @@ export default function QuanLyPhim() {
           resetForm();
         })
         .catch(err => {
-          console.error('Lỗi khi thêm phim:', err);
-          alert('❌ Không thể thêm phim.');
+  console.error('Lỗi khi thêm phim:', err.response?.data || err.message);
+  alert('❌ Không thể thêm phim: ' + (err.response?.data?.message || err.message));
+});
+
+    }
+  };
+  const handleXoaPhim = (id) => {
+    if (window.confirm('Bạn có chắc muốn xóa phim này không?')) {
+      axios.delete(`${API_BASE}/${id}`)
+        .then(() => {
+          fetchData();
+          showMessage('✅ Đã xóa phim thành công!');
+        })
+        .catch(err => {
+          console.error('Lỗi khi xóa phim:', err);
+          alert('❌ Không thể xóa phim.');
         });
     }
   };
@@ -80,8 +91,11 @@ export default function QuanLyPhim() {
     setTen(phim.ten);
     setTacGia(phim.tacGia);
     setThoiLuong(phim.thoiLuong);
-    setAnh(phim.anh);
+    setAnh(phim.anh || '');
     setMoTa(phim.moTa);
+    setTrailer(phim.trailer || '');
+    setTrailer(phim.trailer || '');
+
   };
 
   const resetForm = () => {
@@ -92,6 +106,8 @@ export default function QuanLyPhim() {
     setMoTa('');
     setEditing(false);
     setCurrentPhim(null);
+    setTrailer('');
+
   };
 
   return (
@@ -109,8 +125,9 @@ export default function QuanLyPhim() {
         <input type="text" placeholder="Tên Phim" value={ten} onChange={(e) => setTen(e.target.value)} required />
         <input type="text" placeholder="Tác Giả" value={tacGia} onChange={(e) => setTacGia(e.target.value)} required />
         <input type="text" placeholder="Thời Lượng" value={thoiLuong} onChange={(e) => setThoiLuong(e.target.value)} required />
-        <input type="text" placeholder="Link ảnh" value={anh} onChange={(e) => setAnh(e.target.value)} required />
+        <input type="text" placeholder="Link ảnh" value={anh} onChange={(e) => setAnh(e.target.value)} />
         <input type="text" placeholder="Mô Tả" value={moTa} onChange={(e) => setMoTa(e.target.value)} required />
+        <input type="text" placeholder="Link trailer" value={trailer} onChange={(e) => setTrailer(e.target.value)} />
         <button type="submit">{editing ? 'Cập nhật Phim' : 'Lưu Phim'}</button>
         {editing && (
           <button type="button" onClick={resetForm} className="cancel-button">Hủy</button>
@@ -125,6 +142,7 @@ export default function QuanLyPhim() {
             <th>Thời Lượng</th>
             <th>Ảnh</th>
             <th>Mô Tả</th>
+            <th>Trailer</th>
             <th>Hành Động</th>
           </tr>
         </thead>
@@ -142,6 +160,14 @@ export default function QuanLyPhim() {
                 )}
               </td>
               <td>{phim.moTa}</td>
+              <td>
+                {phim.trailer ? (
+                  <a href={phim.trailer} target="_blank" rel="noopener noreferrer">Xem</a>
+                ) : (
+                  'Chưa có trailer'
+                )}
+              </td>
+
               <td>
                 <button className="edit-button" onClick={() => handleEditPhim(phim)}>Sửa</button>
                 <button className="delete-button" onClick={() => handleXoaPhim(phim.id)}>Xóa</button>

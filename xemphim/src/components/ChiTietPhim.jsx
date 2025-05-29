@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
-// Thành phần hiển thị chi tiết phim
+// Hàm chuyển đổi YouTube URL sang embed
+const convertToEmbedUrl = (url) => {
+  if (!url) return null;
+  const videoId = url.split('v=')[1]?.split('&')[0]; // Lấy phần sau "v="
+  return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`;
+};
+
 export default function ChiTietPhim() {
   const { id } = useParams();
   const [phim, setPhim] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Lấy thông tin phim từ API
   useEffect(() => {
     fetch(`http://localhost:3000/api/phim`)
       .then((response) => response.json())
@@ -35,6 +40,8 @@ export default function ChiTietPhim() {
     );
   }
 
+  const embedUrl = convertToEmbedUrl(phim.trailer);
+
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px', padding: '20px' }}>
       <img
@@ -47,6 +54,20 @@ export default function ChiTietPhim() {
         <p><strong>Mô tả:</strong> {phim.moTa}</p>
         <p><strong>Tác giả:</strong> {phim.tacGia}</p>
         <p><strong>Thời lượng:</strong> {phim.thoiLuong}</p>
+
+        {embedUrl && (
+          <iframe
+            width="320"
+            height="180"
+            src={embedUrl}
+            title="Trailer phim"
+            frameBorder="0"
+            allow="autoplay; encrypted-media"
+            allowFullScreen
+            style={{ marginTop: '10px', borderRadius: '8px' }}
+          ></iframe>
+        )}
+
         <Link to={`/datve/${phim.id}`} style={{
           display: 'inline-block',
           marginTop: '15px',

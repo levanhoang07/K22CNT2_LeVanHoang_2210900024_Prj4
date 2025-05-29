@@ -211,6 +211,7 @@ def get_all_phim():
         phim['moTa'] = phim.pop('mo_ta')
         phim['thoiLuong'] = phim.pop('thoi_luong')
         phim['tacGia'] = phim.pop('tac_gia')
+        phim['trailer'] = phim.pop('trailer')
     return flask.jsonify(phim_data)
 
 @app.route('/api/phongchieu', methods=['GET'])
@@ -229,14 +230,17 @@ def get_all_suat_chieu():
 def get_all_ve_dat():
     return flask.jsonify(fetch_all('ve_dat'))
 
-# Thêm phim mới
+
+# --------------------- API: THÊM PHIM ---------------------
 @app.route('/api/phim', methods=['POST'])
 def them_phim():
     data = flask.request.get_json()
     ten_phim = data.get('ten')
+    tac_gia = data.get('tacGia')
     mo_ta = data.get('moTa')
     thoi_luong = data.get('thoiLuong')
-    tac_gia = data.get('tacGia')
+    anh = data.get('anh')
+    trailer = data.get('trailer')
 
     if not ten_phim:
         return flask.jsonify({'success': False, 'message': 'Tên phim không được để trống'}), 400
@@ -245,9 +249,9 @@ def them_phim():
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO phim (ten_phim, mo_ta, thoi_luong, tac_gia)
-            VALUES (?, ?, ?, ?)
-        """, (ten_phim, mo_ta, thoi_luong, tac_gia))
+            INSERT INTO phim (ten_phim, mo_ta, thoi_luong, tac_gia, anh, trailer)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (ten_phim, mo_ta, thoi_luong, tac_gia, anh, trailer))
         conn.commit()
         cursor.close()
         conn.close()
@@ -256,7 +260,8 @@ def them_phim():
         print("Lỗi thêm phim:", e)
         return flask.jsonify({'success': False, 'message': str(e)}), 500
 
-# Sửa phim
+
+# --------------------- API: SỬA PHIM ---------------------
 @app.route('/api/phim/<int:phim_id>', methods=['PUT'])
 def sua_phim(phim_id):
     data = flask.request.get_json()
@@ -264,15 +269,17 @@ def sua_phim(phim_id):
     mo_ta = data.get('moTa')
     thoi_luong = data.get('thoiLuong')
     tac_gia = data.get('tacGia')
+    anh = data.get('anh')
+    trailer = data.get('trailer')
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("""
             UPDATE phim
-            SET ten_phim = ?, mo_ta = ?, thoi_luong = ?, tac_gia = ?
+            SET ten_phim = ?, mo_ta = ?, thoi_luong = ?, tac_gia = ?, anh = ?, trailer = ?
             WHERE phim_id = ?
-        """, (ten_phim, mo_ta, thoi_luong, tac_gia, phim_id))
+        """, (ten_phim, mo_ta, thoi_luong, tac_gia, anh, trailer, phim_id))
         conn.commit()
         cursor.close()
         conn.close()
@@ -280,7 +287,8 @@ def sua_phim(phim_id):
     except Exception as e:
         return flask.jsonify({'success': False, 'message': str(e)}), 500
 
-# Xóa phim
+
+# --------------------- API: XÓA PHIM ---------------------
 @app.route('/api/phim/<int:phim_id>', methods=['DELETE'])
 def xoa_phim(phim_id):
     try:
@@ -293,7 +301,7 @@ def xoa_phim(phim_id):
         return flask.jsonify({'success': True, 'message': 'Xóa phim thành công'}), 200
     except Exception as e:
         return flask.jsonify({'success': False, 'message': str(e)}), 500
-
+  
 # -------------------- CHẠY APP --------------------
 if __name__ == '__main__':
     app.run(debug=True, port=3000)
