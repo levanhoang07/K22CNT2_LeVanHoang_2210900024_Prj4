@@ -4,8 +4,6 @@ from flask_cors import CORS
 
 app = flask.Flask(__name__)
 CORS(app)
-
-# -------------------- KẾT NỐI DATABASE --------------------
 def get_db_connection():
     conn_str = (
         "Driver={SQL Server};"
@@ -35,7 +33,7 @@ def fetch_all(table_name):
         print(f"Lỗi khi lấy dữ liệu: {str(e)}")
         return []
 
-# -------------------- ĐĂNG KÝ NGƯỜI DÙNG --------------------
+# dang ký người dùng
 @app.route('/api/dangky', methods=['POST'])
 def dang_ky():
     data = flask.request.get_json()
@@ -89,7 +87,7 @@ def dang_ky():
     except Exception as e:
         return flask.jsonify({'success': False, 'message': f'Lỗi: {str(e)}'}), 500
 
-# -------------------- ĐĂNG NHẬP NGƯỜI DÙNG --------------------
+# dawdng nhập người dùng
 @app.route('/api/dangnhap', methods=['POST'])
 def dang_nhap():
     data = flask.request.get_json()
@@ -133,11 +131,11 @@ def dang_nhap():
     except Exception as e:
         return flask.jsonify({'success': False, 'message': str(e)}), 500
 
-# -------------------- CRUD NGƯỜI DÙNG --------------------
+# crud người dùngdùng
 @app.route('/api/nguoidung', methods=['GET'])
 def get_all_nguoi_dung():
     return flask.jsonify(fetch_all('nguoi_dung'))
-
+# thêm người dùngdùng
 @app.route('/api/nguoidung', methods=['POST'])
 def them_nguoi_dung():
     data = flask.request.get_json()
@@ -161,7 +159,7 @@ def them_nguoi_dung():
         return flask.jsonify({'success': True, 'message': 'Thêm người dùng thành công'}), 201
     except Exception as e:
         return flask.jsonify({'success': False, 'message': str(e)}), 500
-
+#sua nguoi dung
 @app.route('/api/nguoidung/<int:nguoidung_id>', methods=['PUT'])
 def sua_nguoi_dung(nguoidung_id):
     data = flask.request.get_json()
@@ -187,7 +185,7 @@ def sua_nguoi_dung(nguoidung_id):
         return flask.jsonify({'success': True, 'message': 'Cập nhật người dùng thành công'}), 200
     except Exception as e:
         return flask.jsonify({'success': False, 'message': str(e)}), 500
-
+#xoa nguoi dung
 @app.route('/api/nguoidung/<int:nguoidung_id>', methods=['DELETE'])
 def xoa_nguoi_dung(nguoidung_id):
     try:
@@ -201,7 +199,7 @@ def xoa_nguoi_dung(nguoidung_id):
     except Exception as e:
         return flask.jsonify({'success': False, 'message': str(e)}), 500
 
-# -------------------- DANH SÁCH CÁC BẢNG KHÁC --------------------
+# danh sach phim 
 @app.route('/api/phim', methods=['GET'])
 def get_all_phim():
     phim_data = fetch_all('phim')
@@ -231,7 +229,7 @@ def get_all_ve_dat():
     return flask.jsonify(fetch_all('ve_dat'))
 
 
-# --------------------- API: THÊM PHIM ---------------------
+# them phim
 @app.route('/api/phim', methods=['POST'])
 def them_phim():
     data = flask.request.get_json()
@@ -261,7 +259,7 @@ def them_phim():
         return flask.jsonify({'success': False, 'message': str(e)}), 500
 
 
-# --------------------- API: SỬA PHIM ---------------------
+# sua phim
 @app.route('/api/phim/<int:phim_id>', methods=['PUT'])
 def sua_phim(phim_id):
     data = flask.request.get_json()
@@ -288,7 +286,7 @@ def sua_phim(phim_id):
         return flask.jsonify({'success': False, 'message': str(e)}), 500
 
 
-# --------------------- API: XÓA PHIM ---------------------
+#xoa phim
 @app.route('/api/phim/<int:phim_id>', methods=['DELETE'])
 def xoa_phim(phim_id):
     try:
@@ -301,7 +299,6 @@ def xoa_phim(phim_id):
         return flask.jsonify({'success': True, 'message': 'Xóa phim thành công'}), 200
     except Exception as e:
         return flask.jsonify({'success': False, 'message': str(e)}), 500
-  
-# -------------------- CHẠY APP --------------------
+
 if __name__ == '__main__':
     app.run(debug=True, port=3000)
