@@ -8,17 +8,17 @@ export default function Locations() {
     <>
       <header className="header">
         <div className="header-container">
+          <div className="logo">
+            <h1>DOREMI</h1>
+            <span>CINEMA</span>
+          </div>
           <div
             className="mobile-menu-toggle"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter') setIsMenuOpen(!isMenuOpen)}}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
+            onKeyDown={(e) => { if (e.key === 'Enter') setIsMenuOpen(!isMenuOpen)}}>
           </div>
           
           <nav className={`main-nav ${isMenuOpen ? 'open' : ''}`}>

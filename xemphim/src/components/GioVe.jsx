@@ -15,7 +15,7 @@ export default function GioVe() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('http://localhost:3000/api/phim') // API trả về danh sách phim
+    axios.get('http://localhost:3000/api/vedat') 
       .then(response => {
         const danhSachPhim = response.data;
         const phimTimThay = danhSachPhim.find((p) => p.id === id);

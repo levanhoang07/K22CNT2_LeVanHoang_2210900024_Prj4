@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./components/context/AuthContext"; // Import AuthProvider
-import Navigation from "./components/Navigation"; // Import Navigation component
+import { AuthProvider } from "./components/context/AuthContext"; 
+import Navigation from "./components/Navigation"; 
 import TrangChu from "./components/TrangChu";
 import About from "./components/About";
 import Contact from "./components/Contact";

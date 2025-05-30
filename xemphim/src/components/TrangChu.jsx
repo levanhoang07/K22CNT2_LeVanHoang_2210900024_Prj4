@@ -28,17 +28,17 @@ export default function TrangChu() {
     <>
       <header className="header">
         <div className="header-container">
+          <div className="logo">
+            <h1>DOREMI</h1>
+            <span>CINEMA</span>
+          </div>
           <div
             className="mobile-menu-toggle"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter') setIsMenuOpen(!isMenuOpen)}}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
+            onKeyDown={(e) => { if (e.key === 'Enter') setIsMenuOpen(!isMenuOpen)}}>
           </div>
           
           <nav className={`main-nav ${isMenuOpen ? 'open' : ''}`}>
@@ -59,33 +59,65 @@ export default function TrangChu() {
         </div>
       </header>
 
-      <main className="trangchu-container">
-        <h1>Phim Đang Chiếu</h1>
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Tìm kiếm phim..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          /><button className="search-btn" aria-label="Tìm kiếm">🔍</button>
-        </div>
-
-        <div className="phim-grid">
-          {loading ? (
-            <p>Đang tải dữ liệu...</p>
-          ) : filteredPhim.length > 0 ? (
-            filteredPhim.map(phim => (
-              <div key={phim.id} className="phim-card">
-                <img src={phim.anh} alt={phim.ten} />
-                <h2>{phim.ten}</h2>
-                <p>{phim.moTa}</p>
-                <Link to={`/phim/${phim.id}`}>Xem chi tiết</Link>
+      <main className="main-content">
+        <section className="hero-section">
+          <div className="hero-content">
+            <h1 className="hero-title">Phim Đang Chiếu</h1>
+            <p className="hero-subtitle">Khám phá những bộ phim điện ảnh đặc sắc nhất</p>
+            
+            <div className="search-container">
+              <div className="search-bar">
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm phim..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <button className="search-btn" aria-label="Tìm kiếm">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                  </svg>
+                </button>
               </div>
-            ))
-          ) : (
-            <p>Không tìm thấy phim nào.</p>
-          )}
-        </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="movies-section">
+          <div className="container">
+            {loading ? (
+              <div className="loading-state">
+                <div className="loading-spinner"></div>
+                <p>Đang tải dữ liệu...</p>
+              </div>
+            ) : filteredPhim.length > 0 ? (
+              <div className="movies-grid">
+                {filteredPhim.map(phim => (
+                  <article key={phim.id} className="movie-card">
+                    <div className="movie-image">
+                      <img src={phim.anh} alt={phim.ten} />
+                      <div className="movie-overlay">
+                        <a href={`/phim/${phim.id}`} className="view-details-btn">
+                          Xem chi tiết
+                        </a>
+                      </div>
+                    </div>
+                    <div className="movie-content">
+                      <h3 className="movie-title">{phim.ten}</h3>
+                      <p className="movie-description">{phim.moTa}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="empty-state">
+                <h3>Không tìm thấy phim nào</h3>
+                <p>Thử tìm kiếm với từ khóa khác</p>
+              </div>
+            )}
+          </div>
+        </section>
       </main>
 
       <footer className="footer">
@@ -143,7 +175,6 @@ export default function TrangChu() {
       </footer>
 
       <style>{`
-        /* Reset & Base Styles */
         * {
           margin: 0;
           padding: 0;
@@ -208,13 +239,11 @@ export default function TrangChu() {
           background-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* Header actions */
         .header-actions {
           display: flex;
           align-items: center;
         }
-
-        .cart-icon {
+.cart-icon {
           position: relative;
           font-size: 1.5rem;
           color: white;
@@ -239,166 +268,263 @@ export default function TrangChu() {
           display: none;
           flex-direction: column;
           justify-content: space-around;
-          width: 24px;
-          height: 24px;
+          width: 28px;
+          height: 28px;
           cursor: pointer;
+          padding: 2px;
         }
 
         .mobile-menu-toggle span {
           display: block;
           width: 100%;
-          height: 3px;
+          height: 2px;
           background: white;
-          border-radius: 3px;
+          border-radius: 2px;
           transition: all 0.3s ease;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-          .main-nav {
-            position: fixed;
-            top: 56px;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: #0f3443;
-            clip-path: circle(0% at 100% 0);
-            transition: clip-path 0.6s ease-in-out;
-            pointer-events: none;
-            z-index: 999;
-          }
-
-          .main-nav.open {
-            clip-path: circle(150% at 100% 0);
-            pointer-events: auto;
-          }
-
-          .nav-links {
-            flex-direction: column;
-            margin: 3rem 0 0 0;
-          }
-
-          .nav-links li {
-            margin: 0.5rem 0;
-            text-align: center;
-          }
-
-          .nav-links a {
-            font-size: 1.5rem;
-            padding: 1rem;
-          }
-
-          .header-actions {
-            display: none;
-          }
-
-          .mobile-menu-toggle {
-            display: flex;
-          }
+        /* Hero Section */
+        .hero-section {
+          background: linear-gradient(135deg, #0f3443 0%, #34e89e 100%);
+          padding: clamp(2rem, 6vw, 4rem) 0; /* giảm padding trên dưới */
+          position: relative;
+          overflow: hidden;
         }
 
-        /* Main container */
-        .trangchu-container {
-          max-width: 1200px;
-          margin: 2rem auto;
-          padding: 0 1rem;
+        .hero-section::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.4" fill="rgba(255,255,255,0.02)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>'); /* giảm chút r và opacity hạt */
+          pointer-events: none;
         }
 
-        .trangchu-container h1 {
-          color: #34e89e;
-          font-size: 2rem;
-          margin-bottom: 1rem;
+        .hero-content {
+          max-width: 1000px; /* giảm max-width */
+          margin: 0 auto;
+          padding: 0 clamp(0.75rem, 4vw, 2rem); /* giảm padding */
           text-align: center;
+          position: relative;
+          z-index: 1;
+        }
+
+        .hero-title {
+          font-family: 'Playfair Display', serif;
+          font-size: clamp(2rem, 5vw, 3rem); /* giảm font-size */
+          font-weight: 600;
+          color: white;
+          margin-bottom: 1rem;
+          letter-spacing: -0.02em;
+          line-height: 1.1;
+        }
+
+        .hero-subtitle {
+          font-size: clamp(0.875rem, 2vw, 1rem); /* giảm font-size */
+          color: rgba(255, 255, 255, 0.8);
+          margin-bottom: 2rem; /* giảm margin */
+          font-weight: 300;
+          letter-spacing: -0.01em;
+        }
+
+
+        .search-container {
+          display: flex;
+          justify-content: center;
+          margin-top: 2rem;
         }
 
         .search-bar {
+          position: relative;
+          width: 100%;
+          max-width: 500px;
           display: flex;
-          justify-content: center;
-          margin-bottom: 1rem;
+          align-items: center;
         }
 
         .search-bar input {
           width: 100%;
-          max-width: 400px;
-          padding: 0.6rem 1rem;
-          border-radius: 25px;
-          border: 2px solid #34e89e;
+          padding: 1rem 1.5rem;
+          padding-right: 3.5rem;
+          border-radius: 50px;
+          border: 2px solid rgba(255, 255, 255, 0.2);
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(20px);
           font-size: 1rem;
+          color: white;
           outline: none;
-          transition: border-color 0.3s ease;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          font-weight: 300;
+          letter-spacing: -0.01em;
+        }
+
+        .search-bar input::placeholder {
+          color: rgba(255, 255, 255, 0.6);
         }
 
         .search-bar input:focus {
-          border-color: #0f3443;
+          border-color: rgba(255, 255, 255, 0.4);
+          background: rgba(255, 255, 255, 0.15);
+          transform: translateY(-2px);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
         .search-btn {
+          position: absolute;
+          right: 1rem;
+          top: 50%;
+          transform: translateY(-50%);
           background: transparent;
           border: none;
           cursor: pointer;
-          font-size: 1.1rem;
-          color: #0f3443;
-          margin-left: -30px;
-          z-index: 1;
+          color: rgba(255, 255, 255, 0.7);
+          padding: 0.5rem;
+          border-radius: 50%;
+          transition: all 0.3s ease;
         }
 
-        /* Movie grid */
-        .phim-grid {
+        .search-btn:hover {
+          color: white;
+          background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Movies Section */
+        .movies-section {
+          padding: clamp(4rem, 8vw, 8rem) 0;
+        }
+
+        .movies-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 2rem;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: clamp(2rem, 4vw, 3rem);
         }
 
-        .phim-card {
+        .movie-card {
           background: white;
-          border-radius: 8px;
-          box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+          border-radius: 16px;
           overflow: hidden;
-          transition: transform 0.3s ease;
-          display: flex;
-          flex-direction: column;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+          position: relative;
         }
 
-        .phim-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        .movie-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         }
 
-        .phim-card img {
+        .movie-image {
+          position: relative;
+          overflow: hidden;
+          aspect-ratio: 3/4;
+        }
+
+        .movie-image img {
           width: 100%;
-          height: 300px;
+          height: 100%;
           object-fit: cover;
+          transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .phim-card h2 {
-          font-size: 1.2rem;
+        .movie-card:hover .movie-image img {
+          transform: scale(1.05);
+        }
+
+        .movie-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgba(15, 52, 67, 0.8) 0%, rgba(52, 232, 158, 0.8) 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .movie-card:hover .movie-overlay {
+          opacity: 1;
+        }
+
+        .view-details-btn {
+          padding: 1rem 2rem;
+          background: white;
           color: #0f3443;
-          margin: 0.75rem 1rem 0.5rem;
-          flex-grow: 0;
+          text-decoration: none;
+          border-radius: 50px;
+          font-weight: 500;
+          font-size: 0.95rem;
+          letter-spacing: -0.01em;
+          transition: all 0.3s ease;
+          transform: translateY(20px);
         }
 
-        .phim-card p {
-          font-size: 0.9rem;
-          color: #555;
-          padding: 0 1rem 1rem;
-          flex-grow: 1;
+        .movie-card:hover .view-details-btn {
+          transform: translateY(0);
         }
 
-        .phim-card a {
-          display: block;
-          margin: 0 1rem 1rem;
-          padding: 0.5rem 0;
+        .view-details-btn:hover {
           background: #34e89e;
           color: white;
-          text-align: center;
-          border-radius: 25px;
-          text-decoration: none;
-          font-weight: 600;
-          transition: background 0.3s ease;
+          transform: translateY(-2px);
         }
 
-        .phim-card a:hover {
-          background: #0f3443;
+        .movie-content {
+          padding: 1.5rem;
+        }
+
+        .movie-title {
+          font-family: 'Playfair Display', serif;
+          font-size: 1.3rem;
+          font-weight: 600;
+          color: #0f3443;
+          margin-bottom: 0.75rem;
+          letter-spacing: -0.01em;
+          line-height: 1.3;
+        }
+
+        .movie-description {
+          font-size: 0.95rem;
+          color: #666;
+          line-height: 1.6;
+          font-weight: 300;
+          letter-spacing: -0.01em;
+        }
+
+        /* Loading & Empty States */
+        .loading-state, .empty-state {
+          text-align: center;
+          padding: 4rem 0;
+        }
+
+        .loading-spinner {
+          width: 40px;
+          height: 40px;
+          border: 3px solid rgba(52, 232, 158, 0.2);
+          border-top: 3px solid #34e89e;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        .loading-state p, .empty-state h3 {
+          color: #0f3443;
+          font-size: 1.1rem;
+          font-weight: 400;
+        }
+
+        .empty-state p {
+          color: #666;
+          margin-top: 0.5rem;
         }
 
         /* Footer */

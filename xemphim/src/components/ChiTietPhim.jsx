@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 
 const convertToEmbedUrl = (url) => {
   if (!url) return null;
-  const videoId = url.split('v=')[1]?.split('&')[0]; // Lấy phần sau "v="
+  const videoId = url.split('v=')[1]?.split('&')[0]; 
   return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`;
 };
 

@@ -8,6 +8,10 @@ export default function About() {
     <>
       <header className="header">
         <div className="header-container">
+          <div className="logo">
+            <h1>DOREMI</h1>
+            <span>CINEMA</span>
+          </div>
           <div
             className="mobile-menu-toggle"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
