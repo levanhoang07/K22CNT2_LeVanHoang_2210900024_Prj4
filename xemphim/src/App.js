@@ -24,13 +24,13 @@ function App() {
   return (
     <AuthProvider>
       {" "}
-      {/* Bọc ứng dụng trong AuthProvider */}
+      {/* bocj web trong AuthProvider */}
       <Router>
         <div className="App">
-          <Navigation /> {/* Thêm Navigation component */}
+          <Navigation /> {/* Navigation cho component */}
           <main>
             <Routes>
-              {/* Các route chính */}
+              {/* route phía người dùngdùng */}
               <Route path="/" element={<TrangChu />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
@@ -41,7 +41,7 @@ function App() {
               <Route path="/dangnhap" element={<DangNhap />} />
               <Route path="/dangky" element={<DangKy />} />
 
-              {/* Quản trị */}
+              {/* route phía quản trị */}
               <Route path="/quantri" element={<QuanTri />}>
                 <Route path="phim" element={<QuanLyPhim />} />
                 <Route path="suatchieu" element={<QuanLySuatChieu />} />

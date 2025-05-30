@@ -26,7 +26,7 @@
             <nav className={`main-nav ${isMenuOpen ? 'open' : ''}`}>
               <ul className="nav-links">
                 <li><Link to="/">Trang Chủ</Link></li>
-                <li><Link to="/locations">Rạp Phim</Link></li>
+                <li><Link to="/locations">Cụm rạp</Link></li>
                 <li><Link to="/about">Giới Thiệu</Link></li>
                 <li><Link to="/contact">Liên Hệ</Link></li>
               </ul>

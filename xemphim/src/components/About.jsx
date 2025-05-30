@@ -24,7 +24,7 @@ export default function About() {
           <nav className={`main-nav ${isMenuOpen ? 'open' : ''}`}>
             <ul className="nav-links">
               <li><Link to="/">Trang Chủ</Link></li>
-              <li><Link to="/locations">Rạp Phim</Link></li>
+              <li><Link to="/locations">Cụm rạp</Link></li>
               <li><Link to="/about">Giới Thiệu</Link></li>
               <li><Link to="/contact">Liên Hệ</Link></li>
             </ul>
@@ -60,7 +60,7 @@ export default function About() {
             <h4>Liên kết nhanh</h4>
             <ul>
               <li><Link to="/">Trang Chủ</Link></li>
-              <li><Link to="/locations">Rạp Phim</Link></li>
+              <li><Link to="/locations">Cụm rạp</Link></li>
               <li><Link to="/about">Giới Thiệu</Link></li>
               <li><Link to="/contact">Liên Hệ</Link></li>
               <li><Link to="/dangnhap">Đăng Nhập</Link></li>
