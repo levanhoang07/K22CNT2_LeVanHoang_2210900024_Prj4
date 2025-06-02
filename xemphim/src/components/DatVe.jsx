@@ -13,7 +13,6 @@ export default function DatVe() {
   const [suatChieu, setSuatChieu] = useState('');
   const [gheDaChon, setGheDaChon] = useState([]);
 
-  // Lấy danh sách phim từ API khi component mount
   useEffect(() => {
     async function fetchPhim() {
       try {
@@ -32,7 +31,6 @@ export default function DatVe() {
     fetchPhim();
   }, []);
 
-  // Hàm lưu vé vào cơ sở dữ liệu
   const handleXacNhanDatVe = async () => {
     try {
       const bookingData = {
@@ -40,7 +38,6 @@ export default function DatVe() {
         rap,
         suatChieu,
         gheDaChon,
-        // userId: 'USER_ID_HERE', // Thêm userId nếu có hệ thống đăng nhập
       };
 
       const response = await fetch('http://127.0.0.1:3000/api/vedat', {
@@ -57,7 +54,6 @@ export default function DatVe() {
 
       const result = await response.json();
       setSuccessMessage('Đặt vé thành công! Mã đặt vé: ' + result.maDatVe);
-      // Reset form
       setRap('');
       setSuatChieu('');
       setGheDaChon([]);
@@ -66,12 +62,29 @@ export default function DatVe() {
     }
   };
 
-  if (loading) return <p>Đang tải danh sách phim...</p>;
-  if (error) return <p style={{ color: 'red' }}>Lỗi: {error}</p>;
+  if (loading)
+    return (
+      <div className="dv-loading">
+        <div className="dv-spinner"></div>
+        <p>Đang tải danh sách phim...</p>
+      </div>
+    );
+  if (error)
+    return (
+      <div className="dv-error">
+        <p>Lỗi: {error}</p>
+        <Link to="/" className="dv-btn dv-btn-home">Trang chủ</Link>
+      </div>
+    );
 
   const phim = danhSachPhim.find(p => p.id === parseInt(id));
   if (!phim) {
-    return <p>Không tìm thấy phim.</p>;
+    return (
+      <div className="dv-error">
+        <p>Không tìm thấy phim.</p>
+        <Link to="/" className="dv-btn dv-btn-home">Trang chủ</Link>
+      </div>
+    );
   }
 
   const gheList = [
@@ -92,86 +105,310 @@ export default function DatVe() {
   };
 
   return (
-    <div>
-      <h1>Đặt Vé: <span style={{ color: 'blue' }}>{phim.ten}</span></h1>
-      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+    <div className="dv-bg">
+      <div className="dv-container">
+        <div className="dv-card">
+          <div className="dv-movie-image">
+            <img src={phim.anh} alt={phim.ten} />
+          </div>
+          <div className="dv-content">
+            <h1 className="dv-title">Đặt Vé: <span>{phim.ten}</span></h1>
+            {successMessage && <div className="dv-success">{successMessage}</div>}
 
-      <div style={{ marginBottom: '10px' }}>
-        <label>🎬 Chọn rạp: </label>
-        <select value={rap} onChange={(e) => setRap(e.target.value)}>
-          <option value="">--Chọn rạp--</option>
-          <option value="Rạp 1">Rạp 1</option>
-          <option value="Rạp 2">Rạp 2</option>
-        </select>
-      </div>
+            <div className="dv-row">
+              <label>🎬 Chọn rạp:</label>
+              <select value={rap} onChange={(e) => setRap(e.target.value)}>
+                <option value="">--Chọn rạp--</option>
+                <option value="Rạp 1">Rạp 1</option>
+                <option value="Rạp 2">Rạp 2</option>
+              </select>
+            </div>
 
-      <div style={{ marginBottom: '10px' }}>
-        <label>🕓 Chọn suất chiếu: </label>
-        <select value={suatChieu} onChange={(e) => setSuatChieu(e.target.value)}>
-          <option value="">--Chọn suất--</option>
-          <option value="10:00">10:00</option>
-          <option value="14:00">14:00</option>
-          <option value="18:00">18:00</option>
-        </select>
-      </div>
+            <div className="dv-row">
+              <label>🕓 Chọn suất chiếu:</label>
+              <select value={suatChieu} onChange={(e) => setSuatChieu(e.target.value)}>
+                <option value="">--Chọn suất--</option>
+                <option value="10:00">10:00</option>
+                <option value="14:00">14:00</option>
+                <option value="18:00">18:00</option>
+              </select>
+            </div>
 
-      <div style={{ marginBottom: '10px', textAlign: 'center' }}>
-        <div style={{ marginBottom: '10px', fontSize: '20px', fontWeight: 'bold' }}>Màn Hình</div>
-        <div style={{ width: '25%', height: '20px', backgroundColor: '#ccc', margin: '0 auto' }}></div>
-      </div>
+            <div className="dv-ghe">
+              <div className="dv-man-hinh">Màn Hình</div>
+              <div className="dv-man-hinh-bar"></div>
+              <label>💺 Chọn ghế:</label>
+              <div className="dv-ghe-list">
+                {gheList.map((hang, index) => (
+                  <div key={index} className="dv-ghe-row">
+                    {hang.map((ghe) => (
+                      <button
+                        key={ghe}
+                        onClick={() => handleChonGhe(ghe)}
+                        className={`dv-ghe-btn${gheDaChon.includes(ghe) ? ' selected' : ''}`}
+                        type="button"
+                      >
+                        {ghe}
+                      </button>
+                    ))}
+                    {index === 5 && (
+                      <span className="dv-loi-vao">Lối vào🚪</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
 
-      <div style={{ marginBottom: '10px' }}>
-        <label>💺 Chọn ghế: </label>
-        <div style={{ textAlign: 'center' }}>
-          {gheList.map((hang, index) => (
-            <div key={index} style={{ marginBottom: '10px' }}>
-              {hang.map((ghe) => (
+            <div className="dv-btn-group">
+              <Link to="/" className="dv-btn dv-btn-home"> Quay lại Trang chủ</Link>
+              {rap && suatChieu && gheDaChon.length > 0 ? (
                 <button
-                  key={ghe}
-                  onClick={() => handleChonGhe(ghe)}
-                  style={{
-                    margin: '5px',
-                    padding: '10px',
-                    backgroundColor: gheDaChon.includes(ghe) ? 'green' : 'lightgray',
-                    color: gheDaChon.includes(ghe) ? 'white' : 'black',
-                    border: '1px solid #ccc',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                  }}
+                  onClick={handleXacNhanDatVe}
+                  className="dv-btn dv-btn-xacnhan"
                 >
-                  {ghe}
+                  🎟️ Xác nhận đặt vé
                 </button>
-              ))}
-              {index === 5 && (
-                <div style={{ marginLeft: '10px', display: 'inline-block', fontSize: '16px', color: 'brown' }}>
-                  Lối vào🚪
-                </div>
+              ) : (
+                <span className="dv-warning">Vui lòng chọn đầy đủ rạp, suất chiếu và ghế.</span>
               )}
             </div>
-          ))}
+          </div>
         </div>
       </div>
-
-      <div style={{ marginTop: '20px' }}>
-        {rap && suatChieu && gheDaChon.length > 0 ? (
-          <button
-            onClick={handleXacNhanDatVe}
-            style={{
-              textDecoration: 'none',
-              color: 'white',
-              background: 'green',
-              padding: '10px 20px',
-              borderRadius: '5px',
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            🎟️ Xác nhận đặt vé
-          </button>
-        ) : (
-          <p style={{ color: 'red' }}>Vui lòng chọn đầy đủ rạp, suất chiếu và ghế.</p>
-        )}
-      </div>
+      <style>{`
+        .dv-bg {
+          background: rgb(40,38,38);
+          min-height: 100vh;
+          padding: 0;
+        }
+        .dv-container {
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 48px 16px 60px 16px;
+        }
+        .dv-card {
+          display: flex;
+          flex-direction: row;
+          gap: 40px;
+          background: rgba(28,28,32,0.98);
+          border-radius: 24px;
+          box-shadow: 0 8px 32px rgba(40,40,60,0.14), 0 1.5px 0 #e53935 inset;
+          overflow: hidden;
+          align-items: flex-start;
+        }
+        .dv-movie-image {
+          flex-shrink: 0;
+          width: 300px;
+          min-width: 200px;
+          max-width: 340px;
+          height: 420px;
+          background: #232733;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 24px 0 0 24px;
+          overflow: hidden;
+          box-shadow: 0 4px 18px rgba(40,40,60,0.10);
+        }
+        .dv-movie-image img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 24px 0 0 24px;
+        }
+        .dv-content {
+          flex: 1;
+          padding: 38px 18px 38px 0;
+          color: #fff;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+        }
+        .dv-title {
+          font-size: 2rem;
+          font-weight: 700;
+          color: #e53935;
+          margin-bottom: 18px;
+          font-family: 'Playfair Display', serif;
+          letter-spacing: 0.5px;
+          text-shadow: 0 2px 16px #e53935, 0 1px 0 #fff;
+        }
+        .dv-title span {
+          color: #fff;
+          font-size: 1.2em;
+        }
+        .dv-row {
+          margin-bottom: 16px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .dv-row label {
+          min-width: 120px;
+          color: #ffb199;
+          font-weight: 600;
+        }
+        .dv-row select {
+          padding: 8px 14px;
+          border-radius: 8px;
+          border: 1.5px solid #e53935;
+          background: #232733;
+          color: #fff;
+          font-size: 1rem;
+          outline: none;
+        }
+        .dv-row select:focus {
+          border-color: #ffb199;
+        }
+        .dv-ghe {
+          margin-bottom: 18px;
+        }
+        .dv-man-hinh {
+          font-size: 1.1rem;
+          font-weight: bold;
+          text-align: center;
+          margin-bottom: 6px;
+        }
+        .dv-man-hinh-bar {
+          width: 30%;
+          height: 20px;
+          background-color: #ccc;
+          margin: 0 auto 12px auto;
+          border-radius: 8px;
+        }
+        .dv-ghe-list {
+          text-align: center;
+        }
+        .dv-ghe-row {
+          margin-bottom: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .dv-ghe-btn {
+          margin: 5px;
+          padding: 10px 0;
+          width: 44px;
+          background-color: #444857;
+          color: #fff;
+          border: 1.5px solid #bdbdbd;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 1rem;
+          transition: background 0.2s, color 0.2s, border 0.2s;
+        }
+        .dv-ghe-btn.selected {
+          background: linear-gradient(90deg, #e53935 60%, #ffb199 100%);
+          color: #fff;
+          border: 1.5px solid #e53935;
+        }
+        .dv-ghe-btn:hover {
+          background: #e57373;
+          color: #fff;
+        }
+        .dv-loi-vao {
+          margin-left: 10px;
+          display: inline-block;
+          font-size: 16px;
+          color: brown;
+        }
+        .dv-btn-group {
+          display: flex;
+          gap: 14px;
+          margin-top: 18px;
+        }
+        .dv-btn {
+          display: inline-block;
+          padding: 10px 22px;
+          background: linear-gradient(90deg, #e53935 60%, #ffb199 100%);
+          color: #fff;
+          text-decoration: none;
+          font-weight: 700;
+          font-size: 1rem;
+          border-radius: 10px;
+          box-shadow: 0 4px 15px rgba(229,57,53,0.13);
+          letter-spacing: 0.5px;
+          transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+          border: none;
+          cursor: pointer;
+        }
+        .dv-btn-home {
+          background: linear-gradient(90deg, #232733 60%, #555 100%);
+          color: #fff;
+          border: 1.5px solid #e53935;
+        }
+        .dv-btn-home:hover {
+          background: #181c24;
+          color: #e53935;
+        }
+        .dv-btn-xacnhan {
+          background: linear-gradient(90deg, #43e97b 60%, #38f9d7 100%);
+          color: #232733;
+        }
+        .dv-btn-xacnhan:hover {
+          background: linear-gradient(90deg, #11998e 60%, #38f9d7 100%);
+          color: #fff;
+          transform: translateY(-2px) scale(1.04);
+          box-shadow: 0 8px 24px rgba(67,233,123,0.18);
+        }
+        .dv-warning {
+          color: #e57373;
+          font-size: 1rem;
+          align-self: center;
+          margin-top: 8px;
+        }
+        .dv-success {
+          color: #43e97b;
+          background: rgba(67,233,123,0.07);
+          border-radius: 6px;
+          padding: 7px 12px;
+          margin-bottom: 12px;
+          font-weight: 500;
+        }
+        .dv-loading, .dv-error {
+          text-align: center;
+          padding: 60px 0;
+          color: #e53935;
+          font-size: 1.2rem;
+        }
+        .dv-spinner {
+          width: 40px;
+          height: 40px;
+          border: 3px solid rgba(229,57,53, 0.2);
+          border-top: 3px solid #e53935;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg);}
+          100% { transform: rotate(360deg);}
+        }
+        @media (max-width: 900px) {
+          .dv-card {
+            flex-direction: column;
+            gap: 0;
+            border-radius: 18px;
+          }
+          .dv-movie-image {
+            width: 100%;
+            max-width: 100vw;
+            height: 220px;
+            border-radius: 18px 18px 0 0;
+          }
+          .dv-movie-image img {
+            border-radius: 18px 18px 0 0;
+          }
+          .dv-content {
+            padding: 24px 12px 24px 12px;
+          }
+          .dv-btn-group {
+            flex-direction: column;
+            gap: 10px;
+            align-items: stretch;
+          }
+        }
+      `}</style>
     </div>
   );
 }

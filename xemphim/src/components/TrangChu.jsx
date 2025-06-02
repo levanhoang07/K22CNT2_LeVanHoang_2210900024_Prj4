@@ -15,7 +15,6 @@ export default function TrangChu() {
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Lỗi khi lấy dữ liệu phim: ", error);
         setLoading(false);
       });
   }, []);
@@ -26,30 +25,28 @@ export default function TrangChu() {
 
   return (
     <>
+      {/* HEADER */}
       <header className="header">
         <div className="header-container">
-          <div className="logo">
-            <h1>DOREMI</h1>
-            <span>CINEMA</span>
-          </div>
+          <span className="site-logo">DOREMI <span className="logo-red">CINEMA</span></span>
           <div
             className="mobile-menu-toggle"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter') setIsMenuOpen(!isMenuOpen)}}>
+            onKeyDown={(e) => { if (e.key === 'Enter') setIsMenuOpen(!isMenuOpen); }}
+          >
+            <span></span><span></span><span></span>
           </div>
-          
           <nav className={`main-nav ${isMenuOpen ? 'open' : ''}`}>
-            <ul className="nav-links">
+            <ul className="nav-links plain-links">
               <li><Link to="/">Trang Chủ</Link></li>
               <li><Link to="/locations">Cụm rạp</Link></li>
               <li><Link to="/about">Giới Thiệu</Link></li>
               <li><Link to="/contact">Liên Hệ</Link></li>
             </ul>
           </nav>
-          
           <div className="header-actions">
             <Link to="/giove" className="cart-icon" title="Giỏ vé của bạn">
               <span className="icon">🛒</span>
@@ -59,31 +56,31 @@ export default function TrangChu() {
         </div>
       </header>
 
-      <main className="main-content">
-        <section className="hero-section">
-          <div className="hero-content">
-            <h1 className="hero-title">Phim Đang Chiếu</h1>
-            <p className="hero-subtitle">Khám phá những bộ phim điện ảnh đặc sắc nhất</p>
-            
-            <div className="search-container">
-              <div className="search-bar">
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm phim..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <button className="search-btn" aria-label="Tìm kiếm">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.35-4.35"></path>
-                  </svg>
-                </button>
-              </div>
+      <section className="hero-banner">
+        <div className="hero-overlay"></div>
+        <div className="hero-content">
+          <h1>Phim Đang Chiếu Tại <span className="logo-red">Doremi Cinema</span></h1>
+          <p>Khám phá những bộ phim điện ảnh đặc sắc nhất tại hệ thống rạp của chúng tôi!</p>
+          <div className="search-container">
+            <div className="search-bar">
+              <input
+                type="text"
+                placeholder="Tìm kiếm phim..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <button className="search-btn" aria-label="Tìm kiếm">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+              </button>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
+      <main className="main-content">
         <section className="movies-section">
           <div className="container">
             {loading ? (
@@ -175,29 +172,22 @@ export default function TrangChu() {
       </footer>
 
       <style>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-        
         body {
-          font-family: 'Segoe UI', 'Roboto', sans-serif;
-          line-height: 1.6;
-          background: #fff;
-          color: #2e7d32;
+          font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+          background: #555555;
+          color: #222;
         }
-
-        /* Header Styles */
+        .main-content {
+          background:rgb(45, 41, 41);
+        }
         .header {
-          background: linear-gradient(135deg, #0f3443 0%, #34e89e 100%);
-          padding: 0;
+          background: #111;
+          color: #fff;
           position: sticky;
           top: 0;
           z-index: 1000;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 2px 10px rgba(0,0,0,0.18);
         }
-
         .header-container {
           max-width: 1200px;
           margin: 0 auto;
@@ -206,64 +196,75 @@ export default function TrangChu() {
           align-items: center;
           padding: 0.8rem 1rem;
         }
-
+        .site-logo {
+          font-size: 1.7rem;
+          font-weight: 700;
+          letter-spacing: 2px;
+          color: #fff;
+        }
+        .logo-red {
+          color: #e53935;
+        }
         .main-nav {
           flex-grow: 1;
           margin-left: 2rem;
         }
-
         .nav-links {
           display: flex;
           list-style: none;
-          margin: 0;
-          padding: 0;
         }
-
         .nav-links li {
-          position: relative;
-          margin: 0;
+          margin: 0 0.2rem;
         }
-
         .nav-links a {
-          display: block;
+          color: #fff;
           text-decoration: none;
-          color: white;
           font-size: 1rem;
-          padding: 0.75rem 1.25rem;
-          font-weight: 500;
-          transition: all 0.3s ease;
-          border-radius: 4px;
+          padding: 0.7rem 1.2rem;
+          border-radius: 8px;
+          transition: background 0.3s, color 0.2s;
         }
-
-        .nav-links a:hover {
-          background-color: rgba(255, 255, 255, 0.1);
+        .nav-links a:hover, .nav-links a:focus {
+          background: #e53935;
+          color: #fff;
         }
-
+        .nav-links.plain-links a {
+          background: none !important;
+          border: none !important;
+          padding: 0.7rem 0.7rem;
+          border-radius: 0;
+          transition: color 0.2s;
+        }
+        .nav-links.plain-links a:hover, .nav-links.plain-links a:focus {
+          background: none !important;
+          color: #e53935;
+        }
         .header-actions {
           display: flex;
           align-items: center;
         }
-.cart-icon {
+        .cart-icon {
           position: relative;
           font-size: 1.5rem;
-          color: white;
+          color: #fff;
           margin-right: 1rem;
           text-decoration: none;
+          transition: transform 0.2s;
         }
-
+        .cart-icon:hover {
+          transform: scale(1.15) rotate(-8deg);
+        }
         .cart-icon .badge {
           position: absolute;
           top: -6px;
           right: -10px;
-          background: #f44336;
+          background: #e53935;
           color: white;
           border-radius: 50%;
           padding: 2px 6px;
           font-size: 0.7rem;
           font-weight: 700;
         }
-
-        /* Mobile Menu Toggle */
         .mobile-menu-toggle {
           display: none;
           flex-direction: column;
@@ -271,71 +272,94 @@ export default function TrangChu() {
           width: 28px;
           height: 28px;
           cursor: pointer;
-          padding: 2px;
         }
-
         .mobile-menu-toggle span {
           display: block;
           width: 100%;
-          height: 2px;
-          background: white;
-          border-radius: 2px;
-          transition: all 0.3s ease;
+          height: 3px;
+          background: #fff;
+          border-radius: 3px;
+          margin-bottom: 4px;
         }
-
-        /* Hero Section */
-        .hero-section {
-          background: linear-gradient(135deg, #0f3443 0%, #34e89e 100%);
-          padding: clamp(2rem, 6vw, 4rem) 0; /* giảm padding trên dưới */
+        .mobile-menu-toggle span:last-child {
+          margin-bottom: 0;
+        }
+        @media (max-width: 768px) {
+          .main-nav {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #111;
+            clip-path: circle(0% at 100% 0);
+            transition: clip-path 0.6s;
+            pointer-events: none;
+            z-index: 999;
+          }
+          .main-nav.open {
+            clip-path: circle(150% at 100% 0);
+            pointer-events: auto;
+          }
+          .nav-links {
+            flex-direction: column;
+            margin: 3rem 0 0 0;
+          }
+          .nav-links li {
+            margin: 0.5rem 0;
+            text-align: center;
+          }
+          .nav-links a {
+            font-size: 1.5rem;
+            padding: 1rem;
+          }
+          .header-actions {
+            display: none;
+          }
+          .mobile-menu-toggle {
+            display: flex;
+          }
+          .hero-content h1 {
+            font-size: 1.3rem;
+          }
+        }
+        /* HERO BANNER */
+        .hero-banner {
           position: relative;
-          overflow: hidden;
+          background: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+          min-height: 260px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
-
-        .hero-section::before {
-          content: '';
+        .hero-overlay {
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.4" fill="rgba(255,255,255,0.02)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>'); /* giảm chút r và opacity hạt */
-          pointer-events: none;
+          inset: 0;
+          background: rgba(17,17,17,0.7);
         }
-
         .hero-content {
-          max-width: 1000px; /* giảm max-width */
-          margin: 0 auto;
-          padding: 0 clamp(0.75rem, 4vw, 2rem); /* giảm padding */
-          text-align: center;
           position: relative;
           z-index: 1;
+          text-align: center;
+          color: #fff;
+          padding: 2.5rem 1rem 2rem 1rem;
         }
-
-        .hero-title {
-          font-family: 'Playfair Display', serif;
-          font-size: clamp(2rem, 5vw, 3rem); /* giảm font-size */
-          font-weight: 600;
-          color: white;
+        .hero-content h1 {
+          font-size: 2rem;
+          font-weight: 700;
           margin-bottom: 1rem;
-          letter-spacing: -0.02em;
-          line-height: 1.1;
+          letter-spacing: 1px;
         }
-
-        .hero-subtitle {
-          font-size: clamp(0.875rem, 2vw, 1rem); /* giảm font-size */
-          color: rgba(255, 255, 255, 0.8);
-          margin-bottom: 2rem; /* giảm margin */
-          font-weight: 300;
-          letter-spacing: -0.01em;
+        .hero-content p {
+          font-size: 1.1rem;
+          margin-bottom: 0;
+          color: #fff;
         }
-
-
         .search-container {
           display: flex;
           justify-content: center;
           margin-top: 2rem;
         }
-
         .search-bar {
           position: relative;
           width: 100%;
@@ -343,7 +367,6 @@ export default function TrangChu() {
           display: flex;
           align-items: center;
         }
-
         .search-bar input {
           width: 100%;
           padding: 1rem 1.5rem;
@@ -359,18 +382,15 @@ export default function TrangChu() {
           font-weight: 300;
           letter-spacing: -0.01em;
         }
-
         .search-bar input::placeholder {
           color: rgba(255, 255, 255, 0.6);
         }
-
         .search-bar input:focus {
           border-color: rgba(255, 255, 255, 0.4);
           background: rgba(255, 255, 255, 0.15);
           transform: translateY(-2px);
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
-
         .search-btn {
           position: absolute;
           right: 1rem;
@@ -384,76 +404,73 @@ export default function TrangChu() {
           border-radius: 50%;
           transition: all 0.3s ease;
         }
-
         .search-btn:hover {
           color: white;
           background: rgba(255, 255, 255, 0.1);
         }
-
-        /* Movies Section */
+        /* MOVIE LIST */
         .movies-section {
-          padding: clamp(4rem, 8vw, 8rem) 0;
+          padding: 3rem 0 4rem 0;
         }
-
+        .container {
+          max-width: 1300px;
+          margin: 0 auto;
+          padding: 0 1rem;
+        }
         .movies-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: clamp(2rem, 4vw, 3rem);
+          grid-template-columns: repeat(4, 1fr);
+          gap: 2.8rem 2.8rem; /* tăng khoảng cách giữa các phim */
         }
-
         .movie-card {
-          background: white;
-          border-radius: 16px;
+          background: rgba(180, 173, 173, 0.15);
+          border-radius: 20px;
           overflow: hidden;
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 6px 36px rgba(144, 54, 54, 0.1);
           position: relative;
+          /* tăng kích thước thẻ phim */
+          min-height: 420px;
         }
-
         .movie-card:hover {
           transform: translateY(-8px);
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         }
-
         .movie-image {
           position: relative;
           overflow: hidden;
           aspect-ratio: 3/4;
+          min-height: 320px; /* tăng chiều cao ảnh */
         }
-
         .movie-image img {
           width: 100%;
           height: 100%;
           object-fit: cover;
           transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .movie-card:hover .movie-image img {
           transform: scale(1.05);
         }
-
         .movie-overlay {
           position: absolute;
           top: 0;
           left: 0;
           right: 0;
           bottom: 0;
-          background: linear-gradient(135deg, rgba(15, 52, 67, 0.8) 0%, rgba(52, 232, 158, 0.8) 100%);
+          background: linear-gradient(135deg, rgba(17,17,17,0.8) 0%, rgba(229,57,53,0.8) 100%);
           display: flex;
           align-items: center;
           justify-content: center;
           opacity: 0;
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .movie-card:hover .movie-overlay {
           opacity: 1;
         }
-
         .view-details-btn {
           padding: 1rem 2rem;
           background: white;
-          color: #0f3443;
+          color: #e53935;
           text-decoration: none;
           border-radius: 50px;
           font-weight: 500;
@@ -462,79 +479,66 @@ export default function TrangChu() {
           transition: all 0.3s ease;
           transform: translateY(20px);
         }
-
         .movie-card:hover .view-details-btn {
           transform: translateY(0);
         }
-
         .view-details-btn:hover {
-          background: #34e89e;
+          background: #e53935;
           color: white;
           transform: translateY(-2px);
-        }
-
+        }s
         .movie-content {
-          padding: 1.5rem;
+          padding: 2rem 1.2rem 1.5rem 1.2rem; /* tăng padding */
         }
-
         .movie-title {
           font-family: 'Playfair Display', serif;
           font-size: 1.3rem;
           font-weight: 600;
-          color: #0f3443;
+          color:rgb(248, 233, 233);
           margin-bottom: 0.75rem;
           letter-spacing: -0.01em;
           line-height: 1.3;
         }
-
         .movie-description {
-          font-size: 0.95rem;
-          color: #666;
+          font-size: 1.08rem;
+          color: rgb(197, 187, 187);
           line-height: 1.6;
           font-weight: 300;
           letter-spacing: -0.01em;
         }
-
-        /* Loading & Empty States */
         .loading-state, .empty-state {
           text-align: center;
           padding: 4rem 0;
         }
-
         .loading-spinner {
           width: 40px;
           height: 40px;
-          border: 3px solid rgba(52, 232, 158, 0.2);
-          border-top: 3px solid #34e89e;
+          border: 3px solid rgba(229,57,53, 0.2);
+          border-top: 3px solid #e53935;
           border-radius: 50%;
           animation: spin 1s linear infinite;
           margin: 0 auto 1rem;
         }
-
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
-
         .loading-state p, .empty-state h3 {
-          color: #0f3443;
+          color: #e53935;
           font-size: 1.1rem;
           font-weight: 400;
         }
-
         .empty-state p {
           color: #666;
           margin-top: 0.5rem;
         }
-
-        /* Footer */
+        /* FOOTER */
         .footer {
-          background: #0f3443;
+          background: #111;
           color: white;
           padding: 2rem 0;
           margin-top: 3rem;
         }
-
         .footer-container {
           max-width: 1200px;
           margin: 0 auto;
@@ -543,80 +547,69 @@ export default function TrangChu() {
           gap: 2rem;
           padding: 0 1rem;
         }
-
-        .footer-section h3 {
-          font-size: 1.5rem;
+        .footer-section h3, .footer-section h4 {
+          font-weight: 700;
+          color: #e53935;
           margin-bottom: 1rem;
-          color: #34e89e;
         }
-
-        .footer-section h4 {
-          font-size: 1.2rem;
-          margin-bottom: 1rem;
-          color: #34e89e;
-        }
-
         .footer-section p {
-          font-size: 0.9rem;
-          color: #ddd;
+          font-size: 0.98rem;
+          color: #e0e0e0;
           line-height: 1.8;
         }
-
         .footer-section ul {
           list-style: none;
         }
-
         .footer-section ul li {
           margin-bottom: 0.5rem;
         }
-
         .footer-section ul li a {
-          color: #ddd;
+          color: #e0e0e0;
           text-decoration: none;
-          font-size: 0.9rem;
-          transition: color 0.3s ease;
+          font-size: 1rem;
+          border-radius: 6px;
+          padding: 0.2rem 0.5rem;
+          transition: color 0.3s, background 0.2s;
         }
-
         .footer-section ul li a:hover {
-          color: #34e89e;
+          color: #e53935;
+          background: rgba(229,57,53,0.08);
         }
-
         .social-links {
           display: flex;
-          gap: 1rem;
+          gap: 1.1rem;
         }
-
         .social-icon {
-          color: #ddd;
-          font-size: 1.5rem;
-          transition: color 0.3s ease;
+          color: #e0e0e0;
+          font-size: 1.7rem;
+          transition: color 0.3s, transform 0.2s;
           text-decoration: none;
+          border-radius: 50%;
+          padding: 0.2rem;
         }
-
         .social-icon:hover {
-          color: #34e89e;
+          color: #e53935;
+          background: rgba(229,57,53,0.10);
+          transform: scale(1.18) rotate(-8deg);
         }
-
         .footer-bottom {
           text-align: center;
-          padding: 1rem 0;
+          padding: 1rem 0 0.5rem 0;
           margin-top: 2rem;
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
-
         .footer-bottom p {
-          font-size: 0.9rem;
-          color: #ddd;
+          font-size: 0.98rem;
+          color: #bdbdbd;
         }
-
-        @media (max-width: 768px) {
-          .footer-container {
-            grid-template-columns: 1fr;
-            text-align: center;
+        @media (max-width: 1024px) {
+          .movies-grid {
+            grid-template-columns: repeat(2, 1fr);
           }
-
-          .social-links {
-            justify-content: center;
+        }
+        @media (max-width: 600px) {
+          .movies-grid {
+            grid-template-columns: 1fr;
           }
         }
       `}</style>

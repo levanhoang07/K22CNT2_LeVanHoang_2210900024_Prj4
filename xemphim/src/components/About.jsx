@@ -1,17 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+
+// Hook hiệu ứng cuộn hiện nội dung
+function useInView(threshold = 0.15) {
+  const ref = useRef();
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const observer = new window.IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [threshold]);
+  return [ref, inView];
+}
 
 export default function About() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [ref1, inView1] = useInView();
+  const [ref2, inView2] = useInView();
 
   return (
     <>
+      {/* HEADER */}
       <header className="header">
         <div className="header-container">
-          <div className="logo">
-            <h1>DOREMI</h1>
-            <span>CINEMA</span>
-          </div>
+          <span className="site-logo">DOREMI <span className="logo-red">CINEMA</span></span>
           <div
             className="mobile-menu-toggle"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -20,20 +38,16 @@ export default function About() {
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter') setIsMenuOpen(!isMenuOpen)}}
           >
-            <span></span>
-            <span></span>
-            <span></span>
+            <span></span><span></span><span></span>
           </div>
-          
           <nav className={`main-nav ${isMenuOpen ? 'open' : ''}`}>
-            <ul className="nav-links">
+            <ul className="nav-links plain-links">
               <li><Link to="/">Trang Chủ</Link></li>
               <li><Link to="/locations">Cụm rạp</Link></li>
               <li><Link to="/about">Giới Thiệu</Link></li>
               <li><Link to="/contact">Liên Hệ</Link></li>
             </ul>
           </nav>
-          
           <div className="header-actions">
             <Link to="/giove" className="cart-icon" title="Giỏ vé của bạn">
               <span className="icon">🛒</span>
@@ -43,17 +57,86 @@ export default function About() {
         </div>
       </header>
 
-      <main className="about-container">
-        <h1>Giới Thiệu Về Doremi Cinema</h1>
-        <div className="about-content">
-          <p><strong>Doremi Cinema</strong> tự hào là hệ thống rạp chiếu phim hiện đại hàng đầu, nơi mang đến trải nghiệm giải trí đỉnh cao với hình ảnh sắc nét và âm thanh sống động, giúp bạn đắm chìm vào từng khung cảnh của bộ phim yêu thích.</p>
-          <p>Chúng tôi không chỉ cập nhật liên tục những bộ phim bom tấn mới nhất, mà còn cung cấp dịch vụ đặt vé nhanh chóng, tiện lợi giúp tiết kiệm thời gian, đồng thời tạo ra không gian thoải mái, sang trọng để bạn và gia đình có thể tận hưởng trọn vẹn những phút giây giải trí.</p>
-          <p>Bên cạnh đó, Doremi Cinema còn thường xuyên tổ chức các chương trình ưu đãi hấp dẫn dành riêng cho khách hàng thân thiết, mong muốn mang đến nhiều hơn những giá trị tuyệt vời cho cộng đồng yêu điện ảnh.</p>
-          <p>Với niềm tin rằng điện ảnh là cầu nối gắn kết mọi người, chúng tôi luôn không ngừng nỗ lực để tạo nên những khoảnh khắc đáng nhớ, là nơi bạn và những người thân yêu có thể sẻ chia cảm xúc và kỷ niệm.</p>
-          <p><em>Cảm ơn bạn đã lựa chọn Doremi Cinema – Nơi cảm xúc thăng hoa và từng khoảnh khắc trở nên ý nghĩa!</em></p>
+      {/* HERO BANNER */}
+      <section className="hero-banner">
+        <div className="hero-overlay"></div>
+        <div className="hero-content">
+          <h1>Về <span className="logo-red">Doremi Cinema</span></h1>
+          <p>Khám phá không gian điện ảnh hiện đại, dịch vụ tận tâm và sứ mệnh kết nối cộng đồng yêu phim!</p>
         </div>
+      </section>
+
+      <main className="main-content">
+        <section className="about-section">
+          <div
+            ref={ref1}
+            className={`about-row ${inView1 ? 'about-inview' : ''}`}
+          >
+            <div className="about-img about-img-left">
+              <img
+                src="https://images.pexels.com/photos/436413/pexels-photo-436413.jpeg?auto=compress&cs=tinysrgb&w=600"
+                alt="Không gian rạp Doremi Cinema"
+              />
+            </div>
+            <div className="about-text">
+              <h1 className="about-title">
+                Giới Thiệu Về <span className="logo-red">Doremi Cinema</span>
+              </h1>
+              <p>
+                <strong>Doremi Cinema</strong> tự hào là hệ thống rạp chiếu phim hiện đại hàng đầu, nơi mang đến trải nghiệm giải trí đỉnh cao với hình ảnh sắc nét và âm thanh sống động, giúp bạn đắm chìm vào từng khung cảnh của bộ phim yêu thích.
+              </p>
+              <p>
+                Chúng tôi không chỉ cập nhật liên tục những bộ phim bom tấn mới nhất, mà còn cung cấp dịch vụ đặt vé nhanh chóng, tiện lợi giúp tiết kiệm thời gian, đồng thời tạo ra không gian thoải mái, sang trọng để bạn và gia đình có thể tận hưởng trọn vẹn những phút giây giải trí.
+              </p>
+              <p>
+                Bên cạnh đó, Doremi Cinema còn thường xuyên tổ chức các chương trình ưu đãi hấp dẫn dành riêng cho khách hàng thân thiết, mong muốn mang đến nhiều hơn những giá trị tuyệt vời cho cộng đồng yêu điện ảnh.
+              </p>
+              <p>
+                Với niềm tin rằng điện ảnh là cầu nối gắn kết mọi người, chúng tôi luôn không ngừng nỗ lực để tạo nên những khoảnh khắc đáng nhớ, là nơi bạn và những người thân yêu có thể sẻ chia cảm xúc và kỷ niệm.
+              </p>
+              <p>
+                <em>Cảm ơn bạn đã lựa chọn Doremi Cinema – Nơi cảm xúc thăng hoa và từng khoảnh khắc trở nên ý nghĩa!</em>
+              </p>
+            </div>
+          </div>
+
+          <div
+            ref={ref2}
+            className={`about-row about-row-reverse ${inView2 ? 'about-inview' : ''}`}
+          >
+            <div className="about-img about-img-right">
+              <img
+                src="https://images.pexels.com/photos/8537319/pexels-photo-8537319.jpeg?auto=compress&cs=tinysrgb&w=600"
+                alt="Khán giả tại Doremi Cinema"
+              />
+            </div>
+            <div className="about-text">
+              <h2 className="about-title">
+                Trải Nghiệm Đẳng Cấp & Sứ Mệnh
+              </h2>
+              <div className="about-feature-list">
+                <p>
+                  <strong>Tầm nhìn:</strong> Trở thành điểm đến giải trí điện ảnh hàng đầu, nơi mọi khách hàng đều cảm nhận được sự khác biệt về chất lượng dịch vụ, công nghệ và không gian.
+                </p>
+                <p>
+                  <strong>Sứ mệnh:</strong> Mang đến trải nghiệm điện ảnh tuyệt vời, kết nối cộng đồng yêu phim, lan tỏa cảm xúc tích cực và sáng tạo cho mọi thế hệ.
+                </p>
+                <ul>
+                  <li>Không gian hiện đại, phòng chiếu chuẩn quốc tế</li>
+                  <li>Đội ngũ nhân viên thân thiện, chuyên nghiệp</li>
+                  <li>Dịch vụ đặt vé, thanh toán tiện lợi</li>
+                  <li>Nhiều ưu đãi hấp dẫn cho thành viên</li>
+                </ul>
+                <p>
+                  <strong>Hãy đến và cảm nhận sự khác biệt tại Doremi Cinema!</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
+      {/* FOOTER */}
       <footer className="footer">
         <div className="footer-container">
           <div className="footer-section">
@@ -64,7 +147,7 @@ export default function About() {
             <h4>Liên kết nhanh</h4>
             <ul>
               <li><Link to="/">Trang Chủ</Link></li>
-              <li><Link to="/locations">Cụm rạp</Link></li>
+              <li><Link to="/locations">Cụm Rạp</Link></li>
               <li><Link to="/about">Giới Thiệu</Link></li>
               <li><Link to="/contact">Liên Hệ</Link></li>
               <li><Link to="/dangnhap">Đăng Nhập</Link></li>
@@ -109,30 +192,22 @@ export default function About() {
       </footer>
 
       <style>{`
-        /* Reset & Base Styles */
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-        
         body {
-          font-family: 'Segoe UI', 'Roboto', sans-serif;
-          line-height: 1.6;
-          background: #fff;
-          color: #2e7d32;
+          font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+          background: #555555;
+          color: #222;
         }
-
-        /* Header Styles */
+        .main-content {
+          background:rgb(45, 41, 41);
+        }
         .header {
-          background: linear-gradient(135deg, #0f3443 0%, #34e89e 100%);
-          padding: 0;
+          background: #111;
+          color: #fff;
           position: sticky;
           top: 0;
           z-index: 1000;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 2px 10px rgba(0,0,0,0.18);
         }
-
         .header-container {
           max-width: 1200px;
           margin: 0 auto;
@@ -141,85 +216,94 @@ export default function About() {
           align-items: center;
           padding: 0.8rem 1rem;
         }
-
+        .site-logo {
+          font-size: 1.7rem;
+          font-weight: 700;
+          letter-spacing: 2px;
+          color: #fff;
+        }
+        .logo-red {
+          color: #e53935;
+        }
         .main-nav {
           flex-grow: 1;
           margin-left: 2rem;
         }
-
         .nav-links {
           display: flex;
           list-style: none;
-          margin: 0;
-          padding: 0;
         }
-
         .nav-links li {
-          position: relative;
-          margin: 0;
+          margin: 0 0.2rem;
         }
-
         .nav-links a {
-          display: block;
+          color: #fff;
           text-decoration: none;
-          color: white;
           font-size: 1rem;
-          padding: 0.75rem 1.25rem;
-          font-weight: 500;
-          transition: all 0.3s ease;
-          border-radius: 4px;
+          padding: 0.7rem 1.2rem;
+          border-radius: 8px;
+          transition: background 0.3s, color 0.2s;
         }
-
-        .nav-links a:hover {
-          background-color: rgba(255, 255, 255, 0.1);
+        .nav-links a:hover, .nav-links a:focus {
+          background: #e53935;
+          color: #fff;
         }
-
-        /* Header actions */
+        .nav-links.plain-links a {
+          background: none !important;
+          border: none !important;
+          padding: 0.7rem 0.7rem;
+          border-radius: 0;
+          transition: color 0.2s;
+        }
+        .nav-links.plain-links a:hover, .nav-links.plain-links a:focus {
+          background: none !important;
+          color: #e53935;
+        }
         .header-actions {
           display: flex;
           align-items: center;
         }
-
         .cart-icon {
           position: relative;
           font-size: 1.5rem;
-          color: white;
+          color: #fff;
           margin-right: 1rem;
           text-decoration: none;
+          transition: transform 0.2s;
         }
-
+        .cart-icon:hover {
+          transform: scale(1.15) rotate(-8deg);
+        }
         .cart-icon .badge {
           position: absolute;
           top: -6px;
           right: -10px;
-          background: #f44336;
+          background: #e53935;
           color: white;
           border-radius: 50%;
           padding: 2px 6px;
           font-size: 0.7rem;
           font-weight: 700;
         }
-
-        /* Mobile Menu Toggle */
         .mobile-menu-toggle {
           display: none;
           flex-direction: column;
           justify-content: space-around;
-          width: 24px;
-          height: 24px;
+          width: 28px;
+          height: 28px;
           cursor: pointer;
         }
-
         .mobile-menu-toggle span {
           display: block;
           width: 100%;
           height: 3px;
-          background: white;
+          background: #fff;
           border-radius: 3px;
-          transition: all 0.3s ease;
+          margin-bottom: 4px;
         }
-
-        /* Responsive Header */
+        .mobile-menu-toggle span:last-child {
+          margin-bottom: 0;
+        }
         @media (max-width: 768px) {
           .main-nav {
             position: fixed;
@@ -227,93 +311,187 @@ export default function About() {
             left: 0;
             width: 100%;
             height: 100vh;
-            background: #0f3443;
+            background: #111;
             clip-path: circle(0% at 100% 0);
-            transition: clip-path 0.6s ease-in-out;
+            transition: clip-path 0.6s;
             pointer-events: none;
             z-index: 999;
           }
-
           .main-nav.open {
             clip-path: circle(150% at 100% 0);
             pointer-events: auto;
           }
-
           .nav-links {
             flex-direction: column;
             margin: 3rem 0 0 0;
           }
-
           .nav-links li {
             margin: 0.5rem 0;
             text-align: center;
           }
-
           .nav-links a {
             font-size: 1.5rem;
             padding: 1rem;
           }
-
           .header-actions {
             display: none;
           }
-
           .mobile-menu-toggle {
             display: flex;
           }
         }
-
-        /* About container */
-        .about-container {
-          max-width: 1200px;
-          margin: 2rem auto;
+        /* HERO BANNER */
+        .hero-banner {
+          position: relative;
+          background: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+          min-height: 260px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .hero-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(17,17,17,0.7);
+        }
+        .hero-content {
+          position: relative;
+          z-index: 1;
+          text-align: center;
+          color: #fff;
+          padding: 2.5rem 1rem 2rem 1rem;
+        }
+        .hero-content h1 {
+          font-size: 2rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+          letter-spacing: 1px;
+        }
+        .hero-content p {
+          font-size: 1.1rem;
+          margin-bottom: 0;
+          color: #fff;
+        }
+        /* ABOUT SECTION */
+        .about-section {
+          max-width: 1100px;
+          margin: 2.5rem auto 2rem auto;
           padding: 0 1rem;
         }
-
-        .about-container h1 {
-          color: #34e89e;
+        .about-row {
+          display: flex;
+          align-items: stretch;
+          gap: 2.5rem;
+          margin-bottom: 2.5rem;
+          opacity: 0;
+          transform: translateY(40px);
+          transition: all 0.8s cubic-bezier(0.4,0,0.2,1);
+          background: #fff;
+          border-radius: 18px;
+          box-shadow: 0 4px 24px rgba(229,57,53,0.08);
+        }
+        .about-row.about-inview {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .about-row-reverse {
+          flex-direction: row-reverse;
+        }
+        .about-img {
+          flex: 1 1 340px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(120deg, #fbe9e7 0%, #fff 100%);
+          border-radius: 18px 0 0 18px;
+          padding: 2rem 1rem;
+        }
+        .about-row-reverse .about-img {
+          border-radius: 0 18px 18px 0;
+        }
+        .about-img img {
+          width: 100%;
+          max-width: 370px;
+          border-radius: 12px;
+          box-shadow: 0 4px 18px rgba(229,57,53,0.10);
+          object-fit: cover;
+          margin-bottom: 0.5rem;
+        }
+        .about-img-link {
+          color: #e53935;
+          font-size: 0.95rem;
+          text-decoration: underline;
+          margin-top: 0.2rem;
+          transition: color 0.2s;
+        }
+        .about-img-link:hover {
+          color: #111;
+        }
+        .about-text {
+          flex: 2 1 400px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 2rem 2rem 2rem 0;
+        }
+        .about-row-reverse .about-text {
+          padding: 2rem 0 2rem 2rem;
+        }
+        .about-title {
+          color: #e53935;
           font-size: 2rem;
-          margin-bottom: 1rem;
-          text-align: center;
+          font-weight: 700;
+          margin-bottom: 1.2rem;
         }
-
-        .about-content {
-          background: white;
-          border-radius: 8px;
-          box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-          padding: 2rem;
-          transition: transform 0.3s ease;
-        }
-
-        .about-content:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-
-        .about-content p {
-          font-size: 1rem;
-          color: #555;
+        .about-feature-list p {
+          font-size: 1.05rem;
+          color: #444;
           margin-bottom: 1rem;
           line-height: 1.8;
         }
-
-        .about-content p strong {
-          color: #0f3443;
+        .about-feature-list ul {
+          margin-left: 1.2rem;
+          margin-bottom: 1rem;
         }
-
-        .about-content p em {
-          color: #0f3443;
-          font-style: italic;
+        .about-feature-list li {
+          font-size: 1rem;
+          color: #444;
+          margin-bottom: 0.3rem;
+          list-style: disc;
         }
-
-        /* Footer */
+        @media (max-width: 1024px) {
+          .about-row, .about-row-reverse {
+            flex-direction: column !important;
+            gap: 1.5rem;
+            border-radius: 18px;
+          }
+          .about-img, .about-row-reverse .about-img {
+            border-radius: 18px 18px 0 0 !important;
+            padding: 1.2rem 0.5rem;
+          }
+          .about-text, .about-row-reverse .about-text {
+            padding: 1.2rem 0.5rem;
+          }
+        }
+        @media (max-width: 768px) {
+          .about-section {
+            padding: 0 0.3rem;
+          }
+          .about-title {
+            font-size: 1.3rem;
+          }
+          .hero-content h1 {
+            font-size: 1.3rem;
+          }
+        }
+        /* FOOTER */
         .footer {
-          background: #0f3443;
+          background: #111;
           color: white;
           padding: 2rem 0;
           margin-top: 3rem;
         }
-
         .footer-container {
           max-width: 1200px;
           margin: 0 auto;
@@ -322,83 +500,66 @@ export default function About() {
           gap: 2rem;
           padding: 0 1rem;
         }
-
-        .footer-section h3 {
-          font-size: 1.5rem;
+        .footer-section h3, .footer-section h4 {
+          font-weight: 700;
+          color: #e53935;
           margin-bottom: 1rem;
-          color: #34e89e;
         }
-
-        .footer-section h4 {
-          font-size: 1.2rem;
-          margin-bottom: 1rem;
-          color: #34e89e;
-        }
-
         .footer-section p {
-          font-size: 0.9rem;
-          color: #ddd;
+          font-size: 0.98rem;
+          color: #e0e0e0;
           line-height: 1.8;
         }
-
         .footer-section ul {
           list-style: none;
         }
-
         .footer-section ul li {
           margin-bottom: 0.5rem;
         }
-
         .footer-section ul li a {
-          color: #ddd;
+          color: #e0e0e0;
           text-decoration: none;
-          font-size: 0.9rem;
-          transition: color 0.3s ease;
+          font-size: 1rem;
+          border-radius: 6px;
+          padding: 0.2rem 0.5rem;
+          transition: color 0.3s, background 0.2s;
         }
-
         .footer-section ul li a:hover {
-          color: #34e89e;
+          color: #e53935;
+          background: rgba(229,57,53,0.08);
         }
-
         .social-links {
           display: flex;
-          gap: 1rem;
+          gap: 1.1rem;
         }
-
         .social-icon {
-          color: #ddd;
-          font-size: 1.5rem;
-          transition: color 0.3s ease;
+          color: #e0e0e0;
+          font-size: 1.7rem;
+          transition: color 0.3s, transform 0.2s;
           text-decoration: none;
+          border-radius: 50%;
+          padding: 0.2rem;
         }
-
         .social-icon:hover {
-          color: #34e89e;
+          color: #e53935;
+          background: rgba(229,57,53,0.10);
+          transform: scale(1.18) rotate(-8deg);
         }
-
         .footer-bottom {
           text-align: center;
-          padding: 1rem 0;
+          padding: 1rem 0 0.5rem 0;
           margin-top: 2rem;
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
-
         .footer-bottom p {
-          font-size: 0.9rem;
-          color: #ddd;
+          font-size: 0.98rem;
+          color: #bdbdbd;
         }
-
-        /* Responsive About */
         @media (max-width: 768px) {
-          .about-content {
-            padding: 1.5rem;
-          }
-
           .footer-container {
             grid-template-columns: 1fr;
             text-align: center;
           }
-
           .social-links {
             justify-content: center;
           }

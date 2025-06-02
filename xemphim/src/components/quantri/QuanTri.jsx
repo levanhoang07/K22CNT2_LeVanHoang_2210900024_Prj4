@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, Outlet } from 'react-router-dom'; // Thêm Outlet để render các Route con
+import { Link, Outlet } from 'react-router-dom';
 
 export default function QuanTri() {
   return (
@@ -18,16 +18,12 @@ export default function QuanTri() {
           </nav>
         </div>
 
-        {/* Nội dung chính */}
         <div style={styles.content}>
           <h2 style={styles.greeting}>Chào mừng bạn đến với hệ thống Quản lý Phim Doremi Cinema</h2>
-
-          {/* Đây là nơi các route con sẽ được render */}
           <Outlet />
         </div>
       </div>
 
-      {/* Thêm Font Awesome nếu cần */}
       <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
