@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import ChatBox from './ChatBox';
 
 export default function TrangChu() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -613,6 +614,7 @@ export default function TrangChu() {
           }
         }
       `}</style>
+      <ChatBox />
     </>
   );
 }

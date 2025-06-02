@@ -262,56 +262,118 @@ export default function DatVe() {
         }
         .dv-ghe {
           margin-bottom: 18px;
+          background: #232733;
+          border-radius: 14px;
+          padding: 18px 10px 20px 10px;
+          box-shadow: 0 2px 16px rgba(229,57,53,0.07);
+          position: relative;
         }
         .dv-man-hinh {
-          font-size: 1.1rem;
+          font-size: 1.15rem;
           font-weight: bold;
           text-align: center;
-          margin-bottom: 6px;
+          margin-bottom: 0;
+          letter-spacing: 1px;
+          color: #fff;
+          position: relative;
+          z-index: 2;
         }
         .dv-man-hinh-bar {
-          width: 30%;
-          height: 20px;
-          background-color: #ccc;
-          margin: 0 auto 12px auto;
-          border-radius: 8px;
+          width: 70%;
+          height: 18px;
+          margin: 0 auto 18px auto;
+          background: #e53935;
+          border-radius: 0 0 40px 40px;
+          box-shadow:
+            0 8px 24px 2px rgba(229,57,53,0.13),
+            0 0 60px 18px #fff8,
+            0 0 120px 32px #fff5;
+          position: relative;
+          z-index: 1;
+          border-bottom: 3px solid #e53935;
+          border-left: 1px solid #fff2;
+          border-right: 1px solid #fff2;
+          overflow: visible;
+        }
+        .dv-man-hinh-bar::after {
+          content: "";
+          display: block;
+          position: absolute;
+          left: 50%;
+          top: 70%;
+          transform: translateX(-50%);
+          width: 60px;
+          height: 30px;
+          background: radial-gradient(ellipse at center, #fff 0%, #fff0 80%);
+          opacity: 0.85;
+          filter: blur(2px);
+          pointer-events: none;
         }
         .dv-ghe-list {
           text-align: center;
+          margin-top: 10px;
         }
         .dv-ghe-row {
-          margin-bottom: 10px;
+          margin-bottom: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
+          gap: 8px;
+          position: relative;
         }
         .dv-ghe-btn {
-          margin: 5px;
+          margin: 0 4px;
           padding: 10px 0;
           width: 44px;
-          background-color: #444857;
+          background: linear-gradient(180deg, #444857 60%, #232733 100%);
           color: #fff;
           border: 1.5px solid #bdbdbd;
-          border-radius: 8px;
+          border-radius: 8px 8px 12px 12px;
           cursor: pointer;
           font-size: 1rem;
-          transition: background 0.2s, color 0.2s, border 0.2s;
+          font-family: inherit;
+          box-shadow: 0 2px 8px rgba(40,40,60,0.08);
+          transition: background 0.2s, color 0.2s, border 0.2s, transform 0.15s;
+          position: relative;
         }
         .dv-ghe-btn.selected {
           background: linear-gradient(90deg, #e53935 60%, #ffb199 100%);
           color: #fff;
           border: 1.5px solid #e53935;
+          box-shadow: 0 4px 16px rgba(229,57,53,0.18);
+          transform: scale(1.08);
         }
         .dv-ghe-btn:hover {
           background: #e57373;
           color: #fff;
+          border-color: #e53935;
+          transform: translateY(-2px) scale(1.06);
         }
+
+        .dv-ghe-btn::after {
+          content: "";
+          display: block;
+          width: 60%;
+          height: 4px;
+          background: #fff3;
+          border-radius: 0 0 8px 8px;
+          margin: 0 auto;
+          margin-top: 2px;
+        }
+
         .dv-loi-vao {
-          margin-left: 10px;
+          margin-left: 18px;
           display: inline-block;
           font-size: 16px;
-          color: brown;
+          color: #e53935;
+          font-weight: 600;
+          background: #fff;
+          border-radius: 8px;
+          padding: 3px 12px 3px 8px;
+          box-shadow: 0 2px 8px rgba(229,57,53,0.08);
+          border: 1.5px dashed #e53935;
         }
+
         .dv-btn-group {
           display: flex;
           gap: 14px;

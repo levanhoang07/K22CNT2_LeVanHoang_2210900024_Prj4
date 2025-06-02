@@ -47,68 +47,63 @@ export default function Contact() {
       </section>
 
       {/* CONTACT MAIN */}
-      <main className="main-content">
-        <section className="contact-section">
-          <div className="container">
-            <h1 className="contact-title">Liên Hệ Với Chúng Tôi</h1>
-            <div className="contact-info-grid">
-              <div className="contact-info-item">
-                <i className="fas fa-map-marker-alt icon"></i>
-                <div>
-                  <h3>Địa chỉ</h3>
-                  <p>28A Lê Trọng Tấn, Hà Đông, Hà Nội</p>
-                </div>
-              </div>
-              <div className="contact-info-item">
-                <i className="fas fa-envelope icon"></i>
-                <div>
-                  <h3>Email</h3>
-                  <p><a href="mailto:support@doremicinema.com">support@doremicinema.com</a></p>
-                </div>
-              </div>
-              <div className="contact-info-item">
-                <i className="fas fa-phone-alt icon"></i>
-                <div>
-                  <h3>Điện thoại</h3>
-                  <p><a href="tel:0982121680">0982 121 680</a></p>
-                </div>
-              </div>
-              <div className="contact-info-item">
-                <i className="fas fa-clock icon"></i>
-                <div>
-                  <h3>Giờ mở cửa</h3>
-                  <p>09:00 - 22:00 (Thứ 2 - Chủ nhật)</p>
-                </div>
-              </div>
-              <div className="contact-info-item">
-                <i className="fab fa-facebook-f icon"></i>
-                <div>
-                  <h3>Fanpage Facebook</h3>
-                  <p>
-                    <a href="https://www.facebook.com/doremicinema" target="_blank" rel="noopener noreferrer">
-                      facebook.com/doremicinema
-                    </a>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <h2 className="contact-map-title">Bản Đồ</h2>
-            <div className="map-container">
-              <iframe
-                title="Bản đồ Doremi Cinema"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.378420578216!2d105.7462676!3d20.9710027!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3134531d639eaaab%3A0x1b23ce48070fe314!2zMjhBIMSQLiBMw6ogVHLhu5NuZyBU4bqnbiwgRMawxqFuZyBLaW5oLCBIw6AgxJDhu5FuZywgSMOgIE7hu5lpLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1715766261140!5m2!1svi!2s"
-                width="100%"
-                height="300"
-                style={{ border: 0, borderRadius: '8px' }}
-                allowFullScreen=""
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-            </div>
+<main className="main-content">
+  <section className="contact-section">
+    <div className="container">
+      <h1 className="contact-title">Liên Hệ Với Chúng Tôi</h1>
+      <div className="contact-info-grid">
+        <div className="contact-info-item">
+          <i className="fas fa-building icon"></i>
+          <div>
+            <h3>TRỤ SỞ</h3>
+            <p>Số 28A Lê Trọng Tấn, Phường La Khê, Quận Hà Đông , Tp.Hà Nội</p>
           </div>
-        </section>
-      </main>
+        </div>
+        <div className="contact-info-item">
+          <i className="fas fa-headset icon"></i>
+          <div>
+            <h3>HỖ TRỢ KHÁCH HÀNG</h3>
+            <p>Hotline: <a href="02435199999999">024.35199999999</a></p>
+            <p>Zalo: <a href="https://oa.zalo.me/doremiCinema" target="_blank" rel="noopener noreferrer">https://oa.zalo.me/ttcpqg</a></p>
+            <p>Giờ làm việc: 8:00 - 22:00<br />Tất cả các ngày bao gồm cả Lễ tết</p>
+            <p>Email: <a href="mailto:support@doremiCinema.vn">support@doremiCinema.vn</a></p>
+          </div>
+        </div>
+        <div className="contact-info-item">
+          <i className="fas fa-bullhorn icon"></i>
+          <div>
+            <h3>LIÊN HỆ QUẢNG CÁO, TỔ CHỨC SỰ KIỆN, THUÊ RẠP</h3>
+            <p>Phòng dịch vụ</p>
+            <p>Hotline: <a href="tel:0243456789">024.3456789</a></p>
+            <p>Email: <a href="mailto:Booking@doremiCinema.vn">Booking@doremiCinema.vn</a></p>
+          </div>
+        </div>
+        <div className="contact-info-item">
+          <i className="fas fa-ticket-alt icon"></i>
+          <div>
+            <h3>LIÊN HỆ MUA VÉ HỢP ĐỒNG</h3>
+            <p>Phòng Chiếu phim và Trưng bày Điện Ảnh</p>
+            <p>Hotline: <a href="tel:02435888888">024.35888888</a></p>
+            <p>Email: <a href="mailto:contact@doremiCinema.vn">contact@doremiCinema.vn</a></p>
+          </div>
+        </div>
+      </div>
+      <h2 className="contact-map-title">Bản Đồ</h2>
+      <div className="map-container">
+        <iframe
+          title="Bản đồ Doremi Cinema"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.624687364105!2d105.7592438!3d20.9630515!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313453ef854da745%3A0x91291de5392ac9ae!2zVMO0YSBUaMO6eSBM4buRdCBUb3dlcg!5e0!3m2!1svi!2s!4v1717320000000!5m2!1svi!2s"
+          width="100%"
+          height="300"
+          style={{ border: 0, borderRadius: '8px' }}
+          allowFullScreen=""
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
+      </div>
+    </div>
+  </section>
+</main>
 
       {/* FOOTER */}
       <footer className="footer">
@@ -380,29 +375,34 @@ export default function Contact() {
           align-items: flex-start;
           gap: 1rem;
           transition: box-shadow 0.3s, transform 0.3s;
+          /* Thêm dòng này để chữ không bị tràn ra ngoài */
+          word-break: break-word;
+          /* Giới hạn chiều rộng nội dung bên trong */
+          max-width: 100%;
+          box-sizing: border-box;
         }
-        .contact-info-item:hover {
-          box-shadow: 0 8px 24px rgba(229,57,53,0.18);
-          transform: translateY(-6px) scale(1.03);
+        .contact-info-item > div {
+          flex: 1 1 0;
+          min-width: 0;
+          /* Đảm bảo nội dung không bị tràn */
+          word-break: break-word;
+          overflow-wrap: break-word;
         }
-        .contact-info-item .icon {
-          font-size: 1.7rem;
-          color: #e53935;
-          margin-top: 2px;
-        }
-        .contact-info-item h3 {
-          font-size: 1.1rem;
-          color: #e53935;
-          margin-bottom: 0.3rem;
-        }
-        .contact-info-item p, .contact-info-item a {
+        .contact-info-item p, 
+        .contact-info-item a {
           font-size: 1rem;
           color: #444;
           text-decoration: none;
+          /* Ngăn chữ dài bị tràn */
+          word-break: break-word;
+          overflow-wrap: break-word;
+          max-width: 100%;
         }
-        .contact-info-item a:hover {
-          color: #e53935;
-          text-decoration: underline;
+        @media (max-width: 900px) {
+          .contact-info-item {
+            flex-direction: column;
+            align-items: stretch;
+          }
         }
         .contact-map-title {
           margin: 2rem 0 1rem 0;

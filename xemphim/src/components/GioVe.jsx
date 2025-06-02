@@ -60,7 +60,7 @@ export default function GioVe() {
     return (
       <div className="gio-error">
         <h2>❌ Thiếu thông tin vé. Vui lòng đặt lại.</h2>
-        <Link to="/" className="gio-btn gio-btn-home">Trang chủ</Link>
+        <Link to="/" className="gio-btn gio-btn-home"> Quay lại Trang chủ</Link>
         <style>{`
           .gio-error {
             text-align: center;

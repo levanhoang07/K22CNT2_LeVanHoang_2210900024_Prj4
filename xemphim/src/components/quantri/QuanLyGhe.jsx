@@ -13,7 +13,6 @@ const QuanLyGhe = () => {
   const [currentGhe, setCurrentGhe] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Set baseURL để gọi api ngắn gọn hơn
   axios.defaults.baseURL = 'http://127.0.0.1:3000/api';
 
   const fetchGhe = () => {
