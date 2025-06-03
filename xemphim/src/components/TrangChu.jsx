@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import ChatBox from './ChatBox';
+import { AuthContext } from "./context/AuthContext";
 
 export default function TrangChu() {
+  const { user } = useContext(AuthContext);
+  const nguoiDungId = user?.nguoidung_id || user?.id;
   const [searchTerm, setSearchTerm] = useState('');
   const [phimList, setPhimList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [soLuongVe, setSoLuongVe] = useState(0);
 
   useEffect(() => {
     fetch('http://127.0.0.1:3000/api/phim')
@@ -19,6 +23,17 @@ export default function TrangChu() {
         setLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    if (!nguoiDungId) {
+      setSoLuongVe(0);
+      return;
+    }
+    fetch(`http://localhost:3000/api/vedat?nguoidung_id=${nguoiDungId}`)
+      .then(res => res.json())
+      .then(data => setSoLuongVe(data.length))
+      .catch(() => setSoLuongVe(0));
+  }, [nguoiDungId]);
 
   const filteredPhim = phimList.filter(phim =>
     phim.ten.toLowerCase().includes(searchTerm.toLowerCase())
@@ -51,7 +66,7 @@ export default function TrangChu() {
           <div className="header-actions">
             <Link to="/giove" className="cart-icon" title="Giỏ vé của bạn">
               <span className="icon">🛒</span>
-              <span className="badge">0</span>
+              <span className="badge">{soLuongVe}</span>
             </Link>
           </div>
         </div>

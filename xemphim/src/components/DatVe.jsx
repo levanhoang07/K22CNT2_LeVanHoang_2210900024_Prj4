@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from "./context/AuthContext"; // Thêm dòng này
 
 export default function DatVe() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useContext(AuthContext); // Thêm dòng này
+  const nguoiDungId = user?.nguoidung_id || user?.id; // Thêm dòng này
 
   const [danhSachPhim, setDanhSachPhim] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,9 +16,10 @@ export default function DatVe() {
   const [rap, setRap] = useState('');
   const [suatChieu, setSuatChieu] = useState('');
   const [gheDaChon, setGheDaChon] = useState([]);
-  const [danhSachGhe, setDanhSachGhe] = useState([]);
+  const [danhSachGhe, setDanhSachGhe] = useState([]); // mảng 2 chiều [{so_ghe, ghe_id, loai_ghe, gia_ve, phong_id}]
   const [danhSachSuatChieu, setDanhSachSuatChieu] = useState([]);
 
+  // Lấy danh sách phim
   useEffect(() => {
     async function fetchPhim() {
       try {
@@ -33,44 +38,81 @@ export default function DatVe() {
     fetchPhim();
   }, []);
 
+  // Lấy danh sách ghế và suất chiếu
   useEffect(() => {
     fetch('http://127.0.0.1:3000/api/ghe')
       .then(res => res.json())
-      .then(data => setDanhSachGhe(data));
+      .then(data => {
+        // Nếu API trả về mảng 1 chiều, nhóm lại thành mảng 2 chiều theo hàng (A, B, C...)
+        if (Array.isArray(data) && data.length > 0 && !Array.isArray(data[0])) {
+          const grouped = {};
+          data.forEach(ghe => {
+            if (!grouped[ghe.so_ghe[0]]) grouped[ghe.so_ghe[0]] = [];
+            grouped[ghe.so_ghe[0]].push(ghe);
+          });
+          setDanhSachGhe(Object.values(grouped));
+        } else {
+          setDanhSachGhe(data);
+        }
+      });
     fetch('http://127.0.0.1:3000/api/suatchieu')
       .then(res => res.json())
       .then(data => setDanhSachSuatChieu(data));
   }, []);
 
+  // Chọn/bỏ chọn ghế
+  const handleChonGhe = (ghe) => {
+    if (gheDaChon.includes(ghe.so_ghe)) {
+      setGheDaChon(gheDaChon.filter(item => item !== ghe.so_ghe));
+    } else {
+      setGheDaChon([...gheDaChon, ghe.so_ghe]);
+    }
+  };
+
+  // Tính tổng tiền
+  const tinhTongTien = () => {
+    let tong = 0;
+    danhSachGhe.forEach(hang => {
+      hang.forEach(ghe => {
+        if (gheDaChon.includes(ghe.so_ghe)) tong += Number(ghe.gia_ve);
+      });
+    });
+    return tong;
+  };
+
+  // Đặt vé
   const handleXacNhanDatVe = async () => {
     try {
       // Tìm suat_chieu_id từ giờ chiếu và phim
       const suatChieuObj = danhSachSuatChieu.find(
-        s => s.gio === suatChieu && s.phim_id === parseInt(id)
+        s => (s.gio_bat_dau === suatChieu || s.gio === suatChieu) && s.phim_id === parseInt(id)
       );
-      const suatChieuId = suatChieuObj ? suatChieuObj.id : null;
+      const suat_chieu_id = suatChieuObj ? (suatChieuObj.suat_chieu_id || suatChieuObj.id) : null;
 
       // Tìm danh sách ghe_id từ tên ghế
-      const gheIdDaChon = gheDaChon.map(tenGhe => {
-        const ghe = danhSachGhe.find(g => g.ten === tenGhe);
-        return ghe ? ghe.id : null;
-      }).filter(Boolean);
+      const gheIdDaChon = [];
+      danhSachGhe.forEach(hang => {
+        hang.forEach(ghe => {
+          if (gheDaChon.includes(ghe.so_ghe)) gheIdDaChon.push(ghe.ghe_id);
+        });
+      });
 
-      if (!suatChieuId || gheIdDaChon.length === 0) {
+      if (!suat_chieu_id || gheIdDaChon.length === 0) {
         setError('Vui lòng chọn đúng suất chiếu và ghế.');
         return;
       }
 
-      const bookingData = {
-        suatChieuId,
-        gheDaChon: gheIdDaChon,
-        nguoiDungId: 1 // hoặc lấy từ context đăng nhập nếu có
+      // Gửi 1 lần tất cả ghế lên server
+      const veData = {
+        suatChieuId: suat_chieu_id,
+        gheDaChon: gheIdDaChon, // là mảng các ghe_id
+        nguoiDungId: nguoiDungId // Sử dụng id của user đang đăng nhập
       };
 
       const response = await fetch('http://127.0.0.1:3000/api/vedat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookingData),
+        body: JSON.stringify(veData),
       });
 
       if (!response.ok) {
@@ -78,12 +120,16 @@ export default function DatVe() {
         throw new Error('Lỗi khi lưu vé: ' + errText);
       }
 
-      const result = await response.json();
-      setSuccessMessage('Đặt vé thành công! Mã đặt vé: ' + result.maDatVe);
-
+      setSuccessMessage('Đặt vé thành công!');
       setRap('');
       setSuatChieu('');
       setGheDaChon([]);
+      // Chuyển sang trang giỏ vé cho user
+      setTimeout(() => {
+        navigate(
+          `/giove?phim=${id}&rap=${encodeURIComponent(rap)}&suat=${encodeURIComponent(suatChieu)}&ghe=${encodeURIComponent(gheDaChon.join(','))}`
+        );
+      }, 1000); // Đợi 1s cho user thấy thông báo
     } catch (err) {
       setError(err.message);
     }
@@ -104,7 +150,7 @@ export default function DatVe() {
       </div>
     );
 
-  const phim = danhSachPhim.find(p => p.id === parseInt(id));
+  const phim = danhSachPhim.find(p => p.id === parseInt(id) || p.phim_id === parseInt(id));
   if (!phim) {
     return (
       <div className="dv-error">
@@ -114,32 +160,15 @@ export default function DatVe() {
     );
   }
 
-  const gheList = [
-    ['A1', 'A2', 'A3', 'A4'],
-    ['B1', 'B2', 'B3', 'B4', 'B5'],
-    ['C1', 'C2', 'C3', 'C4', 'C5', 'C6'],
-    ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7'],
-    ['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8'],
-    ['F1', 'F2', 'F3', 'F4'],
-  ];
-
-  const handleChonGhe = (ghe) => {
-    if (gheDaChon.includes(ghe)) {
-      setGheDaChon(gheDaChon.filter(item => item !== ghe));
-    } else {
-      setGheDaChon([...gheDaChon, ghe]);
-    }
-  };
-
   return (
     <div className="dv-bg">
       <div className="dv-container">
         <div className="dv-card">
           <div className="dv-movie-image">
-            <img src={phim.anh} alt={phim.ten} />
+            <img src={phim.anh} alt={phim.ten || phim.ten_phim} />
           </div>
           <div className="dv-content">
-            <h1 className="dv-title">Đặt Vé: <span>{phim.ten}</span></h1>
+            <h1 className="dv-title">Đặt Vé: <span>{phim.ten || phim.ten_phim}</span></h1>
             {successMessage && <div className="dv-success">{successMessage}</div>}
 
             <div className="dv-row">
@@ -155,9 +184,13 @@ export default function DatVe() {
               <label>🕓 Chọn suất chiếu:</label>
               <select value={suatChieu} onChange={(e) => setSuatChieu(e.target.value)}>
                 <option value="">--Chọn suất--</option>
-                <option value="10:00">10:00</option>
-                <option value="14:00">14:00</option>
-                <option value="18:00">18:00</option>
+                {danhSachSuatChieu
+                  .filter(s => s.phim_id === parseInt(id))
+                  .map(s => (
+                    <option key={s.suat_chieu_id || s.id} value={s.gio_bat_dau || s.gio}>
+                      {s.gio_bat_dau || s.gio}
+                    </option>
+                  ))}
               </select>
             </div>
 
@@ -166,16 +199,18 @@ export default function DatVe() {
               <div className="dv-man-hinh-bar"></div>
               <label>💺 Chọn ghế:</label>
               <div className="dv-ghe-list">
-                {gheList.map((hang, index) => (
+                {danhSachGhe.map((hang, index) => (
                   <div key={index} className="dv-ghe-row">
                     {hang.map((ghe) => (
                       <button
-                        key={ghe}
+                        key={ghe.so_ghe}
                         onClick={() => handleChonGhe(ghe)}
-                        className={`dv-ghe-btn${gheDaChon.includes(ghe) ? ' selected' : ''}`}
+                        className={`dv-ghe-btn${gheDaChon.includes(ghe.so_ghe) ? ' selected' : ''} ${ghe.loai_ghe === 'VIP' ? ' vip' : ''}`}
                         type="button"
+                        title={`Loại: ${ghe.loai_ghe}`}
                       >
-                        {ghe}
+                        {ghe.so_ghe}
+                        <div style={{fontSize: '0.8em'}}>{ghe.loai_ghe}</div>
                       </button>
                     ))}
                     {index === 5 && (
@@ -184,6 +219,12 @@ export default function DatVe() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            <div className="dv-tong-tien">
+              <b>Ghế đã chọn:</b> {gheDaChon.join(', ') || 'Chưa chọn'}
+              <br />
+              <b>Tổng tiền:</b> <span style={{color: '#e53935', fontWeight: 700, fontSize: '1.2em'}}>{tinhTongTien().toLocaleString()} đ</span>
             </div>
 
             <div className="dv-btn-group">
@@ -204,298 +245,159 @@ export default function DatVe() {
       </div>
       <style>{`
         .dv-bg {
-          background: rgb(40,38,38);
           min-height: 100vh;
-          padding: 0;
+          background: linear-gradient(120deg, #f8fafc 0%, #e3e6f3 100%);
+          padding: 40px 0;
         }
         .dv-container {
-          max-width: 1100px;
+          max-width: 700px;
           margin: 0 auto;
-          padding: 48px 16px 60px 16px;
         }
         .dv-card {
+          background: #fff;
+          border-radius: 18px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.18);
           display: flex;
-          flex-direction: row;
-          gap: 40px;
-          background: rgba(28,28,32,0.98);
-          border-radius: 24px;
-          box-shadow: 0 8px 32px rgba(40,40,60,0.14), 0 1.5px 0 #e53935 inset;
-          overflow: hidden;
-          align-items: flex-start;
-        }
-        .dv-movie-image {
-          flex-shrink: 0;
-          width: 300px;
-          min-width: 200px;
-          max-width: 340px;
-          height: 420px;
-          background: #232733;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 24px 0 0 24px;
-          overflow: hidden;
-          box-shadow: 0 4px 18px rgba(40,40,60,0.10);
+          padding: 24px;
+          gap: 28px;
         }
         .dv-movie-image img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          border-radius: 24px 0 0 24px;
+          width: 180px;
+          border-radius: 12px;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.08);
         }
         .dv-content {
           flex: 1;
-          padding: 38px 18px 38px 0;
-          color: #fff;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-start;
         }
         .dv-title {
-          font-size: 2rem;
-          font-weight: 700;
+          font-size: 1.5rem;
           color: #e53935;
-          margin-bottom: 18px;
-          font-family: 'Playfair Display', serif;
-          letter-spacing: 0.5px;
-          text-shadow: 0 2px 16px #e53935, 0 1px 0 #fff;
-        }
-        .dv-title span {
-          color: #fff;
-          font-size: 1.2em;
+          margin-bottom: 16px;
         }
         .dv-row {
-          margin-bottom: 16px;
+          margin-bottom: 14px;
           display: flex;
           align-items: center;
           gap: 10px;
         }
         .dv-row label {
           min-width: 120px;
-          color: #ffb199;
-          font-weight: 600;
-        }
-        .dv-row select {
-          padding: 8px 14px;
-          border-radius: 8px;
-          border: 1.5px solid #e53935;
-          background: #232733;
-          color: #fff;
-          font-size: 1rem;
-          outline: none;
-        }
-        .dv-row select:focus {
-          border-color: #ffb199;
-        }
-        .dv-ghe {
-          margin-bottom: 18px;
-          background: #232733;
-          border-radius: 14px;
-          padding: 18px 10px 20px 10px;
-          box-shadow: 0 2px 16px rgba(229,57,53,0.07);
-          position: relative;
-        }
-        .dv-man-hinh {
-          font-size: 1.15rem;
-          font-weight: bold;
-          text-align: center;
-          margin-bottom: 0;
-          letter-spacing: 1px;
-          color: #fff;
-          position: relative;
-          z-index: 2;
-        }
-        .dv-man-hinh-bar {
-          width: 70%;
-          height: 18px;
-          margin: 0 auto 18px auto;
-          background: #e53935;
-          border-radius: 0 0 40px 40px;
-          box-shadow:
-            0 8px 24px 2px rgba(229,57,53,0.13),
-            0 0 60px 18px #fff8,
-            0 0 120px 32px #fff5;
-          position: relative;
-          z-index: 1;
-          border-bottom: 3px solid #e53935;
-          border-left: 1px solid #fff2;
-          border-right: 1px solid #fff2;
-          overflow: visible;
-        }
-        .dv-man-hinh-bar::after {
-          content: "";
-          display: block;
-          position: absolute;
-          left: 50%;
-          top: 70%;
-          transform: translateX(-50%);
-          width: 60px;
-          height: 30px;
-          background: radial-gradient(ellipse at center, #fff 0%, #fff0 80%);
-          opacity: 0.85;
-          filter: blur(2px);
-          pointer-events: none;
-        }
-        .dv-ghe-list {
-          text-align: center;
-          margin-top: 10px;
-        }
-        .dv-ghe-row {
-          margin-bottom: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          position: relative;
-        }
-        .dv-ghe-btn {
-          margin: 0 4px;
-          padding: 10px 0;
-          width: 44px;
-          background: linear-gradient(180deg, #444857 60%, #232733 100%);
-          color: #fff;
-          border: 1.5px solid #bdbdbd;
-          border-radius: 8px 8px 12px 12px;
-          cursor: pointer;
-          font-size: 1rem;
-          font-family: inherit;
-          box-shadow: 0 2px 8px rgba(40,40,60,0.08);
-          transition: background 0.2s, color 0.2s, border 0.2s, transform 0.15s;
-          position: relative;
-        }
-        .dv-ghe-btn.selected {
-          background: linear-gradient(90deg, #e53935 60%, #ffb199 100%);
-          color: #fff;
-          border: 1.5px solid #e53935;
-          box-shadow: 0 4px 16px rgba(229,57,53,0.18);
-          transform: scale(1.08);
-        }
-        .dv-ghe-btn:hover {
-          background: #e57373;
-          color: #fff;
-          border-color: #e53935;
-          transform: translateY(-2px) scale(1.06);
-        }
-
-        .dv-ghe-btn::after {
-          content: "";
-          display: block;
-          width: 60%;
-          height: 4px;
-          background: #fff3;
-          border-radius: 0 0 8px 8px;
-          margin: 0 auto;
-          margin-top: 2px;
-        }
-
-        .dv-loi-vao {
-          margin-left: 18px;
-          display: inline-block;
-          font-size: 16px;
-          color: #e53935;
-          font-weight: 600;
-          background: #fff;
-          border-radius: 8px;
-          padding: 3px 12px 3px 8px;
-          box-shadow: 0 2px 8px rgba(229,57,53,0.08);
-          border: 1.5px dashed #e53935;
-        }
-
-        .dv-btn-group {
-          display: flex;
-          gap: 14px;
-          margin-top: 18px;
-        }
-        .dv-btn {
-          display: inline-block;
-          padding: 10px 22px;
-          background: linear-gradient(90deg, #e53935 60%, #ffb199 100%);
-          color: #fff;
-          text-decoration: none;
-          font-weight: 700;
-          font-size: 1rem;
-          border-radius: 10px;
-          box-shadow: 0 4px 15px rgba(229,57,53,0.13);
-          letter-spacing: 0.5px;
-          transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
-          border: none;
-          cursor: pointer;
-        }
-        .dv-btn-home {
-          background: linear-gradient(90deg, #232733 60%, #555 100%);
-          color: #fff;
-          border: 1.5px solid #e53935;
-        }
-        .dv-btn-home:hover {
-          background: #181c24;
-          color: #e53935;
-        }
-        .dv-btn-xacnhan {
-          background: linear-gradient(90deg, #43e97b 60%, #38f9d7 100%);
-          color: #232733;
-        }
-        .dv-btn-xacnhan:hover {
-          background: linear-gradient(90deg, #11998e 60%, #38f9d7 100%);
-          color: #fff;
-          transform: translateY(-2px) scale(1.04);
-          box-shadow: 0 8px 24px rgba(67,233,123,0.18);
-        }
-        .dv-warning {
-          color: #e57373;
-          font-size: 1rem;
-          align-self: center;
-          margin-top: 8px;
-        }
-        .dv-success {
-          color: #43e97b;
-          background: rgba(67,233,123,0.07);
-          border-radius: 6px;
-          padding: 7px 12px;
-          margin-bottom: 12px;
           font-weight: 500;
         }
-        .dv-loading, .dv-error {
+        select {
+          padding: 7px 12px;
+          border-radius: 6px;
+          border: 1px solid #bbb;
+          font-size: 1rem;
+        }
+        .dv-ghe {
+          margin: 18px 0 10px 0;
+        }
+        .dv-man-hinh {
           text-align: center;
-          padding: 60px 0;
+          font-weight: 600;
+          margin-bottom: 2px;
+        }
+        .dv-man-hinh-bar {
+          width: 100%;
+          height: 8px;
+          background: #e53935;
+          border-radius: 6px;
+          margin-bottom: 12px;
+        }
+        .dv-ghe-list {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .dv-ghe-row {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+        }
+        .dv-ghe-btn {
+          width: 44px;
+          height: 44px;
+          border-radius: 8px;
+          border: 1.5px solid #bbb;
+          background: #f4f4f4;
+          color: #222;
+          font-weight: 600;
+          font-size: 1.1em;
+          cursor: pointer;
+          transition: background 0.2s, border 0.2s;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+        }
+        .dv-ghe-btn.vip {
+          border: 2px solid #e53935;
+          background: #ffeaea;
           color: #e53935;
-          font-size: 1.2rem;
         }
-        .dv-spinner {
-          width: 40px;
-          height: 40px;
-          border: 3px solid rgba(229,57,53, 0.2);
-          border-top: 3px solid #e53935;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-          margin: 0 auto 1rem;
+        .dv-ghe-btn.selected {
+          background: #e53935;
+          color: #fff;
+          border: 2px solid #e53935;
         }
-        @keyframes spin {
-          0% { transform: rotate(0deg);}
-          100% { transform: rotate(360deg);}
+        .dv-ghe-btn.selected.vip {
+          background: #b71c1c;
+          color: #fff;
+        }
+        .dv-loi-vao {
+          margin-left: 16px;
+          font-size: 1.1em;
+          color: #888;
+        }
+        .dv-tong-tien {
+          margin: 18px 0 8px 0;
+          font-size: 1.1em;
+        }
+        .dv-btn-group {
+          margin-top: 18px;
+          display: flex;
+          gap: 16px;
+          align-items: center;
+        }
+        .dv-btn {
+          padding: 10px 22px;
+          border-radius: 8px;
+          border: none;
+          background: #e53935;
+          color: #fff;
+          font-weight: 600;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: background 0.2s;
+          text-decoration: none;
+        }
+        .dv-btn-home {
+          background: #888;
+        }
+        .dv-btn-xacnhan {
+          background: #e53935;
+        }
+        .dv-btn:disabled, .dv-btn[disabled] {
+          background: #ccc;
+          cursor: not-allowed;
+        }
+        .dv-warning {
+          color: #e53935;
+          font-weight: 500;
+        }
+        .dv-success {
+          background: #e0ffe0;
+          color: #388e3c;
+          padding: 8px 14px;
+          border-radius: 6px;
+          margin-bottom: 10px;
+          font-weight: 600;
         }
         @media (max-width: 900px) {
-          .dv-card {
-            flex-direction: column;
-            gap: 0;
-            border-radius: 18px;
-          }
-          .dv-movie-image {
-            width: 100%;
-            max-width: 100vw;
-            height: 220px;
-            border-radius: 18px 18px 0 0;
-          }
-          .dv-movie-image img {
-            border-radius: 18px 18px 0 0;
-          }
-          .dv-content {
-            padding: 24px 12px 24px 12px;
-          }
-          .dv-btn-group {
-            flex-direction: column;
-            gap: 10px;
-            align-items: stretch;
-          }
+          .dv-card { flex-direction: column; align-items: center; }
+          .dv-movie-image img { width: 120px; }
         }
       `}</style>
     </div>

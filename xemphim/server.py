@@ -193,7 +193,7 @@ def xoa_nguoi_dung(nguoidung_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM nguoi_dung WHERE nguoidung_id = ?", (nguoidung_id,))
+        cursor.execute("DELETE FROM nguoidung WHERE nguoidung_id = ?", (nguoidung_id,))
         conn.commit()
         cursor.close()
         conn.close()
@@ -304,37 +304,67 @@ def xoa_phim(phim_id):
 # ddawt ves
 @app.route('/api/vedat', methods=['POST'])
 def dat_ve():
-    data = request.get_json()
-    ghe_da_chon = data.get('gheDaChon', [])
-    suat_chieu_id = data.get('suatChieuId')  # Bạn cần truyền suatChieuId từ FE
-    nguoi_dung_id = data.get('nguoiDungId', None)  # Nếu có đăng nhập thì truyền lên, không thì để None hoặc 1
-    thoi_gian_dat = datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
+    data = flask.request.get_json(force=True)
+    ghe_da_chon = data.get('gheDaChon', [])  # Danh sách ghe_id
+    suat_chieu_id = data.get('suatChieuId')
+    nguoi_dung_id = data.get('nguoiDungId', None)
+    thoi_gian_dat = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     trang_thai = "Đã đặt"
+    so_luong = len(ghe_da_chon)
+
+    if not ghe_da_chon or not suat_chieu_id:
+        return flask.jsonify({"success": False, "error": "Thiếu thông tin ghế hoặc suất chiếu"}), 400
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        ma_ve_list = []
+        # 1. Tạo vé đặt
+        cursor.execute(
+            """
+            INSERT INTO ve_dat (so_luong, nguoi_dung_id, suat_chieu_id, thoi_gian_dat, trang_thai)
+            OUTPUT INSERTED.ve_id
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            so_luong, nguoi_dung_id, suat_chieu_id, thoi_gian_dat, trang_thai
+        )
+        row = cursor.fetchone()
+        if not row:
+            raise Exception("Không tạo được vé đặt")
+        ve_id = row[0]
+
+        # 2. Thêm từng ghế vào chi_tiet_ve_dat
         for ghe_id in ghe_da_chon:
+            # Lấy giá vé từ bảng ghế
+            cursor.execute("SELECT gia_ve FROM ghe WHERE ghe_id = ?", ghe_id)
+            gia_ve_row = cursor.fetchone()
+            gia_ve = gia_ve_row[0] if gia_ve_row else 0
             cursor.execute(
-                "INSERT INTO VeDat (ghe_id, nguoi_dung_id, suat_chieu_id, thoi_gian_dat, trang_thai) OUTPUT INSERTED.ve_id VALUES (?, ?, ?, ?, ?)",
-                ghe_id, nguoi_dung_id, suat_chieu_id, thoi_gian_dat, trang_thai
+                """
+                INSERT INTO chi_tiet_ve_dat (ve_dat_id, ghe_id, gia_ve)
+                VALUES (?, ?, ?)
+                """,
+                ve_id, ghe_id, gia_ve
             )
-            row = cursor.fetchone()
-            if row:
-                ma_ve_list.append(row[0])
         conn.commit()
-        return jsonify({"success": True, "maDatVe": ma_ve_list}), 201
+        cursor.close()
+        conn.close()
+        return flask.jsonify({"success": True, "maDatVe": ve_id}), 201
     except Exception as e:
         import traceback
         print("Lỗi đặt vé:", e)
         traceback.print_exc()
-        return jsonify({"success": False, "error": str(e)}), 500
-    finally:
-        try:
-            conn.close()
-        except:
-            pass
-
+        return flask.jsonify({"success": False, "error": str(e)}), 500
+@app.route('/api/vedat', methods=['GET'])
+def get_vedat():
+    nguoi_dung_id = request.args.get('nguoi_dung_id')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    if nguoi_dung_id:
+        cursor.execute("SELECT * FROM ve_dat WHERE nguoi_dung_id = ?", (nguoi_dung_id,))
+    else:
+        cursor.execute("SELECT * FROM ve_dat")
+    ve_list = [dict(row) for row in cursor.fetchall()]
+    # ...trả về chi tiết ghế như cũ...
+    return jsonify(ve_list)
 if __name__ == '__main__':
     app.run(debug=True, port=3000)

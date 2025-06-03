@@ -6,6 +6,7 @@ const QuanLyVeDat = () => {
   const [nguoiDungList, setNguoiDungList] = useState([]);
   const [suatChieuList, setSuatChieuList] = useState([]);
   const [gheList, setGheList] = useState([]);
+  const [phimList, setPhimList] = useState([]);
   const [form, setForm] = useState({
     nguoi_dung_id: '',
     suat_chieu_id: '',
@@ -22,6 +23,7 @@ const QuanLyVeDat = () => {
     axios.get('http://127.0.0.1:3000/api/nguoidung').then(res => setNguoiDungList(res.data)).catch(console.error);
     axios.get('http://127.0.0.1:3000/api/suatchieu').then(res => setSuatChieuList(res.data)).catch(console.error);
     axios.get('http://127.0.0.1:3000/api/ghe').then(res => setGheList(res.data)).catch(console.error);
+    axios.get('http://127.0.0.1:3000/api/phim').then(res => setPhimList(res.data)).catch(console.error);
   };
 
   useEffect(() => {
@@ -154,6 +156,7 @@ const QuanLyVeDat = () => {
           <tr>
             <th>ID</th>
             <th>Người dùng</th>
+            <th>Tên phim</th>
             <th>Suất chiếu</th>
             <th>Ghế</th>
             <th>Thời gian đặt</th>
@@ -165,13 +168,32 @@ const QuanLyVeDat = () => {
           {veList.map(ve => {
             const user = nguoiDungList.find(u => u.nguoidung_id === ve.nguoi_dung_id);
             const suat = suatChieuList.find(s => s.suat_chieu_id === ve.suat_chieu_id);
-            const ghe = gheList.find(g => g.ghe_id === ve.ghe_id);
+            const phim = suat ? phimList.find(p => p.phim_id === suat.phim_id || p.id === suat.phim_id) : null;
+
+            // Xử lý tên ghế: ưu tiên chi_tiet, fallback sang ghe_id
+            let gheStr = 'Không rõ';
+            if (Array.isArray(ve.chi_tiet) && ve.chi_tiet.length > 0) {
+              gheStr = ve.chi_tiet
+                .map(g => {
+                  // Nếu API đã trả về so_ghe trong chi_tiet thì dùng luôn, không thì tra cứu
+                  if (g.so_ghe) return g.so_ghe;
+                  const gheObj = gheList.find(ghe => ghe.ghe_id === g.ghe_id);
+                  return gheObj ? gheObj.so_ghe : '';
+                })
+                .filter(Boolean)
+                .join(', ');
+            } else if (ve.ghe_id) {
+              const gheObj = gheList.find(g => g.ghe_id === ve.ghe_id);
+              gheStr = gheObj ? gheObj.so_ghe : 'Không rõ';
+            }
+
             return (
               <tr key={ve.ve_id}>
                 <td>{ve.ve_id}</td>
                 <td>{user?.ho_ten || user?.ten_dang_nhap}</td>
+                <td>{phim ? (phim.ten || phim.ten_phim) : 'Không rõ'}</td>
                 <td>{suat ? `${suat.ngay_chieu} ${suat.gio_bat_dau}` : 'Không rõ'}</td>
-                <td>{ghe ? `${ghe.so_ghe} (${ghe.loai_ghe})` : 'Không rõ'}</td>
+                <td>{gheStr}</td>
                 <td>{ve.thoi_gian_dat?.replace('T', ' ').slice(0, 16)}</td>
                 <td>{ve.trang_thai}</td>
                 <td>

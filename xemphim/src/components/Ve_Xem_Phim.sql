@@ -75,7 +75,7 @@ CREATE TABLE ve_dat (
     trang_thai NVARCHAR(20) COLLATE Vietnamese_CI_AI NOT NULL,
     CONSTRAINT fk_vedat_nguoidung FOREIGN KEY (nguoi_dung_id) REFERENCES nguoi_dung(nguoidung_id) ON DELETE CASCADE,
     CONSTRAINT fk_vedat_suat_chieu FOREIGN KEY (suat_chieu_id) REFERENCES suat_chieu(suat_chieu_id) ON DELETE CASCADE,
-    CONSTRAINT chk_trang_thai CHECK (trang_thai IN (N'Đã đặt', N'Đã hủy', N'Đã thanh toán')),
+    CONSTRAINT chk_trang_thai CHECK (trang_thai IN (N'Đã đặt', N'Đã hủy')),
     CONSTRAINT chk_so_luong CHECK (so_luong > 0)
 );
 
@@ -95,55 +95,124 @@ INSERT INTO nguoi_dung (ten_dang_nhap, mat_khau, ho_ten, email, so_dien_thoai, l
 (N'hoang', N'123456', N'Lê Văn Hoàng', N'hoang@gmail.com', N'0911111', 0),
 (N'user2', N'userpass', N'Trần Thị B', N'b@example.com', N'0922222222', 0);
 
--- Chèn dữ liệu mẫu vào bảng phim
 INSERT INTO phim (ten_phim, mo_ta, thoi_luong, anh, trailer, tac_gia) VALUES
-(N'Mắt Biếc', N'Một câu chuyện tình yêu đầy tiếc nuối giữa Ngạn và Hà Lan, gợi lại tuổi học trò đầy mộng mơ và day dứt.', 117, N'https://th.bing.com/th/id/R.ced5017cb4ee94fe71611036f6a89a36?rik=XGQVDZCpFRmYsw&pid=ImgRaw&r=0', N'https://www.youtube.com/watch?v=ITlQ0oU7tDA&t=17s', N'Victor Vũ'),
-(N'Hai Phượng', N'Một bà mẹ đơn thân dấn thân vào thế giới ngầm để giải cứu con gái mình bị bắt cóc, đầy hành động và cảm xúc.', 98, N'https://th.bing.com/th/id/R.52a8160aa3cf0afa720d31755c9c0b04?rik=BmNRA1LTlnolsw&riu=http%3a%2f%2fwww.impawards.com%2fintl%2fvietnam%2f2019%2fposters%2fhai_phuong_ver2.jpg&ehk=yP51yBZZ8o4wHgUpd4C%2bPRgoMYPhVI8KWhYIZcvjAD0%3d&risl=&pid=ImgRaw&r=0', N'', N'Lê Văn Kiệt'),
-(N'Em Chưa 18', N'Một bộ phim hài – tình cảm học đường, kể về mối quan hệ “trớ trêu” giữa một học sinh cấp 3 và một tay chơi sát gái.', 108, N'https://static.tuoitre.vn/tto/i/s626/2017/04/06/1-1491445646.jpg', N'', N'Lê Thanh Sơn'),
-(N'Bố Già', N'Câu chuyện gia đình cảm động về tình cha con, những xung đột thế hệ, và tình yêu thương không điều kiện.', 120, N'https://th.bing.com/th/id/OIP.o9DHR35-qyyhNEhhiI8nlQHaK-?rs=1&pid=ImgDetMain', N'', N'Trấn Thành'),
-(N'Tiệc Trăng Máu', N'Một bữa tiệc biến thành thảm họa khi bí mật của từng người lần lượt được tiết lộ qua chiếc điện thoại.', 115, N'https://th.bing.com/th/id/OIP.wBnourAYqCKkpYk0tqm_NwAAAA?rs=1&pid=ImgDetMain', N'', N'Nguyễn Quang Dũng'),
-(N'Ròm', N'Bộ phim chân thực về cuộc sống khó khăn nơi đô thị, theo chân cậu bé sống bằng nghề “dẫn số đề”.', 93, N'https://th.bing.com/th/id/OIP.vLOAqQuI9p8eghlQsvzXAgHaK-?rs=1&pid=ImgDetMain', N'', N'Trần Thanh Huy'),
-(N'Tháng Năm Rực Rỡ', N'Những ký ức thanh xuân của nhóm bạn nữ sinh được tái hiện, vừa hài hước vừa xúc động.', 118, N'https://th.bing.com/th/id/OIP.SaMkkU3u5qmFGVagrNMeJgHaK-?rs=1&pid=ImgDetMain', N'', N'Nguyễn Quang Dũng'),
-(N'Lật Mặt 7', N'Bộ phim kết hợp giữa hành động và gia đình, mang đến nhiều tình huống bất ngờ và cảm động.', 104, N'https://th.bing.com/th/id/OIP.zvN3Ljo5Cz94IMPkEVP31AHaLH?rs=1&pid=ImgDetMain', N'', N'Lý Hải'),
-(N'Trạng Tí', N'Chuyến phiêu lưu kỳ thú của cậu bé thông minh Trạng Tí và những người bạn để khám phá thân thế của mình.', 100, N'https://touchcinema.com/uploads/phim-2021/61b4633451b0a2eefba1-poster.jpg', N'', N'Phan Gia Nhật Linh'),
-(N'Avatar 2', N'Tiếp nối câu chuyện ở Pandora với hình ảnh mãn nhãn, khám phá những vùng đất mới dưới đại dương.', 192, N'https://th.bing.com/th/id/R.88386fe549d83e6ae16b49f8543e4baa?rik=lEi3KbbTR1V1hw&pid=ImgRaw&r=0', N'', N'James Cameron');
+(N'Mắt Biếc', N'Một câu chuyện tình yêu đầy tiếc nuối giữa Ngạn và Hà Lan, gợi lại tuổi học trò đầy mộng mơ và day dứt.', 117, 
+ N'https://th.bing.com/th/id/R.ced5017cb4ee94fe71611036f6a89a36?rik=XGQVDZCpFRmYsw&pid=ImgRaw&r=0', 
+ N'https://www.youtube.com/watch?v=ITlQ0oU7tDA&t=17s', 
+ N'Victor Vũ'),
+
+(N'Hai Phượng', N'Một bà mẹ đơn thân dấn thân vào thế giới ngầm để giải cứu con gái mình bị bắt cóc, đầy hành động và cảm xúc.', 98, 
+ N'https://th.bing.com/th/id/R.52a8160aa3cf0afa720d31755c9c0b04?rik=BmNRA1LTlnolsw&riu=http%3a%2f%2fwww.impawards.com%2fintl%2fvietnam%2f2019%2fposters%2fhai_phuong_ver2.jpg&ehk=yP51yBZZ8o4wHgUpd4C%2bPRgoMYPhVI8KWhYIZcvjAD0%3d&risl=&pid=ImgRaw&r=0', 
+ N'https://www.youtube.com/watch?v=THXPCF6UHh8', 
+ N'Lê Văn Kiệt'),
+
+(N'Em Chưa 18', N'Một bộ phim hài – tình cảm học đường, kể về mối quan hệ “trớ trêu” giữa một học sinh cấp 3 và một tay chơi sát gái.', 108, 
+ N'https://static.tuoitre.vn/tto/i/s626/2017/04/06/1-1491445646.jpg', 
+ N'https://www.youtube.com/watch?v=_affkHceSj4', 
+ N'Lê Thanh Sơn'),
+
+(N'Bố Già', N'Câu chuyện gia đình cảm động về tình cha con, những xung đột thế hệ, và tình yêu thương không điều kiện.', 120, 
+ N'https://th.bing.com/th/id/OIP.o9DHR35-qyyhNEhhiI8nlQHaK-?rs=1&pid=ImgDetMain', 
+ N'https://www.youtube.com/watch?v=jluSu8Rw6YE', 
+ N'Trấn Thành'),
+
+(N'Tiệc Trăng Máu', N'Một bữa tiệc biến thành thảm họa khi bí mật của từng người lần lượt được tiết lộ qua chiếc điện thoại.', 115, 
+ N'https://th.bing.com/th/id/OIP.wBnourAYqCKkpYk0tqm_NwAAAA?rs=1&pid=ImgDetMain', 
+ N'https://www.youtube.com/watch?v=nh0BklwPN9Q', 
+ N'Nguyễn Quang Dũng'),
+
+(N'Ròm', N'Bộ phim chân thực về cuộc sống khó khăn nơi đô thị, theo chân cậu bé sống bằng nghề “dẫn số đề”.', 93, 
+ N'https://th.bing.com/th/id/OIP.vLOAqQuI9p8eghlQsvzXAgHaK-?rs=1&pid=ImgDetMain', 
+ N'https://www.youtube.com/watch?v=XRm1P7oGpMQ', 
+ N'Trần Thanh Huy'),
+
+(N'Tháng Năm Rực Rỡ', N'Những ký ức thanh xuân của nhóm bạn nữ sinh được tái hiện, vừa hài hước vừa xúc động.', 118, 
+ N'https://th.bing.com/th/id/OIP.SaMkkU3u5qmFGVagrNMeJgHaK-?rs=1&pid=ImgDetMain', 
+ N'https://www.youtube.com/watch?v=qjWoaNWZ2Xo', 
+ N'Nguyễn Quang Dũng'),
+
+(N'Lật Mặt 7', N'Bộ phim kết hợp giữa hành động và gia đình, mang đến nhiều tình huống bất ngờ và cảm động.', 104, 
+ N'https://th.bing.com/th/id/OIP.zvN3Ljo5Cz94IMPkEVP31AHaLH?rs=1&pid=ImgDetMain', 
+ N'https://www.youtube.com/watch?v=d1ZHdosjNX8', 
+ N'Lý Hải'),
+
+(N'Trạng Tí', N'Chuyến phiêu lưu kỳ thú của cậu bé thông minh Trạng Tí và những người bạn để khám phá thân thế của mình.', 100, 
+ N'https://touchcinema.com/uploads/phim-2021/61b4633451b0a2eefba1-poster.jpg', 
+ N'https://www.youtube.com/watch?v=r-SR6-b4OQo', 
+ N'Phan Gia Nhật Linh'),
+
+(N'Avatar 2', N'Tiếp nối câu chuyện ở Pandora với hình ảnh mãn nhãn, khám phá những vùng đất mới dưới đại dương.', 192, 
+ N'https://th.bing.com/th/id/R.88386fe549d83e6ae16b49f8543e4baa?rik=lEi3KbbTR1V1hw&pid=ImgRaw&r=0', 
+ N'https://www.youtube.com/watch?v=d9MyW72ELq0', 
+ N'James Cameron');
 
 -- Chèn dữ liệu mẫu vào bảng phòng chiếu
 INSERT INTO phong_chieu (phong_id, ten_phong, phim_id, so_ghe) VALUES
-(1, N'Phòng 1', 1, 100),
-(2, N'Phòng 2', 2, 80),
-(3, N'Phòng 3', 3, 90),
-(4, N'Phòng 4', 4, 85),
-(5, N'Phòng 5', 5, 95),
-(6, N'Phòng 6', 6, 70),
-(7, N'Phòng 7', 7, 100),
-(8, N'Phòng 8', 8, 80),
-(9, N'Phòng 9', 9, 90),
-(10, N'Phòng 10', 10, 120);
+(1, N'Phòng 1', 1, 34),
+(2, N'Phòng 2', 2, 34),
+(3, N'Phòng 3', 3, 34),
+(4, N'Phòng 4', 4, 34),
+(5, N'Phòng 5', 5, 34),
+(6, N'Phòng 6', 6, 34),
+(7, N'Phòng 7', 7, 34),
+(8, N'Phòng 8', 8, 34),
+(9, N'Phòng 9', 9, 34),
+(10, N'Phòng 10', 10, 34);
+
 
 -- Chèn dữ liệu mẫu vào bảng ghế với giá vé
+-- Hàng A
 INSERT INTO ghe (phong_id, so_ghe, loai_ghe, gia_ve) VALUES
-(1, N'A1', N'Thường', 90000), 
-(1, N'A2', N'Thường', 90000), 
-(1, N'B1', N'VIP', 120000),
-(2, N'C1', N'Thường', 80000), 
-(2, N'C2', N'VIP', 110000),
-(3, N'D1', N'Thường', 85000), 
-(3, N'D2', N'Thường', 85000),
-(4, N'E1', N'Thường', 95000), 
-(4, N'E2', N'VIP', 130000),
-(5, N'F1', N'Thường', 90000), 
-(5, N'F2', N'Thường', 90000),
-(6, N'G1', N'Thường', 80000), 
-(6, N'G2', N'VIP', 115000),
-(7, N'H1', N'Thường', 85000), 
-(7, N'H2', N'Thường', 85000),
-(8, N'I1', N'Thường', 90000), 
-(8, N'I2', N'VIP', 120000),
-(9, N'J1', N'Thường', 80000), 
-(9, N'J2', N'Thường', 80000),
-(10, N'K1', N'Thường', 95000), 
-(10, N'K2', N'VIP', 135000);
+(1, 'A1', N'Thường', 79000),
+(1, 'A2', N'Thường', 79000),
+(1, 'A3', N'Thường', 79000),
+(1, 'A4', N'Thường', 79000);
+
+-- Hàng B
+INSERT INTO ghe (phong_id, so_ghe, loai_ghe, gia_ve) VALUES
+(1, 'B1', N'Thường', 79000),
+(1, 'B2', N'Thường', 79000),
+(1, 'B3', N'Thường', 79000),
+(1, 'B4', N'Thường', 79000),
+(1, 'B5', N'Thường', 79000);
+
+-- Hàng C
+INSERT INTO ghe (phong_id, so_ghe, loai_ghe, gia_ve) VALUES
+(1, 'C1', N'Thường', 79000),
+(1, 'C2', N'Thường', 79000),
+(1, 'C3', N'Thường', 79000),
+(1, 'C4', N'Thường', 79000),
+(1, 'C5', N'Thường', 79000),
+(1, 'C6', N'Thường', 79000);
+
+-- Hàng D
+INSERT INTO ghe (phong_id, so_ghe, loai_ghe, gia_ve) VALUES
+(1, 'D1', N'Thường', 79000),
+(1, 'D2', N'Thường', 79000),
+(1, 'D3', N'Thường', 79000),
+(1, 'D4', N'Thường', 79000),
+(1, 'D5', N'Thường', 79000),
+(1, 'D6', N'Thường', 79000),
+(1, 'D7', N'Thường', 79000);
+
+-- Hàng E
+INSERT INTO ghe (phong_id, so_ghe, loai_ghe, gia_ve) VALUES
+(1, 'E1', N'Thường', 79000),
+(1, 'E2', N'Thường', 79000),
+(1, 'E3', N'Thường', 79000),
+(1, 'E4', N'Thường', 79000),
+(1, 'E5', N'Thường', 79000),
+(1, 'E6', N'Thường', 79000),
+(1, 'E7', N'Thường', 79000),
+(1, 'E8', N'Thường', 79000);
+
+-- Hàng F (VIP)
+INSERT INTO ghe (phong_id, so_ghe, loai_ghe, gia_ve) VALUES
+(1, 'F1', N'VIP', 99000),
+(1, 'F2', N'VIP', 99000),
+(1, 'F3', N'VIP', 99000),
+(1, 'F4', N'VIP', 99000);
+
 
 -- Chèn dữ liệu mẫu vào bảng suất chiếu
 INSERT INTO suat_chieu (phim_id, phong_id, ngay_chieu, gio_bat_dau) VALUES
@@ -165,11 +234,14 @@ INSERT INTO ve_dat (nguoi_dung_id, suat_chieu_id, thoi_gian_dat, trang_thai, so_
 (2, 3, '2025-06-02 12:00:00', N'Đã đặt', 1);  
 
 -- Chèn dữ liệu mẫu vào bảng chi tiết vé đặt
+-- Ví dụ vé đặt 1 chọn ghế A1 (Thường), A2 (Thường), F1 (VIP)
 INSERT INTO chi_tiet_ve_dat (ve_dat_id, ghe_id, gia_ve) VALUES
-(1, 1, 90000), 
-(1, 2, 90000),  
-(2, 4, 80000),  
-(3, 6, 85000);  
+(1, 1, 79000),  -- A1, Thường
+(1, 2, 79000),  -- A2, Thường
+(1, 30, 99000); -- F1, VIP
+
+
+  
 
 -- Tạo chỉ mục để tối ưu truy vấn
 CREATE INDEX idx_ten_dang_nhap ON nguoi_dung(ten_dang_nhap);
