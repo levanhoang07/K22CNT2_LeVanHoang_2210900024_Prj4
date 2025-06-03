@@ -172,7 +172,7 @@ export default function DatVe() {
             {successMessage && <div className="dv-success">{successMessage}</div>}
 
             <div className="dv-row">
-              <label>🎬 Chọn rạp:</label>
+              <label>Chọn rạp:</label>
               <select value={rap} onChange={(e) => setRap(e.target.value)}>
                 <option value="">--Chọn rạp--</option>
                 <option value="Rạp 1">Rạp 1</option>
@@ -181,7 +181,7 @@ export default function DatVe() {
             </div>
 
             <div className="dv-row">
-              <label>🕓 Chọn suất chiếu:</label>
+              <label>Chọn suất chiếu:</label>
               <select value={suatChieu} onChange={(e) => setSuatChieu(e.target.value)}>
                 <option value="">--Chọn suất--</option>
                 {danhSachSuatChieu
@@ -197,8 +197,8 @@ export default function DatVe() {
             <div className="dv-ghe">
               <div className="dv-man-hinh">Màn Hình</div>
               <div className="dv-man-hinh-bar"></div>
-              <label>💺 Chọn ghế:</label>
-              <div className="dv-ghe-list">
+              <label>Chọn ghế:</label>
+              <div className="dv-ghe-so-do">
                 {danhSachGhe.map((hang, index) => (
                   <div key={index} className="dv-ghe-row">
                     {hang.map((ghe) => (
@@ -234,7 +234,7 @@ export default function DatVe() {
                   onClick={handleXacNhanDatVe}
                   className="dv-btn dv-btn-xacnhan"
                 >
-                  🎟️ Xác nhận đặt vé
+                  Xác nhận đặt vé
                 </button>
               ) : (
                 <span className="dv-warning">Vui lòng chọn đầy đủ rạp, suất chiếu và ghế.</span>
@@ -292,28 +292,58 @@ export default function DatVe() {
         }
         .dv-ghe {
           margin: 18px 0 10px 0;
+          text-align: center;
         }
         .dv-man-hinh {
           text-align: center;
-          font-weight: 600;
+          font-weight: 700;
           margin-bottom: 2px;
+          font-size: 1.1em;
+          letter-spacing: 1px;
         }
         .dv-man-hinh-bar {
-          width: 100%;
-          height: 8px;
-          background: #e53935;
-          border-radius: 6px;
-          margin-bottom: 12px;
+          width: 60%;
+          min-width: 220px;
+          max-width: 400px;
+          margin: 0 auto 18px auto;
+          height: 22px;
+          background: #fff;
+          border-radius: 0 0 120px 120px / 0 0 60px 60px;
+          /* Vòng cung rõ nét phía dưới */
+          box-shadow:
+            0 8px 32px 0 #e5393533,
+            0 2px 18px 0 #fff8,
+            0 18px 36px 0 rgba(213, 7, 7, 0.7) inset;
+          position: relative;
+          overflow: hidden;
         }
-        .dv-ghe-list {
+        .dv-man-hinh-bar::after {
+          content: "";
+          display: block;
+          position: absolute;
+          left: 50%;
+          bottom: 0;
+          transform: translateX(-50%);
+          width: 70%;
+          height: 80%;
+          background: radial-gradient(ellipse at 50% 100%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.0) 80%);
+          pointer-events: none;
+        }
+        .dv-ghe-so-do {
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          align-items: center;
+          gap: 10px;
+          margin: 0 auto;
+          width: fit-content;
+          min-width: 220px;
+          max-width: 420px;
         }
         .dv-ghe-row {
           display: flex;
-          gap: 8px;
-          align-items: center;
+          gap: 10px;
+          justify-content: center;
+          margin-bottom: 2px;
         }
         .dv-ghe-btn {
           width: 44px;
@@ -325,12 +355,13 @@ export default function DatVe() {
           font-weight: 600;
           font-size: 1.1em;
           cursor: pointer;
-          transition: background 0.2s, border 0.2s;
+          transition: background 0.2s, border 0.2s, color 0.2s;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           position: relative;
+          box-shadow: 0 1px 4px #e5393533;
         }
         .dv-ghe-btn.vip {
           border: 2px solid #e53935;
@@ -347,9 +378,10 @@ export default function DatVe() {
           color: #fff;
         }
         .dv-loi-vao {
-          margin-left: 16px;
+          margin-left: 18px;
           font-size: 1.1em;
           color: #888;
+          align-self: center;
         }
         .dv-tong-tien {
           margin: 18px 0 8px 0;
@@ -398,6 +430,21 @@ export default function DatVe() {
         @media (max-width: 900px) {
           .dv-card { flex-direction: column; align-items: center; }
           .dv-movie-image img { width: 120px; }
+        }
+        @media (max-width: 600px) {
+          .dv-ghe-so-do {
+            min-width: 0;
+            max-width: 100vw;
+          }
+          .dv-man-hinh-bar {
+            width: 90%;
+            min-width: 0;
+          }
+          .dv-ghe-btn {
+            width: 34px;
+            height: 34px;
+            font-size: 0.95em;
+          }
         }
       `}</style>
     </div>
