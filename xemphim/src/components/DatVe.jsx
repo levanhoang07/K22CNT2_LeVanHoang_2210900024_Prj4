@@ -12,6 +12,8 @@ export default function DatVe() {
   const [rap, setRap] = useState('');
   const [suatChieu, setSuatChieu] = useState('');
   const [gheDaChon, setGheDaChon] = useState([]);
+  const [danhSachGhe, setDanhSachGhe] = useState([]);
+  const [danhSachSuatChieu, setDanhSachSuatChieu] = useState([]);
 
   useEffect(() => {
     async function fetchPhim() {
@@ -31,29 +33,54 @@ export default function DatVe() {
     fetchPhim();
   }, []);
 
+  useEffect(() => {
+    fetch('http://127.0.0.1:3000/api/ghe')
+      .then(res => res.json())
+      .then(data => setDanhSachGhe(data));
+    fetch('http://127.0.0.1:3000/api/suatchieu')
+      .then(res => res.json())
+      .then(data => setDanhSachSuatChieu(data));
+  }, []);
+
   const handleXacNhanDatVe = async () => {
     try {
+      // Tìm suat_chieu_id từ giờ chiếu và phim
+      const suatChieuObj = danhSachSuatChieu.find(
+        s => s.gio === suatChieu && s.phim_id === parseInt(id)
+      );
+      const suatChieuId = suatChieuObj ? suatChieuObj.id : null;
+
+      // Tìm danh sách ghe_id từ tên ghế
+      const gheIdDaChon = gheDaChon.map(tenGhe => {
+        const ghe = danhSachGhe.find(g => g.ten === tenGhe);
+        return ghe ? ghe.id : null;
+      }).filter(Boolean);
+
+      if (!suatChieuId || gheIdDaChon.length === 0) {
+        setError('Vui lòng chọn đúng suất chiếu và ghế.');
+        return;
+      }
+
       const bookingData = {
-        phimId: id,
-        rap,
-        suatChieu,
-        gheDaChon,
+        suatChieuId,
+        gheDaChon: gheIdDaChon,
+        nguoiDungId: 1 // hoặc lấy từ context đăng nhập nếu có
       };
 
       const response = await fetch('http://127.0.0.1:3000/api/vedat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bookingData),
       });
 
       if (!response.ok) {
-        throw new Error('Lỗi khi lưu vé');
+        const errText = await response.text();
+        throw new Error('Lỗi khi lưu vé: ' + errText);
       }
 
       const result = await response.json();
       setSuccessMessage('Đặt vé thành công! Mã đặt vé: ' + result.maDatVe);
+
       setRap('');
       setSuatChieu('');
       setGheDaChon([]);

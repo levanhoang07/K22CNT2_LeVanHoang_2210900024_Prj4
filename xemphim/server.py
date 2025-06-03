@@ -1,6 +1,8 @@
 import flask
 import pyodbc
 from flask_cors import CORS  
+from flask import request, jsonify
+from datetime import datetime
 
 app = flask.Flask(__name__)
 CORS(app)
@@ -8,7 +10,7 @@ def get_db_connection():
     conn_str = (
         "Driver={SQL Server};"
         "Server=LEVANHOANG\\SQLEXPRESS;"
-        "Database=VeXemPhim;"
+        "Database=Ve_Xem_Phim;"
         "Trusted_Connection=yes;"
     )
     try:
@@ -299,6 +301,40 @@ def xoa_phim(phim_id):
         return flask.jsonify({'success': True, 'message': 'Xóa phim thành công'}), 200
     except Exception as e:
         return flask.jsonify({'success': False, 'message': str(e)}), 500
+# ddawt ves
+@app.route('/api/vedat', methods=['POST'])
+def dat_ve():
+    data = request.get_json()
+    ghe_da_chon = data.get('gheDaChon', [])
+    suat_chieu_id = data.get('suatChieuId')  # Bạn cần truyền suatChieuId từ FE
+    nguoi_dung_id = data.get('nguoiDungId', None)  # Nếu có đăng nhập thì truyền lên, không thì để None hoặc 1
+    thoi_gian_dat = datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
+    trang_thai = "Đã đặt"
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        ma_ve_list = []
+        for ghe_id in ghe_da_chon:
+            cursor.execute(
+                "INSERT INTO VeDat (ghe_id, nguoi_dung_id, suat_chieu_id, thoi_gian_dat, trang_thai) OUTPUT INSERTED.ve_id VALUES (?, ?, ?, ?, ?)",
+                ghe_id, nguoi_dung_id, suat_chieu_id, thoi_gian_dat, trang_thai
+            )
+            row = cursor.fetchone()
+            if row:
+                ma_ve_list.append(row[0])
+        conn.commit()
+        return jsonify({"success": True, "maDatVe": ma_ve_list}), 201
+    except Exception as e:
+        import traceback
+        print("Lỗi đặt vé:", e)
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        try:
+            conn.close()
+        except:
+            pass
 
 if __name__ == '__main__':
     app.run(debug=True, port=3000)

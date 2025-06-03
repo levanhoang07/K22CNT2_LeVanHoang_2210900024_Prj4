@@ -11,11 +11,12 @@ const QuanLyVeDat = () => {
     suat_chieu_id: '',
     ghe_id: '',
     thoi_gian_dat: '',
-    trang_thai: '',
+    trang_thai: 'Đã đặt',
   });
   const [editing, setEditing] = useState(false);
   const [currentVe, setCurrentVe] = useState(null);
 
+  // Lấy dữ liệu
   const fetchAll = () => {
     axios.get('http://127.0.0.1:3000/api/vedat').then(res => setVeList(res.data)).catch(console.error);
     axios.get('http://127.0.0.1:3000/api/nguoidung').then(res => setNguoiDungList(res.data)).catch(console.error);
@@ -27,21 +28,29 @@ const QuanLyVeDat = () => {
     fetchAll();
   }, []);
 
+  // Xử lý thay đổi form
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Thêm hoặc cập nhật vé
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      let data = { ...form };
+      // Nếu thêm mới, tự động lấy thời gian hiện tại
+      if (!editing) {
+        const now = new Date();
+        data.thoi_gian_dat = now.toISOString().slice(0, 16); // yyyy-MM-ddTHH:mm
+      }
       if (editing) {
-        await axios.put(`/api/vedat/${currentVe.ve_id}`, form);
+        await axios.put(`http://127.0.0.1:3000/api/vedat/${currentVe.ve_id}`, data);
         setEditing(false);
         setCurrentVe(null);
       } else {
-        await axios.post('/api/vedat', form);
+        await axios.post('http://127.0.0.1:3000/api/vedat', data);
       }
-      setForm({ nguoi_dung_id: '', suat_chieu_id: '', ghe_id: '', thoi_gian_dat: '', trang_thai: '' });
+      setForm({ nguoi_dung_id: '', suat_chieu_id: '', ghe_id: '', thoi_gian_dat: '', trang_thai: 'Đã đặt' });
       fetchAll();
     } catch (err) {
       console.error('Lỗi khi thêm hoặc cập nhật vé:', err);
@@ -49,6 +58,7 @@ const QuanLyVeDat = () => {
     }
   };
 
+  // Sửa vé
   const handleEdit = (ve) => {
     setEditing(true);
     setCurrentVe(ve);
@@ -56,21 +66,23 @@ const QuanLyVeDat = () => {
       nguoi_dung_id: ve.nguoi_dung_id,
       suat_chieu_id: ve.suat_chieu_id,
       ghe_id: ve.ghe_id,
-      thoi_gian_dat: ve.thoi_gian_dat,
+      thoi_gian_dat: ve.thoi_gian_dat ? ve.thoi_gian_dat.slice(0, 16) : '',
       trang_thai: ve.trang_thai,
     });
   };
 
+  // Hủy sửa
   const handleCancelEdit = () => {
     setEditing(false);
     setCurrentVe(null);
-    setForm({ nguoi_dung_id: '', suat_chieu_id: '', ghe_id: '', thoi_gian_dat: '', trang_thai: '' });
+    setForm({ nguoi_dung_id: '', suat_chieu_id: '', ghe_id: '', thoi_gian_dat: '', trang_thai: 'Đã đặt' });
   };
 
+  // Xóa vé
   const handleDelete = async (ve_id) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa vé này không?')) {
       try {
-        await axios.delete(`/api/vedat/${ve_id}`);
+        await axios.delete(`http://127.0.0.1:3000/api/vedat/${ve_id}`);
         fetchAll();
       } catch (err) {
         console.error('Lỗi khi xóa vé:', err);
@@ -123,10 +135,10 @@ const QuanLyVeDat = () => {
           value={form.thoi_gian_dat}
           onChange={handleChange}
           required
+          disabled={!editing}
         />
 
         <select name="trang_thai" value={form.trang_thai} onChange={handleChange} required>
-          <option value="">-- Trạng thái --</option>
           <option value="Đã đặt">Đã đặt</option>
           <option value="Hủy">Hủy</option>
         </select>
@@ -160,7 +172,7 @@ const QuanLyVeDat = () => {
                 <td>{user?.ho_ten || user?.ten_dang_nhap}</td>
                 <td>{suat ? `${suat.ngay_chieu} ${suat.gio_bat_dau}` : 'Không rõ'}</td>
                 <td>{ghe ? `${ghe.so_ghe} (${ghe.loai_ghe})` : 'Không rõ'}</td>
-                <td>{ve.thoi_gian_dat}</td>
+                <td>{ve.thoi_gian_dat?.replace('T', ' ').slice(0, 16)}</td>
                 <td>{ve.trang_thai}</td>
                 <td>
                   <button onClick={() => handleEdit(ve)} className="edit-button">Sửa</button>
@@ -177,62 +189,51 @@ const QuanLyVeDat = () => {
           padding: 20px;
           font-family: Arial, sans-serif;
         }
-
         h2 {
           color: #333;
           margin-bottom: 20px;
         }
-
         .form-container {
           display: flex;
           flex-direction: column;
           gap: 15px;
           margin-bottom: 20px;
         }
-
         select, input, button {
           padding: 8px;
           font-size: 16px;
           border-radius: 5px;
           border: 1px solid #ddd;
         }
-
         button {
           background-color: #4CAF50;
           color: white;
           border: none;
           cursor: pointer;
         }
-
         button:hover {
           background-color: #45a049;
         }
-
         .styled-table {
           width: 100%;
           border-collapse: collapse;
           margin-top: 20px;
         }
-
         th, td {
           padding: 10px;
           text-align: center;
           border: 1px solid #ddd;
         }
-
         th {
           background-color: #f4f4f4;
           font-weight: bold;
         }
-
         td {
           background-color: #fff;
         }
-
         td:nth-child(odd) {
           background-color: #f9f9f9;
         }
-
         .edit-button {
           background-color: #f39c12;
           color: white;
@@ -242,11 +243,9 @@ const QuanLyVeDat = () => {
           margin-right: 5px;
           cursor: pointer;
         }
-
         .edit-button:hover {
           background-color: #e67e22;
         }
-
         .delete-button {
           background-color: #e74c3c;
           color: white;
@@ -255,7 +254,6 @@ const QuanLyVeDat = () => {
           border-radius: 5px;
           cursor: pointer;
         }
-
         .delete-button:hover {
           background-color: #c0392b;
         }
