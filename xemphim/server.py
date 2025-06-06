@@ -35,6 +35,24 @@ def fetch_all(table_name):
         print(f"Lỗi khi lấy dữ liệu: {str(e)}")
         return []
 
+def fetch_one(sql):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        row = cursor.fetchone()
+        if row:
+            columns = [col[0] for col in cursor.description]
+            result = dict(zip(columns, row))
+        else:
+            result = None
+        cursor.close()
+        conn.close()
+        return result
+    except Exception as e:
+        print(f"Lỗi khi lấy một dòng dữ liệu: {str(e)}")
+        return None
+
 # dang ký người dùng
 @app.route('/api/dangky', methods=['POST'])
 def dang_ky():
@@ -228,7 +246,43 @@ def get_all_suat_chieu():
 
 @app.route('/api/vedat', methods=['GET'])
 def get_all_ve_dat():
-    return flask.jsonify(fetch_all('ve_dat'))
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM ve_dat")
+    ve_list = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
+    for ve in ve_list:
+        # Lấy chi tiết ghế
+        cursor.execute("""
+            SELECT ctv.ghe_id, g.so_ghe, ctv.gia_ve
+            FROM chi_tiet_ve_dat ctv
+            JOIN ghe g ON ctv.ghe_id = g.ghe_id
+            WHERE ctv.ve_dat_id = ?
+        """, (ve['ve_id'],))
+        ve['chi_tiet'] = [
+            {
+                'ghe_id': row[0],
+                'so_ghe': row[1],
+                'gia_ve': row[2]
+            }
+            for row in cursor.fetchall()
+        ]
+        # Lấy trạng thái thanh toán mới nhất
+        cursor.execute("""
+            SELECT TOP 1 trang_thai
+            FROM thanh_toan
+            WHERE ve_id = ?
+            ORDER BY thanh_toan_id DESC
+        """, (ve['ve_id'],))
+        row = cursor.fetchone()
+        ve['trang_thai_thanh_toan'] = row[0] if row else None
+    cursor.close()
+    conn.close()
+    return flask.jsonify(ve_list)
+
+
+@app.route('/api/thanhtoan', methods=['GET'])
+def get_all_thanh_toan():
+    return flask.jsonify(fetch_all('thanh_toan'))
 
 
 # them phim
@@ -334,15 +388,13 @@ def dat_ve():
 
         # 2. Thêm từng ghế vào chi_tiet_ve_dat
         for ghe_id in ghe_da_chon:
-            # Lấy giá vé từ bảng ghế
-            cursor.execute("SELECT gia_ve FROM ghe WHERE ghe_id = ?", ghe_id)
-            gia_ve_row = cursor.fetchone()
-            gia_ve = gia_ve_row[0] if gia_ve_row else 0
+            # Lấy giá vé và số ghế từ bảng ghe
+            ghe_info = fetch_one(f"SELECT gia_ve, so_ghe FROM ghe WHERE ghe_id = {ghe_id}")
+            gia_ve = ghe_info['gia_ve']
+            so_ghe = ghe_info['so_ghe']
+            # Chỉ insert vào các cột có trong bảng chi_tiet_ve_dat
             cursor.execute(
-                """
-                INSERT INTO chi_tiet_ve_dat (ve_dat_id, ghe_id, gia_ve)
-                VALUES (?, ?, ?)
-                """,
+                "INSERT INTO chi_tiet_ve_dat (ve_dat_id, ghe_id, gia_ve) VALUES (?, ?, ?)",
                 ve_id, ghe_id, gia_ve
             )
         conn.commit()
@@ -356,15 +408,108 @@ def dat_ve():
         return flask.jsonify({"success": False, "error": str(e)}), 500
 @app.route('/api/vedat', methods=['GET'])
 def get_vedat():
-    nguoi_dung_id = request.args.get('nguoi_dung_id')
+    nguoidung_id = flask.request.args.get('nguoidung_id')
     conn = get_db_connection()
     cursor = conn.cursor()
-    if nguoi_dung_id:
-        cursor.execute("SELECT * FROM ve_dat WHERE nguoi_dung_id = ?", (nguoi_dung_id,))
+    if nguoidung_id:
+        cursor.execute("SELECT * FROM ve_dat WHERE nguoidung_id = ?", (nguoidung_id,))
     else:
         cursor.execute("SELECT * FROM ve_dat")
-    ve_list = [dict(row) for row in cursor.fetchall()]
-    # ...trả về chi tiết ghế như cũ...
-    return jsonify(ve_list)
+    ve_list = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
+
+    # Lấy chi tiết ghế cho từng vé
+    for ve in ve_list:
+        cursor.execute("""
+            SELECT ctv.ghe_id, g.so_ghe, ctv.gia_ve
+            FROM chi_tiet_ve_dat ctv
+            JOIN ghe g ON ctv.ghe_id = g.ghe_id
+            WHERE ctv.ve_dat_id = ?
+        """, (ve['ve_id'],))
+        ve['chi_tiet'] = [
+            {
+                'ghe_id': row[0],
+                'so_ghe': row[1],
+                'gia_ve': row[2]
+            }
+            for row in cursor.fetchall()
+        ]
+    cursor.close()
+    conn.close()
+    return flask.jsonify(ve_list)
+@app.route('/api/vedat/<int:ve_id>', methods=['DELETE'])
+def xoa_ve_dat(ve_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # Xóa chi tiết ghế trước
+        cursor.execute("DELETE FROM chi_tiet_ve_dat WHERE ve_dat_id = ?", (ve_id,))
+        # Xóa vé
+        cursor.execute("DELETE FROM ve_dat WHERE ve_id = ?", (ve_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return flask.jsonify({'success': True, 'message': 'Xóa vé thành công'}), 200
+    except Exception as e:
+        return flask.jsonify({'success': False, 'message': str(e)}), 500
+    
+    
+    #thanh  toán vé 
+@app.route('/api/thanhtoan', methods=['POST'])
+def thanh_toan():
+    data = flask.request.get_json(force=True)
+    ve_id = data.get('ve_id')
+    so_tien = data.get('so_tien')
+    hinh_thuc = data.get('hinh_thuc')
+    trang_thai = data.get('trang_thai', 'Chờ xử lý')
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO thanh_toan (ve_id, so_tien, hinh_thuc, trang_thai) VALUES (?, ?, ?, ?)",
+            ve_id, so_tien, hinh_thuc, trang_thai
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return flask.jsonify({'success': True, 'message': 'Thanh toán thành công'}), 200
+    except Exception as e:
+        return flask.jsonify({'success': False, 'message': str(e)}), 500
+
+#sửa 
+@app.route('/api/thanhtoan/<int:thanh_toan_id>', methods=['PUT'])
+def sua_thanh_toan(thanh_toan_id):
+    data = flask.request.get_json(force=True)
+    so_tien = data.get('so_tien')
+    hinh_thuc = data.get('hinh_thuc')
+    trang_thai = data.get('trang_thai')
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE thanh_toan
+            SET so_tien = ?, hinh_thuc = ?, trang_thai = ?
+            WHERE thanh_toan_id = ?
+        """, (so_tien, hinh_thuc, trang_thai, thanh_toan_id))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return flask.jsonify({'success': True, 'message': 'Cập nhật thanh toán thành công'}), 200
+    except Exception as e:
+        return flask.jsonify({'success': False, 'message': str(e)}), 500
+    
+    #xóa thanh toán
+@app.route('/api/thanhtoan/<int:thanh_toan_id>', methods=['DELETE'])
+def xoa_thanh_toan(thanh_toan_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM thanh_toan WHERE thanh_toan_id = ?", (thanh_toan_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return flask.jsonify({'success': True, 'message': 'Xóa thanh toán thành công'}), 200
+    except Exception as e:
+        return flask.jsonify({'success': False, 'message': str(e)}), 500
 if __name__ == '__main__':
     app.run(debug=True, port=3000)

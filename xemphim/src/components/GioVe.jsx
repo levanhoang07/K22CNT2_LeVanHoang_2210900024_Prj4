@@ -2,6 +2,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from "./context/AuthContext";
 
+const hinhThucList = ["Momo", "ZaloPay", "Banking"];
+
 export default function GioVe() {
   const { user } = useContext(AuthContext);
   const nguoiDungId = user?.nguoidung_id || user?.id;
@@ -10,6 +12,11 @@ export default function GioVe() {
   const [phimList, setPhimList] = useState([]);
   const [suatChieuList, setSuatChieuList] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Thêm state cho thanh toán
+  const [showPay, setShowPay] = useState(null); // ve_id đang thanh toán
+  const [hinhThuc, setHinhThuc] = useState("");
+  const [payMsg, setPayMsg] = useState("");
 
   useEffect(() => {
     if (!nguoiDungId) return;
@@ -27,29 +34,59 @@ export default function GioVe() {
       .catch(() => setLoading(false));
   }, [nguoiDungId]);
 
+  // Hàm xử lý thanh toán
+  const handlePay = async (ve) => {
+    setPayMsg("");
+    if (!hinhThuc) {
+      setPayMsg("Vui lòng chọn hình thức thanh toán!");
+      return;
+    }
+    try {
+      // Tổng tiền của vé
+      const tongTien = ve.chi_tiet?.reduce((sum, g) => sum + Number(g.gia_ve || 0), 0);
+      await axios.post("http://localhost:3000/api/thanhtoan", {
+        ve_id: ve.ve_id,
+        so_tien: tongTien,
+        hinh_thuc: hinhThuc,
+        trang_thai: "Chờ xử lý"
+      });
+      setPayMsg("Thanh toán thành công! Vui lòng chờ xác nhận.");
+      setShowPay(null);
+      setHinhThuc("");
+    } catch {
+      setPayMsg("Lỗi khi thanh toán!");
+    }
+  };
+
+  // Hàm tính tổng tiền cho từng vé
+  function tinhTongTien(ve) {
+    if (!ve.chi_tiet || !Array.isArray(ve.chi_tiet)) return 0;
+    return ve.chi_tiet.reduce((sum, ghe) => sum + Number(ghe.gia_ve || 0), 0);
+  }
+
   if (!nguoiDungId) return (
     <div className="gio-empty gio-message">
       <span className="gio-icon">🔒</span>
       <div>
-  Vui lòng <a href="/dangnhap" className="gio-link">đăng nhập</a> để xem giỏ vé!
-  <style>{`
-    .gio-link {
-      color: #e53935;
-      font-weight: 600;
-      text-decoration: underline;
-      transition: color 0.2s, text-shadow 0.2s;
-      padding: 2px 4px;
-      border-radius: 4px;
-    }
-    .gio-link:hover, .gio-link:focus {
-      color: #fff;
-      background: #e53935;
-      text-shadow: 0 2px 8px #e53935;
-      text-decoration: none;
-      outline: none;
-    }
-  `}</style>
-</div>
+        Vui lòng <a href="/dangnhap" className="gio-link">đăng nhập</a> để xem giỏ vé!
+        <style>{`
+          .gio-link {
+            color: #e53935;
+            font-weight: 600;
+            text-decoration: underline;
+            transition: color 0.2s, text-shadow 0.2s;
+            padding: 2px 4px;
+            border-radius: 4px;
+          }
+          .gio-link:hover, .gio-link:focus {
+            color: #fff;
+            background: #e53935;
+            text-shadow: 0 2px 8px #e53935;
+            text-decoration: none;
+            outline: none;
+          }
+        `}</style>
+      </div>
     </div>
   );
   if (loading) return (
@@ -65,6 +102,8 @@ export default function GioVe() {
     </div>
   );
 
+  console.log(veList);
+
   return (
     <div className="gio-container">
       <h2 className="gio-title">Giỏ Vé của bạn</h2>
@@ -73,7 +112,7 @@ export default function GioVe() {
           const suat = suatChieuList.find(s => s.suat_chieu_id === ve.suat_chieu_id);
           const phim = suat ? phimList.find(p => p.phim_id === suat.phim_id || p.id === suat.phim_id) : null;
           const gheArr = ve.chi_tiet?.map(g => g.so_ghe) || [];
-          const tongTien = ve.chi_tiet?.reduce((sum, g) => sum + Number(g.gia_ve || 0), 0);
+          const tongTien = tinhTongTien(ve);
 
           return (
             <li key={ve.ve_id} className="gio-item">
@@ -87,7 +126,7 @@ export default function GioVe() {
                 </div>
                 <div className="gio-info">
                   <div className="gio-phim"><b>Phim:</b> {phim ? (phim.ten || phim.ten_phim) : ve.phim_id}</div>
-                  <div><b>Suất chiếu:</b> {suat ? `${suat.ngay_chieu} ${suat.gio_bat_dau}` : ve.suat_chieu_id}</div>
+                  <div><b>Suất chiếu:</b> {suat ? `${suat.ngay_chieu} ${suat.gio_bat_dau ? suat.gio_bat_dau.slice(0,5) : ""}` : ve.suat_chieu_id}</div>
                   <div>
                     <b>Ghế đã đặt:</b>{" "}
                     {gheArr.length > 0 ? (
@@ -101,7 +140,76 @@ export default function GioVe() {
                       "Chưa có"
                     )}
                   </div>
-                  <div className="gio-tien"><b>Tổng tiền:</b> {tongTien?.toLocaleString()} đ</div>
+                  <div className="gio-tien">
+                    <b>Tổng tiền:</b> {tongTien.toLocaleString()} đ
+                  </div>
+                  {ve.trang_thai_thanh_toan === "Đã thanh toán" ? (
+                    <div style={{ color: "#388e3c", fontWeight: 600, marginTop: 4 }}>
+                      Đã thanh toán thành công!
+                      <div style={{ marginTop: 8 }}>
+                        <button
+                          style={{
+                            padding: "6px 16px",
+                            borderRadius: 6,
+                            background: "#1976d2",
+                            color: "#fff",
+                            border: "none",
+                            cursor: "pointer",
+                            fontWeight: 600
+                          }}
+                          onClick={() => window.print()} // hoặc gọi hàm in vé riêng nếu có
+                        >
+                          In vé
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Nút thanh toán */}
+                      <div style={{ marginTop: 8 }}>
+                        <button
+                          onClick={() => setShowPay(ve.ve_id)}
+                          style={{
+                            padding: "6px 16px",
+                            borderRadius: 6,
+                            background: "#e53935",
+                            color: "#fff",
+                            border: "none",
+                            cursor: "pointer"
+                          }}
+                        >
+                          Thanh toán
+                        </button>
+                      </div>
+                      {/* Form thanh toán (hiện khi bấm) */}
+                      {showPay === ve.ve_id && (
+                        <div style={{ marginTop: 10, background: "#fff3e0", padding: 10, borderRadius: 8 }}>
+                          <div>
+                            <b>Chọn hình thức:</b>{" "}
+                            <select value={hinhThuc} onChange={e => setHinhThuc(e.target.value)}>
+                              <option value="">-- Chọn --</option>
+                              {hinhThucList.map(ht => (
+                                <option key={ht} value={ht}>{ht}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <button
+                            onClick={() => handlePay(ve)}
+                            style={{ marginTop: 8, padding: "6px 18px", borderRadius: 6, background: "#388e3c", color: "#fff", border: "none", cursor: "pointer" }}
+                          >
+                            Xác nhận thanh toán
+                          </button>
+                          <button
+                            onClick={() => { setShowPay(null); setHinhThuc(""); setPayMsg(""); }}
+                            style={{ marginLeft: 8, padding: "6px 12px", borderRadius: 6, background: "#bbb", color: "#fff", border: "none", cursor: "pointer" }}
+                          >
+                            Hủy
+                          </button>
+                          {payMsg && <div style={{ color: payMsg.includes("thành công") ? "#388e3c" : "#e53935", marginTop: 6 }}>{payMsg}</div>}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             </li>

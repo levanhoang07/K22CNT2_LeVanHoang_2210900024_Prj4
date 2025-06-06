@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from "./context/AuthContext"; // Thêm dòng này
+import { AuthContext } from "./context/AuthContext"; 
 
 export default function DatVe() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext); // Thêm dòng này
-  const nguoiDungId = user?.nguoidung_id || user?.id; // Thêm dòng này
+  const { user } = useContext(AuthContext); 
+  const nguoiDungId = user?.nguoidung_id || user?.id; 
 
   const [danhSachPhim, setDanhSachPhim] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -180,19 +180,23 @@ export default function DatVe() {
               </select>
             </div>
 
-            <div className="dv-row">
-              <label>Chọn suất chiếu:</label>
-              <select value={suatChieu} onChange={(e) => setSuatChieu(e.target.value)}>
-                <option value="">--Chọn suất--</option>
-                {danhSachSuatChieu
-                  .filter(s => s.phim_id === parseInt(id))
-                  .map(s => (
-                    <option key={s.suat_chieu_id || s.id} value={s.gio_bat_dau || s.gio}>
-                      {s.gio_bat_dau || s.gio}
+           <div className="dv-row">
+            <label>Chọn suất chiếu:</label>
+            <select value={suatChieu} onChange={(e) => setSuatChieu(e.target.value)}>
+              <option value="">--Chọn suất--</option>
+              {danhSachSuatChieu
+                .filter(s => s.phim_id === parseInt(id))
+                .map(s => {
+                  const gio = s.gio_bat_dau || s.gio || "";
+                  const gioHienThi = gio.slice(0, 5); // Lấy HH:mm
+                  return (
+                    <option key={s.suat_chieu_id || s.id} value={gio}>
+                      {gioHienThi}
                     </option>
-                  ))}
-              </select>
-            </div>
+                  );
+                })}
+            </select>
+          </div>
 
             <div className="dv-ghe">
               <div className="dv-man-hinh">Màn Hình</div>

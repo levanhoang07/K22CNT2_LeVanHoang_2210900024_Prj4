@@ -11,8 +11,9 @@ export default function QuanTri() {
 
             <Link to="nguoidung" style={styles.navLink}>Quản lý người dùng</Link>
             <Link to="phim" style={styles.navLink}>Quản lý phim</Link>
-            <Link to="suatchieu" style={styles.navLink}>Quản lý suất chiếu</Link>
             <Link to="phongchieu" style={styles.navLink}>Quản lý phòng chiếu</Link>
+            <Link to="suatchieu" style={styles.navLink}>Quản lý suất chiếu</Link>
+            <Link to="thanhtoan" style={styles.navLink}>Quản lý thanh toán</Link>
             <Link to="ghe" style={styles.navLink}>Quản lý ghế</Link>
             <Link to="vedat" style={styles.navLink}>Quản lý vé đặt</Link>
           </nav>

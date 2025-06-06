@@ -60,27 +60,6 @@ export default function ChiTietPhim() {
       <div className="ct-notfound">
         <h1>Không tìm thấy phim</h1>
         <Link to="/" className="ct-back">Quay lại Trang chủ</Link>
-        <style>{`
-          .ct-notfound {
-            text-align: center;
-            padding: 60px 0;
-            color: #e53935;
-          }
-          .ct-back {
-            color: #fff;
-            background: #e53935;
-            padding: 10px 22px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 18px;
-            display: inline-block;
-            transition: background 0.2s;
-          }
-          .ct-back:hover {
-            background: #b71c1c;
-          }
-        `}</style>
       </div>
     );
   }
@@ -123,10 +102,30 @@ export default function ChiTietPhim() {
         </div>
       </div>
       <style>{`
+      .ct-notfound {
+            text-align: center;
+            padding: 60px 0;
+            color: #e53935;
+          }
+          .ct-back {
+            color: #fff;
+            background: #e53935;
+            padding: 10px 22px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 18px;
+            display: inline-block;
+            transition: background 0.2s;
+          }
+          .ct-back:hover {
+            background: #b71c1c;
+          }
         .ct-main-bg {
           background: rgb(40,38,38);
           min-height: 100vh;
           padding: 0;
+          
         }
         .ct-container {
           max-width: 1100px;

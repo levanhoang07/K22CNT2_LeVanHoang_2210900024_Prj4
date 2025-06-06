@@ -15,6 +15,7 @@ import QuanTri from "./components/quantri/QuanTri";
 import QuanLyNguoiDung from "./components/quantri/QuanLyNguoiDung";
 import QuanLyPhim from "./components/quantri/QuanLyPhim";
 import QuanLySuatChieu from "./components/quantri/QuanLySuatChieu";
+import QuanLyThanhToan from "./components/quantri/QuanLyThanhToan";
 import QuanLyPhongChieu from "./components/quantri/QuanLyPhongChieu";
 import QuanLyGhe from "./components/quantri/QuanLyGhe";
 import QuanLyVeDat from "./components/quantri/QuanLyVeDat";
@@ -47,6 +48,7 @@ function App() {
               <Route path="/quantri" element={<QuanTri />}>
                 <Route path="phim" element={<QuanLyPhim />} />
                 <Route path="suatchieu" element={<QuanLySuatChieu />} />
+                <Route path="thanhtoan" element={<QuanLyThanhToan/>} />
                 <Route path="phongchieu" element={<QuanLyPhongChieu />} />
                 <Route path="ghe" element={<QuanLyGhe />} />
                 <Route path="vedat" element={<QuanLyVeDat />} />

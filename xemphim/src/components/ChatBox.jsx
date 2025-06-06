@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 export default function ChatBox() {
   const [messages, setMessages] = useState([
-    { sender: 'bot', text: 'Xin chào!Tôi là Bot của anh Hoàng Đẹp Trai Bạn muốn biết thông tin về bộ phim nào? Hãy nhập tên phim hoặc từ khóa.' }
+    { sender: 'bot', text: 'Xin chào!Bạn muốn biết thông tin về bộ phim nào? Hãy nhập tên phim hoặc từ khóa.' }
   ]);
   const [input, setInput] = useState('');
   const [phimList, setPhimList] = useState([]);

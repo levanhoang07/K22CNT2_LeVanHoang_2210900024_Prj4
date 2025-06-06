@@ -13,8 +13,7 @@ const QuanLySuatChieu = () => {
     phim_id: '',
     phong_id: '',
     ngay_chieu: '',
-    gio_bat_dau: '',
-    gia_ve: ''
+    gio_bat_dau: ''
   });
   const [editing, setEditing] = useState(false);
   const [currentSuat, setCurrentSuat] = useState(null);
@@ -60,21 +59,26 @@ const QuanLySuatChieu = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const data = {
+        phim_id: form.phim_id,
+        phong_id: form.phong_id,
+        ngay_chieu: form.ngay_chieu,
+        gio_bat_dau: form.gio_bat_dau
+      };
       if (editing) {
-        await axios.put(`${API_BASE_URL}/suatchieu/${currentSuat.suat_chieu_id}`, form);
+        await axios.put(`${API_BASE_URL}/suatchieu/${currentSuat.suat_chieu_id}`, data);
         toast.success('Cập nhật suất chiếu thành công!');
         setEditing(false);
         setCurrentSuat(null);
       } else {
-        await axios.post(`${API_BASE_URL}/suatchieu`, form);
+        await axios.post(`${API_BASE_URL}/suatchieu`, data);
         toast.success('Thêm suất chiếu thành công!');
       }
       setForm({
         phim_id: '',
         phong_id: '',
         ngay_chieu: '',
-        gio_bat_dau: '',
-        gia_ve: ''
+        gio_bat_dau: ''
       });
       fetchSuatChieu();
     } catch (err) {
@@ -91,7 +95,6 @@ const QuanLySuatChieu = () => {
       phong_id: suat.phong_id,
       ngay_chieu: suat.ngay_chieu,
       gio_bat_dau: suat.gio_bat_dau,
-      gia_ve: suat.gia_ve
     });
   };
 
@@ -115,7 +118,6 @@ const QuanLySuatChieu = () => {
       phong_id: '',
       ngay_chieu: '',
       gio_bat_dau: '',
-      gia_ve: ''
     });
   };
 
@@ -156,15 +158,6 @@ const QuanLySuatChieu = () => {
           onChange={handleChange}
           required
         />
-        <input
-          type="number"
-          name="gia_ve"
-          placeholder="Giá vé"
-          value={form.gia_ve}
-          onChange={handleChange}
-          required
-          min="0"
-        />
         <button type="submit">{editing ? 'Cập nhật suất chiếu' : 'Thêm suất chiếu'}</button>
         {editing && (
           <button type="button" className="form-cancel" onClick={handleCancelEdit}>Huỷ chỉnh sửa</button>
@@ -179,7 +172,6 @@ const QuanLySuatChieu = () => {
             <th>Phòng</th>
             <th>Ngày chiếu</th>
             <th>Giờ bắt đầu</th>
-            <th>Giá vé</th>
             <th>Hành động</th>
           </tr>
         </thead>
@@ -193,8 +185,8 @@ const QuanLySuatChieu = () => {
                 <td>{tenPhim}</td>
                 <td>{tenPhong}</td>
                 <td>{suat.ngay_chieu}</td>
-                <td>{suat.gio_bat_dau}</td>
-                <td>{parseInt(suat.gia_ve).toLocaleString()} đ</td>
+                <td>{suat.gio_bat_dau ? suat.gio_bat_dau.slice(0,5) : ""}</td>
+
                 <td>
                   <button className="btn-edit" onClick={() => handleEdit(suat)}>Sửa</button>
                   <button className="btn-delete" onClick={() => handleDelete(suat.suat_chieu_id)}>Xóa</button>

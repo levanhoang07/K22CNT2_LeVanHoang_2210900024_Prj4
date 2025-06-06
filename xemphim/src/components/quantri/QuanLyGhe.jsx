@@ -8,6 +8,7 @@ const QuanLyGhe = () => {
     phong_id: '',
     so_ghe: '',
     loai_ghe: '',
+    gia_ve: 0
   });
   const [editing, setEditing] = useState(false);
   const [currentGhe, setCurrentGhe] = useState(null);
@@ -34,7 +35,7 @@ const QuanLyGhe = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm({ ...form, [name]: name === "gia_ve" ? Number(value) : value });
   };
 
   const handleSubmit = async (e) => {
@@ -48,7 +49,7 @@ const QuanLyGhe = () => {
       } else {
         await axios.post('/ghe', form);
       }
-      setForm({ phong_id: '', so_ghe: '', loai_ghe: '' });
+      setForm({ phong_id: '', so_ghe: '', loai_ghe: '', gia_ve: 0 });
       fetchGhe();
     } catch (err) {
       console.error('Lỗi khi thêm hoặc cập nhật ghế:', err);
@@ -65,13 +66,14 @@ const QuanLyGhe = () => {
       phong_id: ghe.phong_id,
       so_ghe: ghe.so_ghe,
       loai_ghe: ghe.loai_ghe,
+      gia_ve: ghe.gia_ve
     });
   };
 
   const handleCancelEdit = () => {
     setEditing(false);
     setCurrentGhe(null);
-    setForm({ phong_id: '', so_ghe: '', loai_ghe: '' });
+    setForm({ phong_id: '', so_ghe: '', loai_ghe: '', gia_ve: 0 });
   };
 
   const handleDelete = async (ghe_id) => {
@@ -128,9 +130,19 @@ const QuanLyGhe = () => {
           className="input-field"
         >
           <option value="">-- Loại ghế --</option>
-          <option value="Thuong">Thường</option>
+          <option value="Thường">Thường</option>
           <option value="VIP">VIP</option>
         </select>
+        <input
+          type="number"
+          name="gia_ve"
+          placeholder="Giá vé"
+          min={0}
+          value={form.gia_ve}
+          onChange={handleChange}
+          required
+          className="input-field"
+        />
         <div className="button-group">
           <button type="submit" disabled={loading} className="submit-button">
             {loading ? 'Đang xử lý...' : editing ? 'Cập nhật ghế' : 'Thêm ghế'}
@@ -155,6 +167,7 @@ const QuanLyGhe = () => {
             <th>Phòng</th>
             <th>Số ghế</th>
             <th>Loại ghế</th>
+            <th>Giá vé</th>
             <th>Hành động</th>
           </tr>
         </thead>
@@ -167,6 +180,7 @@ const QuanLyGhe = () => {
                 <td>{tenPhong}</td>
                 <td>{ghe.so_ghe}</td>
                 <td>{ghe.loai_ghe}</td>
+                <td>{ghe.gia_ve?.toLocaleString("vi-VN")} đ</td>
                 <td>
                   <button onClick={() => handleEdit(ghe)} className="edit-button">Sửa</button>
                   <button onClick={() => handleDelete(ghe.ghe_id)} className="delete-button">Xóa</button>
