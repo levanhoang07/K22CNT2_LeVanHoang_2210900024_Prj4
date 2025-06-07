@@ -42,6 +42,7 @@ function App() {
               <Route path="/giove" element={<GioVe />} />
               <Route path="/dangnhap" element={<DangNhap />} />
               <Route path="/dangky" element={<DangKy />} />
+          
               
 
               {/* route phía quản trị */}

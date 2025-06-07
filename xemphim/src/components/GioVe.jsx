@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from "./context/AuthContext";
-import { getVietQRUrl } from "./getVietQRUrl";
 
 const hinhThucList = ["Momo", "ZaloPay", "Banking"];
 
@@ -19,20 +18,27 @@ export default function GioVe() {
   const [hinhThucMap, setHinhThucMap] = useState({}); // { [ve_id]: hinhThuc }
   const [payMsg, setPayMsg] = useState("");
 
-  useEffect(() => {
+  // Hàm fetch vé (tách riêng để tái sử dụng)
+  const fetchVeList = () => {
     if (!nguoiDungId) return;
+    setLoading(true);
     Promise.all([
       axios.get(`http://localhost:3000/api/vedat?nguoidung_id=${nguoiDungId}`),
       axios.get('http://localhost:3000/api/phim'),
       axios.get('http://localhost:3000/api/suatchieu')
     ])
       .then(([veRes, phimRes, suatRes]) => {
-        setVeList(veRes.data);
+        const veListFiltered = veRes.data.filter(ve => ve.nguoi_dung_id === nguoiDungId || ve.nguoidung_id === nguoiDungId);
+        setVeList(veListFiltered);
         setPhimList(phimRes.data);
         setSuatChieuList(suatRes.data);
         setLoading(false);
       })
       .catch(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchVeList();
   }, [nguoiDungId]);
 
   // Hàm xử lý thanh toán
@@ -44,7 +50,6 @@ export default function GioVe() {
       return;
     }
     try {
-      // Tổng tiền của vé
       const tongTien = ve.chi_tiet?.reduce((sum, g) => sum + Number(g.gia_ve || 0), 0);
       await axios.post("http://localhost:3000/api/thanhtoan", {
         ve_id: ve.ve_id,
@@ -55,6 +60,7 @@ export default function GioVe() {
       setPayMsg("Thanh toán thành công! Vui lòng chờ xác nhận.");
       setShowPay(null);
       setHinhThucMap(h => ({ ...h, [ve.ve_id]: "" }));
+      fetchVeList(); // Fetch lại danh sách vé để cập nhật trạng thái mới
     } catch {
       setPayMsg("Lỗi khi thanh toán!");
     }
@@ -71,23 +77,6 @@ export default function GioVe() {
       <span className="gio-icon">🔒</span>
       <div>
         Vui lòng <a href="/dangnhap" className="gio-link">đăng nhập</a> để xem giỏ vé!
-        <style>{`
-          .gio-link {
-            color: #e53935;
-            font-weight: 600;
-            text-decoration: underline;
-            transition: color 0.2s, text-shadow 0.2s;
-            padding: 2px 4px;
-            border-radius: 4px;
-          }
-          .gio-link:hover, .gio-link:focus {
-            color: #fff;
-            background: #e53935;
-            text-shadow: 0 2px 8px #e53935;
-            text-decoration: none;
-            outline: none;
-          }
-        `}</style>
       </div>
     </div>
   );
@@ -164,6 +153,21 @@ export default function GioVe() {
                           In vé
                         </button>
                       </div>
+                    </div>
+                  ) : ve.trang_thai_thanh_toan && ve.trang_thai_thanh_toan.startsWith("Đã hủy") ? (
+                    <div style={{ color: '#e53935', fontWeight: 600, marginTop: 10 }}>
+                      Đơn hàng của bạn đã bị quản trị viên hủy
+                      {ve.trang_thai_thanh_toan.length > 7 && (
+                        <>
+                          <br />Lý do: {ve.trang_thai_thanh_toan.slice(7)}
+                        </>
+                      )}
+                      <br />Vui lòng đặt vé lại sau!
+                    </div>
+                  ) : ve.trang_thai_thanh_toan === "Chờ xử lý" ? (
+                    <div style={{ color: '#1976d2', fontWeight: 600, marginTop: 10 }}>
+                      Thanh toán của bạn đang chờ xác nhận từ hệ thống.<br/>
+                      Vui lòng đợi quản trị viên xác nhận hoặc kiểm tra lại sau.
                     </div>
                   ) : (
                     <>

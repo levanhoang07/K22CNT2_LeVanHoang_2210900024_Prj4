@@ -194,11 +194,11 @@ const QuanLyVeDat = () => {
                 <td>{phim ? (phim.ten || phim.ten_phim) : 'Không rõ'}</td>
                 <td>
                   {suat
-                    ? `${suat.ngay_chieu} ${suat.gio_bat_dau ? suat.gio_bat_dau.slice(0,5) : ""}`
+                    ? `${suat.ngay_chieu} ${suat.gio_bat_dau ? suat.gio_bat_dau.slice(0,5) : ''}`
                     : 'Không rõ'}
                 </td>
                 <td>{gheStr}</td>
-                <td>{suat.gio_bat_dau ? suat.gio_bat_dau.slice(0,5) : ""}</td>
+                <td>{suat ? (suat.gio_bat_dau ? suat.gio_bat_dau.slice(0,5) : '') : ''}</td>
                 <td>{ve.trang_thai}</td>
                 <td>
                   <button onClick={() => handleEdit(ve)} className="edit-button">Sửa</button>

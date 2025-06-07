@@ -9,6 +9,7 @@ const trangThaiList = ["Đã thanh toán", "Chờ xử lý", "Đã hủy"];
 export default function QuanLyThanhToan() {
   const [list, setList] = useState([]);
   const [veList, setVeList] = useState([]);
+  const [suatChieuList, setSuatChieuList] = useState([]);
   const [form, setForm] = useState({
     ve_id: "",
     so_tien: "",
@@ -22,6 +23,7 @@ export default function QuanLyThanhToan() {
   useEffect(() => {
     fetchData();
     fetchVe();
+    fetchSuatChieu();
   }, []);
 
   const fetchData = async () => {
@@ -32,6 +34,11 @@ export default function QuanLyThanhToan() {
   const fetchVe = async () => {
     const res = await axios.get(`${API_BASE_URL}/vedat`);
     setVeList(res.data);
+  };
+
+  const fetchSuatChieu = async () => {
+    const res = await axios.get(`${API_BASE_URL}/suatchieu`);
+    setSuatChieuList(res.data);
   };
 
   const handleChange = (e) => {
@@ -134,7 +141,9 @@ export default function QuanLyThanhToan() {
             </option>
           ))}
         </select>
-        <button type="submit">{editing ? "Cập nhật" : "Thêm mới"}</button>
+        <button type="submit" style={{ backgroundColor: editing ? '#f39c12' : '#4CAF50', color: 'white', border: 'none', borderRadius: 5, padding: '8px 12px', marginRight: editing ? 5 : 0, cursor: 'pointer' }}>
+          {editing ? "Cập nhật" : "Cập nhật"}
+        </button>
         {editing && (
           <button
             type="button"
@@ -148,6 +157,7 @@ export default function QuanLyThanhToan() {
               });
               setCurrentId(null);
             }}
+            style={{ backgroundColor: '#bbb', color: '#fff', border: 'none', borderRadius: 5, padding: '8px 12px', marginLeft: 5, cursor: 'pointer' }}
           >
             Hủy
           </button>
@@ -160,33 +170,148 @@ export default function QuanLyThanhToan() {
             <th>Vé</th>
             <th>Số tiền</th>
             <th>Hình thức</th>
-            <th>Trạng thái</th>
             <th>Thời gian</th>
+            <th>Trạng thái</th>
             <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
-          {list.map((item) => (
-            <tr key={item.thanh_toan_id}>
-              <td>{item.thanh_toan_id}</td>
-              <td>#{item.ve_id}</td>
-              <td>{item.so_tien?.toLocaleString("vi-VN")} đ</td>
-              <td>{item.hinh_thuc}</td>
-              <td>{item.trang_thai}</td>
-              <td>
-                {item.thoi_gian_thanh_toan &&
-                  new Date(item.thoi_gian_thanh_toan).toLocaleString("vi-VN")}
-              </td>
-              <td>
-                <button onClick={() => handleEdit(item)}>Sửa</button>
-                <button onClick={() => handleDelete(item.thanh_toan_id)}>
-                  Xóa
-                </button>
-              </td>
-            </tr>
-          ))}
+          {list.map((item) => {
+            // Tìm vé tương ứng để lấy suat_chieu_id
+            const ve = veList.find(v => v.ve_id === item.ve_id);
+            const suat = ve ? suatChieuList.find(s => s.suat_chieu_id === ve.suat_chieu_id) : null;
+            return (
+              <tr key={item.thanh_toan_id}>
+                <td>{item.thanh_toan_id}</td>
+                <td>#{item.ve_id}</td>
+                <td>{item.so_tien?.toLocaleString("vi-VN")} đ</td>
+                <td>{item.hinh_thuc}</td>
+                <td>{suat ? `${suat.ngay_chieu} ${suat.gio_bat_dau ? suat.gio_bat_dau.slice(0,5) : ''}` : ''}</td>
+                <td>
+                  <span
+                    className={
+                      item.trang_thai === "Đã thanh toán"
+                        ? "status-paid"
+                        : item.trang_thai === "Chờ xử lý"
+                        ? "status-pending"
+                        : item.trang_thai === "Đã hủy"
+                        ? "status-cancelled"
+                        : ""
+                    }
+                  >
+                    {item.trang_thai}
+                  </span>
+                </td>
+                <td>
+                  <button className="edit-button" onClick={() => handleEdit(item)} style={{ backgroundColor: '#f39c12' }}>Sửa</button>
+                  <button className="delete-button" onClick={() => handleDelete(item.thanh_toan_id)} style={{ backgroundColor: '#e74c3c' }}>Xóa</button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
+      <style jsx>{`
+        .container {
+          padding: 20px;
+          font-family: Arial, sans-serif;
+        }
+        h2 {
+          color: #333;
+          margin-bottom: 20px;
+        }
+        .form-container {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          margin-bottom: 20px;
+        }
+        select, input, button {
+          padding: 8px;
+          font-size: 16px;
+          border-radius: 5px;
+          border: 1px solid #ddd;
+        }
+        button {
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          cursor: pointer;
+        }
+        button:hover {
+          background-color: #45a049;
+        }
+        .styled-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+        }
+        th, td {
+          padding: 10px;
+          text-align: center;
+          border: 1px solid #ddd;
+        }
+        th {
+          background-color: #f4f4f4;
+          font-weight: bold;
+        }
+        td {
+          background-color: #fff;
+        }
+        td:nth-child(odd) {
+          background-color: #f9f9f9;
+        }
+        .edit-button {
+          background-color: #f39c12;
+          color: white;
+          padding: 8px 12px;
+          border: none;
+          border-radius: 5px;
+          margin-right: 5px;
+          cursor: pointer;
+        }
+        .edit-button:hover {
+          background-color: #e67e22;
+        }
+        .delete-button {
+          background-color: #e74c3c;
+          color: white;
+          padding: 8px 12px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+        .delete-button:hover {
+          background-color: #c0392b;
+        }
+        .status-paid {
+          color: #27ae60;
+          font-weight: bold;
+          background: #eafaf1;
+          border-radius: 4px;
+          padding: 3px 10px;
+          border: 1px solid #27ae60;
+          display: inline-block;
+        }
+        .status-pending {
+          color: #2980d9;
+          font-weight: bold;
+          background: #eaf1fa;
+          border-radius: 4px;
+          padding: 3px 10px;
+          border: 1px solid #2980d9;
+          display: inline-block;
+        }
+        .status-cancelled {
+          color: #e74c3c;
+          font-weight: bold;
+          background: #faeaea;
+          border-radius: 4px;
+          padding: 3px 10px;
+          border: 1px solid #e74c3c;
+          display: inline-block;
+        }
+      `}</style>
     </div>
   );
 }
