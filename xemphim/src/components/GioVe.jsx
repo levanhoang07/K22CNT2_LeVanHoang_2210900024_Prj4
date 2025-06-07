@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from "./context/AuthContext";
+import { getVietQRUrl } from "./getVietQRUrl";
 
 const hinhThucList = ["Momo", "ZaloPay", "Banking"];
 
@@ -15,7 +16,7 @@ export default function GioVe() {
 
   // Thêm state cho thanh toán
   const [showPay, setShowPay] = useState(null); // ve_id đang thanh toán
-  const [hinhThuc, setHinhThuc] = useState("");
+  const [hinhThucMap, setHinhThucMap] = useState({}); // { [ve_id]: hinhThuc }
   const [payMsg, setPayMsg] = useState("");
 
   useEffect(() => {
@@ -37,6 +38,7 @@ export default function GioVe() {
   // Hàm xử lý thanh toán
   const handlePay = async (ve) => {
     setPayMsg("");
+    const hinhThuc = hinhThucMap[ve.ve_id];
     if (!hinhThuc) {
       setPayMsg("Vui lòng chọn hình thức thanh toán!");
       return;
@@ -52,7 +54,7 @@ export default function GioVe() {
       });
       setPayMsg("Thanh toán thành công! Vui lòng chờ xác nhận.");
       setShowPay(null);
-      setHinhThuc("");
+      setHinhThucMap(h => ({ ...h, [ve.ve_id]: "" }));
     } catch {
       setPayMsg("Lỗi khi thanh toán!");
     }
@@ -182,32 +184,43 @@ export default function GioVe() {
                         </button>
                       </div>
                       {/* Form thanh toán (hiện khi bấm) */}
-                      {showPay === ve.ve_id && (
-                        <div style={{ marginTop: 10, background: "#fff3e0", padding: 10, borderRadius: 8 }}>
-                          <div>
-                            <b>Chọn hình thức:</b>{" "}
-                            <select value={hinhThuc} onChange={e => setHinhThuc(e.target.value)}>
-                              <option value="">-- Chọn --</option>
-                              {hinhThucList.map(ht => (
-                                <option key={ht} value={ht}>{ht}</option>
-                              ))}
-                            </select>
+                      {showPay === ve.ve_id && (() => {
+                        const tongTien = tinhTongTien(ve);
+                        return (
+                          <div style={{ marginTop: 10, background: "#fff3e0", padding: 10, borderRadius: 8 }}>
+                            <div>
+                              <b>Chọn hình thức:</b>{" "}
+                              <select value={hinhThucMap[ve.ve_id] || ""} onChange={e => setHinhThucMap(h => ({ ...h, [ve.ve_id]: e.target.value }))}>
+                                <option value="">-- Chọn --</option>
+                                {hinhThucList.map(ht => (
+                                  <option key={ht} value={ht}>{ht}</option>
+                                ))}
+                              </select>
+                            </div>
+                            {hinhThucMap[ve.ve_id] === "Banking" && parseInt(tongTien, 10) > 0 && (
+                              <div style={{ marginTop: 12, textAlign: "center" }}>
+                                {/* Đã bỏ phần tạo và hiển thị QR VietQR */}
+                              </div>
+                            )}
+                            {hinhThucMap[ve.ve_id] === "Banking" && parseInt(tongTien, 10) <= 0 && (
+                              <div style={{ color: '#e53935', marginTop: 12 }}>Vui lòng kiểm tra lại tổng tiền để tạo mã QR!</div>
+                            )}
+                            <button
+                              onClick={() => handlePay(ve)}
+                              style={{ marginTop: 8, padding: "6px 18px", borderRadius: 6, background: "#388e3c", color: "#fff", border: "none", cursor: "pointer" }}
+                            >
+                              Xác nhận thanh toán
+                            </button>
+                            <button
+                              onClick={() => { setShowPay(null); setHinhThucMap(h => ({ ...h, [ve.ve_id]: "" })); setPayMsg(""); }}
+                              style={{ marginLeft: 8, padding: "6px 12px", borderRadius: 6, background: "#bbb", color: "#fff", border: "none", cursor: "pointer" }}
+                            >
+                              Hủy
+                            </button>
+                            {payMsg && <div style={{ color: payMsg.includes("thành công") ? "#388e3c" : "#e53935", marginTop: 6 }}>{payMsg}</div>}
                           </div>
-                          <button
-                            onClick={() => handlePay(ve)}
-                            style={{ marginTop: 8, padding: "6px 18px", borderRadius: 6, background: "#388e3c", color: "#fff", border: "none", cursor: "pointer" }}
-                          >
-                            Xác nhận thanh toán
-                          </button>
-                          <button
-                            onClick={() => { setShowPay(null); setHinhThuc(""); setPayMsg(""); }}
-                            style={{ marginLeft: 8, padding: "6px 12px", borderRadius: 6, background: "#bbb", color: "#fff", border: "none", cursor: "pointer" }}
-                          >
-                            Hủy
-                          </button>
-                          {payMsg && <div style={{ color: payMsg.includes("thành công") ? "#388e3c" : "#e53935", marginTop: 6 }}>{payMsg}</div>}
-                        </div>
-                      )}
+                        );
+                      })()}
                     </>
                   )}
                 </div>
