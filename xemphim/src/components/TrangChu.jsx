@@ -1,16 +1,25 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ChatBox from './ChatBox';
 import { AuthContext } from "./context/AuthContext";
 
 export default function TrangChu() {
-  const { user } = useContext(AuthContext);
+  const { user, logout, isAdmin } = useContext(AuthContext);
+  const navigate = useNavigate();
   const nguoiDungId = user?.nguoidung_id || user?.id;
   const [searchTerm, setSearchTerm] = useState('');
   const [phimList, setPhimList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [soLuongVe, setSoLuongVe] = useState(0);
+  const [hoveredLink, setHoveredLink] = useState(null);
+  const [isLogoutHover, setLogoutHover] = useState(false);
+  
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   useEffect(() => {
     fetch('http://127.0.0.1:3000/api/phim')
@@ -61,14 +70,55 @@ export default function TrangChu() {
               <li><Link to="/locations">Cụm rạp</Link></li>
               <li><Link to="/about">Giới Thiệu</Link></li>
               <li><Link to="/contact">Liên Hệ</Link></li>
-            </ul>
-          </nav>
-          <div className="header-actions">
+               <div className="header-actions">
             <Link to="/giove" className="cart-icon" title="Giỏ vé của bạn">
               <span className="icon">🛒</span>
               <span className="badge">{soLuongVe}</span>
             </Link>
           </div>
+              {user && !isAdmin ? (
+                <>
+                  <li>
+                    <span className="greeting">Xin chào, {user.ho_ten}</span>
+                  </li>
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="logout-button"
+                      onMouseEnter={() => setLogoutHover(true)}
+                      onMouseLeave={() => setLogoutHover(false)}
+                    >
+                      Đăng xuất
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link
+                      to="/dangnhap"
+                      className="nav-link"
+                      onMouseEnter={() => setHoveredLink("/dangnhap")}
+                      onMouseLeave={() => setHoveredLink(null)}
+                    >
+                      Đăng nhập
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/dangky"
+                      className="nav-link"
+                      onMouseEnter={() => setHoveredLink("/dangky")}
+                      onMouseLeave={() => setHoveredLink(null)}
+                    >
+                      Đăng ký
+                    </Link>
+                  </li>
+                </>
+              )}
+            </ul>
+          </nav>
+         
         </div>
       </header>
 
@@ -188,13 +238,24 @@ export default function TrangChu() {
       </footer>
 
       <style>{`
+        .greeting,
+        .header-actions,
+        .nav-links li,
+        .nav-links.plain-links a {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: inline-block;
+          vertical-align: middle;
+        }
+          
         body {
           font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
           background: #555555;
           color: #222;
         }
         .main-content {
-          background:rgb(45, 41, 41);
+          background: rgb(45, 41, 41);
         }
         .header {
           background: #111;
@@ -228,6 +289,7 @@ export default function TrangChu() {
         .nav-links {
           display: flex;
           list-style: none;
+          align-items: center;
         }
         .nav-links li {
           margin: 0 0.2rem;
@@ -255,6 +317,31 @@ export default function TrangChu() {
           background: none !important;
           color: #e53935;
         }
+        .greeting {
+          font-size: 1rem;
+          font-weight: 700;
+          color: #fffde7;
+          text-shadow: 0 0 10px #e53935, 0 1px 0 #fff;
+          letter-spacing: 0.5px;
+          padding: 0.7rem 1.2rem;
+        }
+        .logout-button {
+          background: linear-gradient(90deg, #e53935 60%, #ffb199 100%);
+          color: #fff;
+          border: none;
+          padding: 0.7rem 1.2rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 1rem;
+          font-weight: 700;
+          box-shadow: 0 4px 15px rgba(229,57,53,0.18);
+          transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+        }
+        .logout-button:hover {
+          background: linear-gradient(90deg, #b71c1c 60%, #e57373 100%);
+          box-shadow: 0 6px 20px rgba(183, 28, 28, 0.85);
+          transform: scale(1.05);
+        }
         .header-actions {
           display: flex;
           align-items: center;
@@ -267,13 +354,14 @@ export default function TrangChu() {
           text-decoration: none;
           transition: transform 0.2s;
         }
+          
         .cart-icon:hover {
           transform: scale(1.15) rotate(-8deg);
         }
         .cart-icon .badge {
           position: absolute;
-          top: -6px;
-          right: -10px;
+          top: -0px;
+          right: -0px;
           background: #e53935;
           color: white;
           border-radius: 50%;
@@ -325,7 +413,11 @@ export default function TrangChu() {
             margin: 0.5rem 0;
             text-align: center;
           }
-          .nav-links a {
+          .nav-links a, .logout-button {
+            font-size: 1.5rem;
+            padding: 1rem;
+          }
+          .greeting {
             font-size: 1.5rem;
             padding: 1rem;
           }
@@ -436,7 +528,7 @@ export default function TrangChu() {
         .movies-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 2.8rem 2.8rem; /* tăng khoảng cách giữa các phim */
+          gap: 2.8rem 2.8rem;
         }
         .movie-card {
           background: rgba(180, 173, 173, 0.15);
@@ -445,7 +537,6 @@ export default function TrangChu() {
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           box-shadow: 0 6px 36px rgba(144, 54, 54, 0.1);
           position: relative;
-          /* tăng kích thước thẻ phim */
           min-height: 420px;
         }
         .movie-card:hover {
@@ -456,7 +547,7 @@ export default function TrangChu() {
           position: relative;
           overflow: hidden;
           aspect-ratio: 3/4;
-          min-height: 320px; /* tăng chiều cao ảnh */
+          min-height: 320px;
         }
         .movie-image img {
           width: 100%;
@@ -502,15 +593,15 @@ export default function TrangChu() {
           background: #e53935;
           color: white;
           transform: translateY(-2px);
-        }s
+        }
         .movie-content {
-          padding: 2rem 1.2rem 1.5rem 1.2rem; /* tăng padding */
+          padding: 2rem 1.2rem 1.5rem 1.2rem;
         }
         .movie-title {
           font-family: 'Playfair Display', serif;
           font-size: 1.3rem;
           font-weight: 600;
-          color:rgb(248, 233, 233);
+          color: rgb(248, 233, 233);
           margin-bottom: 0.75rem;
           letter-spacing: -0.01em;
           line-height: 1.3;

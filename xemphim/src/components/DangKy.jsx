@@ -143,6 +143,12 @@ export default function DangKy() {
           </div>
         </div>
       </div>
+      {/* Nút trở về trang chủ */}
+      <div className="back-to-home">
+        <Link to="/">
+          <button className="back-btn">Trở về Trang Chủ</button>
+        </Link>
+      </div>
 
       <style>
         {`
@@ -150,6 +156,7 @@ export default function DangKy() {
             min-height: 100vh;
             background: linear-gradient(120deg, #232733 60%, #181c24 100%);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
@@ -331,6 +338,33 @@ export default function DangKy() {
             box-shadow: 0 8px 24px rgba(2,136,209,0.18);
           }
 
+          /* Back to Home Button */
+          .back-to-home {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            max-width: 820px;
+          }
+          .back-btn {
+            padding: 13px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #757575 60%, #bdbdbd 100%);
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.08rem;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(117,117,117,0.13);
+            letter-spacing: 0.5px;
+          }
+          .back-btn:hover {
+            background: linear-gradient(90deg, #616161 60%, #9e9e9e 100%);
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 8px 24px rgba(97,97,97,0.18);
+          }
+
           /* Animation keyframes */
           @keyframes fadeInLeft {
             from { opacity: 0; transform: translateX(-40px);}
@@ -366,6 +400,9 @@ export default function DangKy() {
             .form-right {
               padding-top: 18px;
               padding-bottom: 18px;
+            }
+            .back-to-home {
+              margin-top: 10px;
             }
           }
         `}

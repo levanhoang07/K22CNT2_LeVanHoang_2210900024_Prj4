@@ -93,76 +93,79 @@ export default function QuanLyThanhToan() {
     <div style={{ maxWidth: 900, margin: "0 auto", padding: 24 }}>
       <h2>Quản lý thanh toán</h2>
       <form onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
-        <select
-          name="ve_id"
-          value={form.ve_id}
-          onChange={handleChange}
-          required
-        >
-          <option value="">-- Chọn vé --</option>
-          {veList.map((ve) => (
-            <option key={ve.ve_id} value={ve.ve_id}>
-              Vé #{ve.ve_id}
-            </option>
-          ))}
-        </select>
-        <input
-          type="number"
-          name="so_tien"
-          placeholder="Số tiền"
-          min={0}
-          value={form.so_tien}
-          onChange={handleChange}
-          required
-        />
-        <select
-          name="hinh_thuc"
-          value={form.hinh_thuc}
-          onChange={handleChange}
-          required
-        >
-          <option value="">-- Hình thức --</option>
-          {hinhThucList.map((ht) => (
-            <option key={ht} value={ht}>
-              {ht}
-            </option>
-          ))}
-        </select>
-        <select
-          name="trang_thai"
-          value={form.trang_thai}
-          onChange={handleChange}
-          required
-        >
-          <option value="">-- Trạng thái --</option>
-          {trangThaiList.map((tt) => (
-            <option key={tt} value={tt}>
-              {tt}
-            </option>
-          ))}
-        </select>
-        <button type="submit" style={{ backgroundColor: editing ? '#f39c12' : '#4CAF50', color: 'white', border: 'none', borderRadius: 5, padding: '8px 12px', marginRight: editing ? 5 : 0, cursor: 'pointer' }}>
-          {editing ? "Cập nhật" : "Cập nhật"}
-        </button>
-        {editing && (
-          <button
-            type="button"
-            onClick={() => {
-              setEditing(false);
-              setForm({
-                ve_id: "",
-                so_tien: "",
-                hinh_thuc: "",
-                trang_thai: "",
-              });
-              setCurrentId(null);
-            }}
-            style={{ backgroundColor: '#bbb', color: '#fff', border: 'none', borderRadius: 5, padding: '8px 12px', marginLeft: 5, cursor: 'pointer' }}
-          >
-            Hủy
-          </button>
-        )}
-      </form>
+  <select
+    name="ve_id"
+    value={form.ve_id}
+    onChange={handleChange}
+    required
+    disabled={editing} // Chỉ cho xem khi sửa
+  >
+    <option value="">-- Chọn vé --</option>
+    {veList.map((ve) => (
+      <option key={ve.ve_id} value={ve.ve_id}>
+        Vé #{ve.ve_id}
+      </option>
+    ))}
+  </select>
+  <input
+    type="number"
+    name="so_tien"
+    placeholder="Số tiền"
+    min={0}
+    value={form.so_tien}
+    onChange={handleChange}
+    required
+    disabled={editing} // Chỉ cho xem khi sửa
+  />
+  <select
+    name="hinh_thuc"
+    value={form.hinh_thuc}
+    onChange={handleChange}
+    required
+    disabled={editing} // Chỉ cho xem khi sửa
+  >
+    <option value="">-- Hình thức --</option>
+    {hinhThucList.map((ht) => (
+      <option key={ht} value={ht}>
+        {ht}
+      </option>
+    ))}
+  </select>
+  <select
+    name="trang_thai"
+    value={form.trang_thai}
+    onChange={handleChange}
+    required
+  >
+    <option value="">-- Trạng thái --</option>
+    {trangThaiList.map((tt) => (
+      <option key={tt} value={tt}>
+        {tt}
+      </option>
+    ))}
+  </select>
+  <button type="submit" style={{ backgroundColor: editing ? '#f39c12' : '#4CAF50', color: 'white', border: 'none', borderRadius: 5, padding: '8px 12px', marginRight: editing ? 5 : 0, cursor: 'pointer' }}>
+    {editing ? "Cập nhật" : "Cập nhật"}
+  </button>
+  {editing && (
+    <button
+      type="button"
+      onClick={() => {
+        setEditing(false);
+        setForm({
+          ve_id: "",
+          so_tien: "",
+          hinh_thuc: "",
+          trang_thai: "",
+        });
+        setCurrentId(null);
+      }}
+      style={{ backgroundColor: '#bbb', color: '#fff', border: 'none', borderRadius: 5, padding: '8px 12px', marginLeft: 5, cursor: 'pointer' }}
+    >
+      Hủy
+    </button>
+  )}
+</form>
       <table border={1} cellPadding={8} style={{ width: "100%" }}>
         <thead>
           <tr>

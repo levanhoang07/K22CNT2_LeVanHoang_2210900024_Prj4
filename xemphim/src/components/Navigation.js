@@ -20,7 +20,7 @@ export default function Navigation() {
 
   return (
     <nav style={styles.nav}>
-      <div style={styles.logo}>
+      {/* <div style={styles.logo}>
         <Link
           to="/"
           style={{
@@ -34,9 +34,9 @@ export default function Navigation() {
           <span style={{ fontSize: "2.1rem", marginRight: 8 }}>🎥</span>
           <span style={styles.logoText}>Doremi Cinema</span>
         </Link>
-      </div>
+      </div> */}
 
-      <div style={styles.navLinks}>
+      {/* <div style={styles.navLinks}>
         {user && !isAdmin ? (
           <>
             <span style={styles.greeting}>Xin chào, {user.ho_ten}</span>
@@ -68,24 +68,24 @@ export default function Navigation() {
             </Link>
           ))
         )}
-      </div>
+      </div> */}
     </nav>
   );
 }
 
 const styles = {
-  nav: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "1.2rem 3rem",
-    background: "linear-gradient(90deg, #111 60%, #e53935 100%)",
-    color: "#fff",
-    boxShadow: "0 4px 24px 0 rgba(229,57,53,0.18), 0 1.5px 0 #e53935 inset",
-    fontFamily: "'Segoe UI', 'Roboto', Arial, sans-serif",
-    fontWeight: "500",
-    userSelect: "none",
-  },
+  // nav: {
+  //   display: "flex",
+  //   justifyContent: "space-between",
+  //   alignItems: "center",
+  //   padding: "1.2rem 3rem",
+  //   background: "linear-gradient(90deg, #111 60%, #e53935 100%)",
+  //   color: "#fff",
+  //   boxShadow: "0 4px 24px 0 rgba(229,57,53,0.18), 0 1.5px 0 #e53935 inset",
+  //   fontFamily: "'Segoe UI', 'Roboto', Arial, sans-serif",
+  //   fontWeight: "500",
+  //   userSelect: "none",
+  // },
   logo: {
     fontSize: "2.1rem",
     fontWeight: "800",
@@ -136,7 +136,8 @@ const styles = {
     borderRadius: "12px",
     transition: "background 0.3s, color 0.2s, box-shadow 0.2s, transform 0.2s",
     cursor: "pointer",
-    background: "linear-gradient(90deg, rgba(229,57,53,0.08) 0%, rgba(255,255,255,0.01) 100%)",
+    background:
+      "linear-gradient(90deg, rgba(229,57,53,0.08) 0%, rgba(255,255,255,0.01) 100%)",
     border: "none",
     boxShadow: "0 1px 6px 0 rgba(229,57,53,0.08)",
     margin: "0 2px",

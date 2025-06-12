@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from "./context/AuthContext";
+import { Link } from "react-router-dom";
 
 const hinhThucList = ["Momo", "ZaloPay", "Banking"];
 
@@ -232,8 +233,39 @@ export default function GioVe() {
             </li>
           );
         })}
+        {/* Nút trở về trang chủ */}
+      <div className="back-to-home" style={{ marginTop: 20, display: "flex", justifyContent: "center" }}>
+        <Link to="/">
+          <button className="back-btn">Trở về Trang Chủ</button>
+        </Link>
+      </div>
       </ul>
+      
       <style>{`
+       .back-btn {
+          padding: 13px 20px;
+          border: none;
+          border-radius: 10px;
+          background: #6b7280;
+          color: #fff;
+          font-weight: bold;
+          font-size: 1.08rem;
+          cursor: pointer;
+          transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+          box-shadow: 0 4px 15px rgba(107,114,128,0.13);
+          letter-spacing: 0.5px;
+        }
+        .back-btn:hover {
+          background: #4b5563;
+          transform: translateY(-2px) scale(1.04);
+          box-shadow: 0 8px 24px rgba(75,85,99,0.18);
+        }
+        .back-to-home {
+          margin-top: 20px;
+          display: flex;
+          justify-content: center;
+          width: 100%;
+        }
         .gio-container {
           max-width: 540px;
           margin: 40px auto;

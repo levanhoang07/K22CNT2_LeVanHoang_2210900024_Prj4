@@ -38,7 +38,7 @@ export default function DangNhap() {
       setThongBao('Sai tên đăng nhập hoặc mật khẩu.');
     }
   };
-// ...existing code...
+
   return (
     <div className="login-wrapper">
       <div className="login-box">
@@ -84,21 +84,25 @@ export default function DangNhap() {
 
         {/* Cột phải: Form Chào mừng + Đăng ký */}
         <div className="form-right">
-  <div className="welcome-box">
-    <h2>🎬 Chào mừng bạn đến với <span style={{ color: '#e50914' }}>Doremi Cinema</span>!</h2>
-    <p>
-  Doremi Cinema – thế giới điện ảnh đỉnh cao với hàng ngàn bộ phim hấp dẫn trong nước và quốc tế. <br />
-  Tận hưởng hình ảnh sắc nét, âm thanh sống động,đắm chìm vào từng khoảnh khắc. <br />
-  Từ phim kinh điển đến bom tấn mới nhất, chúng tôi luôn đồng hành cùng bạn trên hành trình khám phá cảm xúc điện ảnh.
-</p>
-
-    <p>Chưa có tài khoản?</p>
-    <Link to="/dangky">
-      <button className="signup-btn">Tạo tài khoản ngay</button>
-    </Link>
-  </div>
-</div>
-
+          <div className="welcome-box">
+            <h2>🎬 Chào mừng bạn đến với <span style={{ color: '#e50914' }}>Doremi Cinema</span>!</h2>
+            <p>
+              Doremi Cinema – thế giới điện ảnh đỉnh cao với hàng ngàn bộ phim hấp dẫn trong nước và quốc tế. <br />
+              Tận hưởng hình ảnh sắc nét, âm thanh sống động, đắm chìm vào từng khoảnh khắc. <br />
+              Từ phim kinh điển đến bom tấn mới nhất, chúng tôi luôn đồng hành cùng bạn trên hành trình khám phá cảm xúc điện ảnh.
+            </p>
+            <p>Chưa có tài khoản?</p>
+            <Link to="/dangky">
+              <button className="signup-btn">Tạo tài khoản ngay</button>
+            </Link>
+          </div>
+        </div>
+      </div>
+      {/* Nút trở về trang chủ */}
+      <div className="back-to-home">
+        <Link to="/">
+          <button className="back-btn">Trở về Trang Chủ</button>
+        </Link>
       </div>
 
       <style>
@@ -107,6 +111,7 @@ export default function DangNhap() {
             min-height: 100vh;
             background: linear-gradient(120deg, #232733 60%, #181c24 100%);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
@@ -288,6 +293,33 @@ export default function DangNhap() {
             box-shadow: 0 8px 24px rgba(2,136,209,0.18);
           }
 
+          /* Back to Home Button */
+          .back-to-home {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            max-width: 820px;
+          }
+          .back-btn {
+          padding: 13px 20px;
+          border: none;
+          border-radius: 10px;
+          background: #6b7280; /* Solid gray */
+          color: #fff;
+          font-weight: bold;
+          font-size: 1.08rem;
+          cursor: pointer;
+          transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+          box-shadow: 0 4px 15px rgba(107,114,128,0.13); /* Shadow matches gray */
+          letter-spacing: 0.5px;
+        }
+        .back-btn:hover {
+          background: #4b5563; /* Darker gray for hover */
+          transform: translateY(-2px) scale(1.04);
+          box-shadow: 0 8px 24px rgba(75,85,99,0.18); /* Shadow matches hover gray */
+        }
+
           /* Animation keyframes */
           @keyframes fadeInLeft {
             from { opacity: 0; transform: translateX(-40px);}
@@ -323,6 +355,9 @@ export default function DangNhap() {
             .form-right {
               padding-top: 18px;
               padding-bottom: 18px;
+            }
+            .back-to-home {
+              margin-top: 10px;
             }
           }
         `}
