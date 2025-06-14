@@ -10,7 +10,7 @@ def get_db_connection():
     conn_str = (
         "Driver={SQL Server};"
         "Server=LEVANHOANG\\SQLEXPRESS;"
-        "Database=Ve_Xem_Phim;"
+        "Database= Ve_Xem_Phim;"
         "Trusted_Connection=yes;"
     )
     try:

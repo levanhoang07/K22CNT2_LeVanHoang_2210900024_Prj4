@@ -2,6 +2,7 @@
 CREATE DATABASE Ve_Xem_Phim;
 GO
 
+
 -- Thay đổi collation của cơ sở dữ liệu sau khi tạo
 ALTER DATABASE Ve_Xem_Phim
 COLLATE Vietnamese_CI_AI;
@@ -88,6 +89,23 @@ CREATE TABLE chi_tiet_ve_dat (
     CONSTRAINT fk_chitiet_vedat_vedat FOREIGN KEY (ve_dat_id) REFERENCES ve_dat(ve_id) ON DELETE CASCADE,
     CONSTRAINT fk_chitiet_vedat_ghe FOREIGN KEY (ghe_id) REFERENCES ghe(ghe_id) ON DELETE NO ACTION
 );
+-- Tạo bảng thanh toán
+CREATE TABLE thanh_toan (
+    thanh_toan_id INT PRIMARY KEY IDENTITY(1,1),
+    ve_id INT NOT NULL,
+    hinh_thuc NVARCHAR(50) COLLATE Vietnamese_CI_AI NOT NULL,
+    trang_thai NVARCHAR(20) COLLATE Vietnamese_CI_AI NOT NULL,
+    thoi_gian_thanh_toan DATETIME NOT NULL DEFAULT GETDATE(),
+    
+    CONSTRAINT fk_thanhtoan_ve FOREIGN KEY (ve_id) REFERENCES ve_dat(ve_id) ON DELETE CASCADE,
+    CONSTRAINT chk_trang_thai_tt CHECK (trang_thai IN (N'Đã thanh toán', N'Chờ xử lý', N'Đã hủy')),
+    CONSTRAINT chk_hinh_thuc_tt CHECK (hinh_thuc IN (N'Momo', N'ZaloPay', N'Banking'))
+);
+ALTER TABLE thanh_toan
+ADD so_tien DECIMAL(10, 2) NOT NULL DEFAULT 0;
+
+
+
 
 -- Chèn dữ liệu mẫu vào bảng người dùng
 INSERT INTO nguoi_dung (ten_dang_nhap, mat_khau, ho_ten, email, so_dien_thoai, la_quan_tri) VALUES
@@ -234,14 +252,11 @@ INSERT INTO ve_dat (nguoi_dung_id, suat_chieu_id, thoi_gian_dat, trang_thai, so_
 (2, 3, '2025-06-02 12:00:00', N'Đã đặt', 1);  
 
 -- Chèn dữ liệu mẫu vào bảng chi tiết vé đặt
--- Ví dụ vé đặt 1 chọn ghế A1 (Thường), A2 (Thường), F1 (VIP)
 INSERT INTO chi_tiet_ve_dat (ve_dat_id, ghe_id, gia_ve) VALUES
-(1, 1, 79000),  -- A1, Thường
-(1, 2, 79000),  -- A2, Thường
-(1, 30, 99000); -- F1, VIP
-
-
-  
+(1, 1, 90000), 
+(1, 2, 90000),  
+(2, 4, 80000),  
+(3, 6, 85000);  
 
 -- Tạo chỉ mục để tối ưu truy vấn
 CREATE INDEX idx_ten_dang_nhap ON nguoi_dung(ten_dang_nhap);
@@ -255,6 +270,7 @@ SELECT * FROM ghe;
 SELECT * FROM suat_chieu;
 SELECT * FROM ve_dat;
 SELECT * FROM chi_tiet_ve_dat;
+SELECT * FROM thanh_toan
 
 
 DROP TABLE chi_tiet_ve_dat;
@@ -264,3 +280,4 @@ DROP TABLE ghe;
 DROP TABLE phong_chieu;
 DROP TABLE phim;
 DROP TABLE nguoi_dung;
+DROP TABLE thanh_toan

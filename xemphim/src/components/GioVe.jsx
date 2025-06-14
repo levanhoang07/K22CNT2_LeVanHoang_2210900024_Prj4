@@ -91,6 +91,23 @@ export default function GioVe() {
     <div className="gio-empty gio-message">
       <span className="gio-icon">🛒</span>
       <div>Bạn chưa có vé nào trong giỏ!</div>
+      <button
+        onClick={() => window.location.href = '/'}
+        style={{
+          marginTop: 16,
+          padding: '10px 24px',
+          background: '#e53935',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 8,
+          fontWeight: 600,
+          fontSize: '1rem',
+          cursor: 'pointer',
+          boxShadow: '0 2px 8px rgba(229,57,53,0.12)'
+        }}
+      >
+        Quay lại trang chủ
+      </button>
     </div>
   );
 
@@ -149,7 +166,7 @@ export default function GioVe() {
                             cursor: "pointer",
                             fontWeight: 600
                           }}
-                          onClick={() => window.print()} // hoặc gọi hàm in vé riêng nếu có
+                          onClick={() => window.print()}
                         >
                           In vé
                         </button>
@@ -204,7 +221,6 @@ export default function GioVe() {
                             </div>
                             {hinhThucMap[ve.ve_id] === "Banking" && parseInt(tongTien, 10) > 0 && (
                               <div style={{ marginTop: 12, textAlign: "center" }}>
-                                {/* Đã bỏ phần tạo và hiển thị QR VietQR */}
                               </div>
                             )}
                             {hinhThucMap[ve.ve_id] === "Banking" && parseInt(tongTien, 10) <= 0 && (
