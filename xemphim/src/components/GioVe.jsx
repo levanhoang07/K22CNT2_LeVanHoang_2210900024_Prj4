@@ -14,7 +14,7 @@ export default function GioVe() {
   const [suatChieuList, setSuatChieuList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Thêm state cho thanh toán
+  // state cho thanh toán
   const [showPay, setShowPay] = useState(null); // ve_id đang thanh toán
   const [hinhThucMap, setHinhThucMap] = useState({}); // { [ve_id]: hinhThuc }
   const [payMsg, setPayMsg] = useState("");
@@ -66,6 +66,18 @@ export default function GioVe() {
       setPayMsg("Lỗi khi thanh toán!");
     }
   };
+
+// Hàm xử lý hủy vé
+const handleCancelVe = async (ve_id) => {
+  if (window.confirm("Bạn chắc chắn muốn hủy vé này?")) {
+    try {
+      await axios.delete(`http://localhost:3000/api/vedat/${ve_id}`);
+      fetchVeList();
+    } catch (err) {
+      alert("Đã xảy ra lỗi khi hủy vé. Vui lòng thử lại sau!");
+    }
+  }
+};
 
   // Hàm tính tổng tiền cho từng vé
   function tinhTongTien(ve) {
@@ -195,14 +207,37 @@ export default function GioVe() {
                           onClick={() => setShowPay(ve.ve_id)}
                           style={{
                             padding: "6px 16px",
-                            borderRadius: 6,
-                            background: "#e53935",
+                            borderRadius: 8,
+                            background: "#43a047",
                             color: "#fff",
                             border: "none",
-                            cursor: "pointer"
+                            cursor: "pointer",
+                            transition: "background 0.3s",
+                            boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
                           }}
+                          onMouseOver={(e) => e.currentTarget.style.background = "#388e3c"}
+                          onMouseOut={(e) => e.currentTarget.style.background = "#43a047"}
                         >
                           Thanh toán
+                        </button>
+                        <button
+                          onClick={() => handleCancelVe(ve.ve_id)}
+                          style={{
+                            marginLeft: 8,
+                            padding: "6px 16px",
+                            borderRadius: "8px",
+                            background: "#d32f2f", 
+                            color: "#fff",
+                            border: "none",
+                            cursor: "pointer",
+                            transition: "background 0.3s",
+                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
+                          }}
+                          onMouseOver={(e) => e.currentTarget.style.background = "#b71c1c"} // đỏ sẫm khi hover
+                          onMouseOut={(e) => e.currentTarget.style.background = "#d32f2f"}  // trở lại màu gốc khi rời chuột
+
+                        >
+                          Hủy vé
                         </button>
                       </div>
                       {/* Form thanh toán (hiện khi bấm) */}
@@ -228,7 +263,19 @@ export default function GioVe() {
                             )}
                             <button
                               onClick={() => handlePay(ve)}
-                              style={{ marginTop: 8, padding: "6px 18px", borderRadius: 6, background: "#388e3c", color: "#fff", border: "none", cursor: "pointer" }}
+                              style={{
+                                  marginTop: 8,
+                                  padding: "6px 18px",
+                                  borderRadius: 6,
+                                  background: "#2e7d32",
+                                  color: "#fff",
+                                  border: "none",
+                                  cursor: "pointer",
+                                  transition: "background 0.3s ease",
+                                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
+                                }}
+                                onMouseOver={(e) => e.currentTarget.style.background = "#1b5e20"}
+                                onMouseOut={(e) => e.currentTarget.style.background = "#2e7d32"}
                             >
                               Xác nhận thanh toán
                             </button>

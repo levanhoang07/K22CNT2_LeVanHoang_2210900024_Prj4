@@ -135,6 +135,15 @@ export default function DatVe() {
     }
   };
 
+  const handleDatVe = () => {
+    if (!user) {
+      alert("Bạn cần đăng nhập để đặt vé!");
+      navigate("/dangnhap");
+      return;
+    }
+    handleXacNhanDatVe();
+  };
+
   if (loading)
     return (
       <div className="dv-loading">
@@ -235,7 +244,7 @@ export default function DatVe() {
               <Link to="/" className="dv-btn dv-btn-home"> Quay lại Trang chủ</Link>
               {rap && suatChieu && gheDaChon.length > 0 ? (
                 <button
-                  onClick={handleXacNhanDatVe}
+                  onClick={handleDatVe}
                   className="dv-btn dv-btn-xacnhan"
                 >
                   Xác nhận đặt vé

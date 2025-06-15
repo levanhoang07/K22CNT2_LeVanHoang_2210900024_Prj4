@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-
+import ReactToPrint from "react-to-print";
 // Trang/Component in vé xem phim
 const InVe = forwardRef(function InVe({ ve, phim, suat, gheArr, tongTien, user }, ref) {
   return (

@@ -29,7 +29,9 @@ export default function About() {
       {/* HEADER */}
       <header className="header">
         <div className="header-container">
-          <span className="site-logo">DOREMI <span className="logo-red">CINEMA</span></span>
+          <Link to="/" className="site-logo" style={{ textDecoration: "none", color: "inherit" }}>
+            DOREMI <span className="logo-red">CINEMA</span>
+          </Link>
           <div
             className="mobile-menu-toggle"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
