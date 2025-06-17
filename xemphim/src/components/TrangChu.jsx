@@ -105,7 +105,7 @@ export default function TrangChu() {
                     >
                       Đăng nhập
                     </Link>
-                  </li>
+                  </li>|
                   <li>
                     <Link
                       to="/dangky"
@@ -133,7 +133,7 @@ export default function TrangChu() {
             <div className="search-bar">
               <input
                 type="text"
-                placeholder="Tìm kiếm phim..."
+                placeholder="Bạn muốn xem phim gì hôm nay?"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -419,6 +419,7 @@ export default function TrangChu() {
             font-size: 1.5rem;
             padding: 1rem;
           }
+          
           .greeting {
             font-size: 1.5rem;
             padding: 1rem;

@@ -10,8 +10,8 @@ export default function Locations() {
       <header className="header">
         <div className="header-container">
           <Link to="/" className="site-logo" style={{ textDecoration: "none", color: "inherit" }}>
-      DOREMI <span className="logo-red">CINEMA</span>
-    </Link>
+            DOREMI <span className="logo-red">CINEMA</span>
+          </Link>
           <div
             className="mobile-menu-toggle"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
