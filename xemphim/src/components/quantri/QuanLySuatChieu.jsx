@@ -158,20 +158,7 @@ const QuanLySuatChieu = () => {
           onChange={handleChange}
           required
         />
-        <button
-          type="submit"
-          style={{
-            backgroundColor: '#27ae60',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 5,
-            padding: '8px 16px',
-            fontWeight: 600,
-            cursor: 'pointer'
-          }}
-        >
-          {editing ? 'Cập nhật suất chiếu' : 'Thêm suất chiếu'}
-        </button>
+        <button type="submit">{editing ? 'Cập nhật suất chiếu' : 'Thêm suất chiếu'}</button>
         {editing && (
           <button type="button" className="form-cancel" onClick={handleCancelEdit}>Huỷ chỉnh sửa</button>
         )}

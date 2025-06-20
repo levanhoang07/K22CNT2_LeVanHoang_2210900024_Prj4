@@ -4,13 +4,12 @@ from flask_cors import CORS
 from flask import request, jsonify
 from datetime import datetime
 
-
 app = flask.Flask(__name__)
 CORS(app)
 def get_db_connection():
     conn_str = (
         "Driver={SQL Server};"
-        "Server=LEVANHOANG\\SQLEXPRESS;"
+        "Server=TDV-LAPTOP\DUYVU;"
         "Database=Ve_Xem_Phim;"
         "Trusted_Connection=yes;"
     )
@@ -512,28 +511,5 @@ def xoa_thanh_toan(thanh_toan_id):
         return flask.jsonify({'success': True, 'message': 'Xóa thanh toán thành công'}), 200
     except Exception as e:
         return flask.jsonify({'success': False, 'message': str(e)}), 500
-# hủy vé từ người dùng      
-@app.route('/api/vedat/<int:ve_id>', methods=['PUT'])
-def cap_nhat_trang_thai_ve(ve_id):
-    try:
-        data = request.json
-        trang_thai = data.get('trang_thai', None)
-        if not trang_thai:
-            return jsonify({'error': 'Thiếu trường trạng_thai'}), 400
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("UPDATE vedat SET trang_thai = ? WHERE ve_id = ?", (trang_thai, ve_id))
-        conn.commit()
-        updated = cursor.rowcount
-        cursor.close()
-        conn.close()
-
-        if updated == 0:
-            return jsonify({'error': 'Vé không tồn tại'}), 404
-
-        return jsonify({'success': True, 've_id': ve_id, 'trang_thai': trang_thai}), 200
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
 if __name__ == '__main__':
     app.run(debug=True, port=3000)

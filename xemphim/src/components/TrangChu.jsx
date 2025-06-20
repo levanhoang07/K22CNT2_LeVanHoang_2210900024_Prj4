@@ -53,9 +53,7 @@ export default function TrangChu() {
       {/* HEADER */}
       <header className="header">
         <div className="header-container">
-          <Link to="/" className="site-logo" style={{ textDecoration: "none", color: "inherit" }}>
-            DOREMI <span className="logo-red">CINEMA</span>
-          </Link>
+          <span className="site-logo">DOREMI <span className="logo-red">CINEMA</span></span>
           <div
             className="mobile-menu-toggle"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -105,7 +103,7 @@ export default function TrangChu() {
                     >
                       Đăng nhập
                     </Link>
-                  </li>|
+                  </li>
                   <li>
                     <Link
                       to="/dangky"
@@ -133,7 +131,7 @@ export default function TrangChu() {
             <div className="search-bar">
               <input
                 type="text"
-                placeholder="Bạn muốn xem phim gì hôm nay?"
+                placeholder="Tìm kiếm phim..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -419,7 +417,6 @@ export default function TrangChu() {
             font-size: 1.5rem;
             padding: 1rem;
           }
-          
           .greeting {
             font-size: 1.5rem;
             padding: 1rem;

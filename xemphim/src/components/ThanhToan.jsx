@@ -50,8 +50,11 @@ export default function ThanhToan() {
         </select>
         <button type="submit">Thanh toán</button>
       </form>
+
+      {/* Hiện QR nếu chọn Banking */}
       {hinh_thuc === "Banking" && so_tien && Number(so_tien) > 0 && (
         <div style={{ marginTop: 16, textAlign: "center" }}>
+          {/* Đã bỏ phần tạo và hiển thị QR VietQR */}
         </div>
       )}
       {/* Cảnh báo nếu số tiền không hợp lệ */}

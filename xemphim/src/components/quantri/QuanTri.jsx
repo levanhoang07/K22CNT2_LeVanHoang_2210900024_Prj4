@@ -29,8 +29,8 @@ export default function QuanTri() {
                     <button
                       onClick={handleLogout}
                       className="logout-button"
-                      onMouseEnter={() => setLogoutHover(true)} 
-                      onMouseLeave={() => setLogoutHover(false)}
+                      onMouseEnter={() => setLogoutHover(true)} // Now defined
+                      onMouseLeave={() => setLogoutHover(false)} // Now defined
                     >
                       Đăng xuất
                     </button>
@@ -45,16 +45,15 @@ export default function QuanTri() {
       {/* Main Content */}
       <div style={styles.container}>
         <div style={styles.sidebar}>
-          <h2 style={styles.sidebarTitle}>Doremi Cinema</h2>
+          <h2 style={styles.sidebarTitle}>🎬 Doremi Cinema</h2>
           <nav style={styles.nav}>
-            <Link to="nguoidung" style={styles.navLink}>👤 Quản lý người dùng</Link>
-<Link to="phim" style={styles.navLink}>🎬 Quản lý phim</Link>
-<Link to="phongchieu" style={styles.navLink}>🏢 Quản lý phòng chiếu</Link>
-<Link to="suatchieu" style={styles.navLink}>⏰ Quản lý suất chiếu</Link>
-<Link to="ghe" style={styles.navLink}>💺 Quản lý ghế</Link>
-<Link to="vedat" style={styles.navLink}>🎟️ Quản lý vé đặt</Link>
-<Link to="thanhtoan" style={styles.navLink}>💳 Quản lý thanh toán</Link>
-
+            <Link to="nguoidung" style={styles.navLink}>Quản lý người dùng</Link>
+            <Link to="phim" style={styles.navLink}>Quản lý phim</Link>
+            <Link to="phongchieu" style={styles.navLink}>Quản lý phòng chiếu</Link>
+            <Link to="suatchieu" style={styles.navLink}>Quản lý suất chiếu</Link>
+            <Link to="thanhtoan" style={styles.navLink}>Quản lý thanh toán</Link>
+            <Link to="ghe" style={styles.navLink}>Quản lý ghế</Link>
+            <Link to="vedat" style={styles.navLink}>Quản lý vé đặt</Link>
           </nav>
         </div>
 
@@ -119,9 +118,6 @@ export default function QuanTri() {
           color: rgb(45, 163, 53);
           text-shadow: 0 0 10px #35E547, 0 1px 0 #fff;
           letter-spacing: .5px;
-           min-width: 160px;
-          display: inline-block;
-          white-space: nowrap;
         }
         .logout-button {
           background: linear-gradient(90deg,rgb(53, 229, 71) 60%,rgb(153, 255, 167) 100%);
@@ -134,7 +130,6 @@ export default function QuanTri() {
           font-weight: 700;
           box-shadow: 0 4px 15px rgba(229,35,53,.18);
           transition: background .3s, box-shadow .3s, transform .2s;
-          white-space: nowrap;
         }
         .logout-button:hover {
           background: linear-gradient(90deg, #b71c1c 60%, #e57373 100%);

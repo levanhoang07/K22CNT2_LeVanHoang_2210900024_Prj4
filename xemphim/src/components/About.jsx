@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useRef, useEffect, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from "./context/AuthContext";
 
 // Hook hiệu ứng cuộn hiện nội dung
 function useInView(threshold = 0.15) {
@@ -20,18 +21,39 @@ function useInView(threshold = 0.15) {
 }
 
 export default function About() {
+  const { user, logout, isAdmin } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hoveredLink, setHoveredLink] = useState(null);
+  const [isLogoutHover, setIsLogoutHover] = useState(false);
+  const [soLuongVe, setSoLuongVe] = useState(0);
+
   const [ref1, inView1] = useInView();
   const [ref2, inView2] = useInView();
+
+  const nguoiDungId = user?.nguoidung_id || user?.id;
+  useEffect(() => {
+    if (!nguoiDungId) {
+      setSoLuongVe(0);
+      return;
+    }
+    fetch(`http://localhost:3000/api/vedat?nguoidung_id=${nguoiDungId}`)
+      .then(res => res.json())
+      .then(data => setSoLuongVe(data.length))
+      .catch(() => setSoLuongVe(0));
+  }, [nguoiDungId]);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <>
       {/* HEADER */}
       <header className="header">
         <div className="header-container">
-          <Link to="/" className="site-logo" style={{ textDecoration: "none", color: "inherit" }}>
-            DOREMI <span className="logo-red">CINEMA</span>
-          </Link>
+          <span className="site-logo">DOREMI <span className="logo-red">CINEMA</span></span>
           <div
             className="mobile-menu-toggle"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -48,14 +70,54 @@ export default function About() {
               <li><Link to="/locations">Cụm rạp</Link></li>
               <li><Link to="/about">Giới Thiệu</Link></li>
               <li><Link to="/contact">Liên Hệ</Link></li>
+              <li>
+                <Link to="/giove" className="cart-icon" title="Giỏ vé của bạn">
+                  <span className="icon">🛒</span>
+                  <span className="badge">{soLuongVe}</span>
+                </Link>
+              </li>
+              {user && !isAdmin ? (
+                <>
+                  <li>
+                    <span className="greeting">Xin chào, {user.ho_ten}</span>
+                  </li>
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="logout-button"
+                      onMouseEnter={() => setIsLogoutHover(true)}
+                      onMouseLeave={() => setIsLogoutHover(false)}
+                    >
+                      Đăng xuất
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link
+                      to="/dangnhap"
+                      className="nav-link"
+                      onMouseEnter={() => setHoveredLink("/dangnhap")}
+                      onMouseLeave={() => setHoveredLink(null)}
+                    >
+                      Đăng nhập
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/dangky"
+                      className="nav-link"
+                      onMouseEnter={() => setHoveredLink("/dangky")}
+                      onMouseLeave={() => setHoveredLink(null)}
+                    >
+                      Đăng ký
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </nav>
-          <div className="header-actions">
-            <Link to="/giove" className="cart-icon" title="Giỏ vé của bạn">
-              <span className="icon">🛒</span>
-              <span className="badge">0</span>
-            </Link>
-          </div>
         </div>
       </header>
 
@@ -124,7 +186,7 @@ export default function About() {
                   <strong>Sứ mệnh:</strong> Mang đến trải nghiệm điện ảnh tuyệt vời, kết nối cộng đồng yêu phim, lan tỏa cảm xúc tích cực và sáng tạo cho mọi thế hệ.
                 </p>
                 <ul>
-                  <li>Không gian hiện đại, phòng chiếu chuẩn quốc tế</li>
+                  <p>Không gian hiện đại, phòng chiếu chuẩn quốc tế</p>
                   <li>Đội ngũ nhân viên thân thiện, chuyên nghiệp</li>
                   <li>Dịch vụ đặt vé, thanh toán tiện lợi</li>
                   <li>Nhiều ưu đãi hấp dẫn cho thành viên</li>
@@ -138,7 +200,7 @@ export default function About() {
         </section>
       </main>
 
-      {/* FOOTER */}
+      {/* FOOTER giữ nguyên */}
       <footer className="footer">
         <div className="footer-container">
           <div className="footer-section">
@@ -165,6 +227,7 @@ export default function About() {
           <div className="footer-section">
             <h4>Theo dõi chúng tôi</h4>
             <div className="social-links">
+              {/* ...icon SVG như TrangChu.jsx... */}
               <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Facebook">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
@@ -193,14 +256,25 @@ export default function About() {
         </div>
       </footer>
 
+      {/* CSS giống Locations.jsx */}
       <style>{`
+        .greeting,
+        .header-actions,
+        .nav-links li,
+        .nav-links.plain-links a {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: inline-block;
+          vertical-align: middle;
+        }
         body {
           font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
           background: #555555;
           color: #222;
         }
         .main-content {
-          background:rgb(45, 41, 41);
+          background: rgb(45, 41, 41);
         }
         .header {
           background: #111;
@@ -234,6 +308,7 @@ export default function About() {
         .nav-links {
           display: flex;
           list-style: none;
+          align-items: center;
         }
         .nav-links li {
           margin: 0 0.2rem;
@@ -261,6 +336,31 @@ export default function About() {
           background: none !important;
           color: #e53935;
         }
+        .greeting {
+          font-size: 1rem;
+          font-weight: 700;
+          color: #fffde7;
+          text-shadow: 0 0 10px #e53935, 0 1px 0 #fff;
+          letter-spacing: 0.5px;
+          padding: 0.7rem 1.2rem;
+        }
+        .logout-button {
+          background: linear-gradient(90deg, #e53935 60%, #ffb199 100%);
+          color: #fff;
+          border: none;
+          padding: 0.7rem 1.2rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 1rem;
+          font-weight: 700;
+          box-shadow: 0 4px 15px rgba(229,57,53,0.18);
+          transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+        }
+        .logout-button:hover {
+          background: linear-gradient(90deg, #b71c1c 60%, #e57373 100%);
+          box-shadow: 0 6px 20px rgba(183, 28, 28, 0.85);
+          transform: scale(1.05);
+        }
         .header-actions {
           display: flex;
           align-items: center;
@@ -278,8 +378,8 @@ export default function About() {
         }
         .cart-icon .badge {
           position: absolute;
-          top: -6px;
-          right: -10px;
+          top: -0px;
+          right: -0px;
           background: #e53935;
           color: white;
           border-radius: 50%;
@@ -331,7 +431,11 @@ export default function About() {
             margin: 0.5rem 0;
             text-align: center;
           }
-          .nav-links a {
+          .nav-links a, .logout-button {
+            font-size: 1.5rem;
+            padding: 1rem;
+          }
+          .greeting {
             font-size: 1.5rem;
             padding: 1rem;
           }
@@ -340,6 +444,9 @@ export default function About() {
           }
           .mobile-menu-toggle {
             display: flex;
+          }
+          .hero-content h1 {
+            font-size: 1.3rem;
           }
         }
         /* HERO BANNER */
@@ -374,118 +481,58 @@ export default function About() {
           margin-bottom: 0;
           color: #fff;
         }
-        /* ABOUT SECTION */
+        /* ABOUT SECTION (giữ nguyên hiệu ứng cuộn) */
         .about-section {
-          max-width: 1100px;
-          margin: 2.5rem auto 2rem auto;
-          padding: 0 1rem;
+          padding: 3rem 0 4rem 0;
         }
         .about-row {
           display: flex;
-          align-items: stretch;
+          align-items: center;
+          justify-content: center;
           gap: 2.5rem;
-          margin-bottom: 2.5rem;
+          margin-bottom: 3.5rem;
           opacity: 0;
-          transform: translateY(40px);
-          transition: all 0.8s cubic-bezier(0.4,0,0.2,1);
-          background: #fff;
-          border-radius: 18px;
-          box-shadow: 0 4px 24px rgba(229,57,53,0.08);
+          transform: translateY(60px);
+          transition: opacity 0.8s cubic-bezier(0.4,0,0.2,1), transform 0.8s cubic-bezier(0.4,0,0.2,1);
         }
-        .about-row.about-inview {
+        .about-inview {
           opacity: 1;
-          transform: translateY(0);
+          transform: none;
         }
         .about-row-reverse {
           flex-direction: row-reverse;
         }
         .about-img {
-          flex: 1 1 340px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          background: linear-gradient(120deg, #fbe9e7 0%, #fff 100%);
-          border-radius: 18px 0 0 18px;
-          padding: 2rem 1rem;
-        }
-        .about-row-reverse .about-img {
-          border-radius: 0 18px 18px 0;
+          flex: 1 1 320px;
+          min-width: 260px;
+          max-width: 400px;
         }
         .about-img img {
           width: 100%;
-          max-width: 370px;
-          border-radius: 12px;
-          box-shadow: 0 4px 18px rgba(229,57,53,0.10);
-          object-fit: cover;
-          margin-bottom: 0.5rem;
-        }
-        .about-img-link {
-          color: #e53935;
-          font-size: 0.95rem;
-          text-decoration: underline;
-          margin-top: 0.2rem;
-          transition: color 0.2s;
-        }
-        .about-img-link:hover {
-          color: #111;
+          border-radius: 18px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.18);
         }
         .about-text {
           flex: 2 1 400px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          padding: 2rem 2rem 2rem 0;
-        }
-        .about-row-reverse .about-text {
-          padding: 2rem 0 2rem 2rem;
+          color: #fff;
         }
         .about-title {
           color: #e53935;
-          font-size: 2rem;
-          font-weight: 700;
+          font-size: 1.5rem;
           margin-bottom: 1.2rem;
         }
-        .about-feature-list p {
-          font-size: 1.05rem;
-          color: #444;
-          margin-bottom: 1rem;
-          line-height: 1.8;
-        }
         .about-feature-list ul {
-          margin-left: 1.2rem;
-          margin-bottom: 1rem;
+          margin: 0.7rem 0 0.7rem 1.2rem;
+          padding: 0;
+          color: #fff;
         }
         .about-feature-list li {
-          font-size: 1rem;
-          color: #444;
-          margin-bottom: 0.3rem;
-          list-style: disc;
+          margin-bottom: 0.5rem;
+          font-size: 1.08rem;
         }
-        @media (max-width: 1024px) {
-          .about-row, .about-row-reverse {
-            flex-direction: column !important;
-            gap: 1.5rem;
-            border-radius: 18px;
-          }
-          .about-img, .about-row-reverse .about-img {
-            border-radius: 18px 18px 0 0 !important;
-            padding: 1.2rem 0.5rem;
-          }
-          .about-text, .about-row-reverse .about-text {
-            padding: 1.2rem 0.5rem;
-          }
-        }
-        @media (max-width: 768px) {
-          .about-section {
-            padding: 0 0.3rem;
-          }
-          .about-title {
-            font-size: 1.3rem;
-          }
-          .hero-content h1 {
-            font-size: 1.3rem;
-          }
+        .about-section p {
+          color: #fff;
+          font-size: 1.1rem;
         }
         /* FOOTER */
         .footer {
@@ -557,13 +604,21 @@ export default function About() {
           font-size: 0.98rem;
           color: #bdbdbd;
         }
-        @media (max-width: 768px) {
-          .footer-container {
-            grid-template-columns: 1fr;
-            text-align: center;
+        @media (max-width: 1024px) {
+          .about-row {
+            flex-direction: column !important;
+            gap: 1.5rem;
           }
-          .social-links {
-            justify-content: center;
+        }
+        @media (max-width: 600px) {
+          .about-row {
+            flex-direction: column !important;
+            gap: 1rem;
+          }
+          .about-img,
+          .about-text {
+            min-width: 0;
+            max-width: 100%;
           }
         }
       `}</style>

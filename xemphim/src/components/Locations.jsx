@@ -1,49 +1,130 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "./context/AuthContext";
 
 export default function Locations() {
+  const { user, logout, isAdmin } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hoveredLink, setHoveredLink] = useState(null);
+  const [isLogoutHover, setLogoutHover] = useState(false);
+  const [soLuongVe, setSoLuongVe] = useState(0);
+
+  // Lấy số lượng vé giống TrangChu.jsx
+  const nguoiDungId = user?.nguoidung_id || user?.id;
+  useEffect(() => {
+    if (!nguoiDungId) {
+      setSoLuongVe(0);
+      return;
+    }
+    fetch(`http://localhost:3000/api/vedat?nguoidung_id=${nguoiDungId}`)
+      .then(res => res.json())
+      .then(data => setSoLuongVe(data.length))
+      .catch(() => setSoLuongVe(0));
+  }, [nguoiDungId]);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <>
       {/* HEADER */}
       <header className="header">
         <div className="header-container">
-          <Link to="/" className="site-logo" style={{ textDecoration: "none", color: "inherit" }}>
+          <span className="site-logo">
             DOREMI <span className="logo-red">CINEMA</span>
-          </Link>
+          </span>
           <div
             className="mobile-menu-toggle"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter') setIsMenuOpen(!isMenuOpen)}}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") setIsMenuOpen(!isMenuOpen);
+            }}
           >
-            <span></span><span></span><span></span>
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
-          <nav className={`main-nav ${isMenuOpen ? 'open' : ''}`}>
+          <nav className={`main-nav ${isMenuOpen ? "open" : ""}`}>
             <ul className="nav-links plain-links">
-              <li><Link to="/">Trang Chủ</Link></li>
-              <li><Link to="/locations">Cụm rạp</Link></li>
-              <li><Link to="/about">Giới Thiệu</Link></li>
-              <li><Link to="/contact">Liên Hệ</Link></li>
+              <li>
+                <Link to="/">Trang Chủ</Link>
+              </li>
+              <li>
+                <Link to="/locations">Cụm rạp</Link>
+              </li>
+              <li>
+                <Link to="/about">Giới Thiệu</Link>
+              </li>
+              <li>
+                <Link to="/contact">Liên Hệ</Link>
+              </li>
+              <div className="header-actions">
+                <Link to="/giove" className="cart-icon" title="Giỏ vé của bạn">
+                  <span className="icon">🛒</span>
+                  <span className="badge">{soLuongVe}</span>
+                </Link>
+              </div>
+              {user && !isAdmin ? (
+                <>
+                  <li>
+                    <span className="greeting">Xin chào, {user.ho_ten}</span>
+                  </li>
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="logout-button"
+                      onMouseEnter={() => setLogoutHover(true)}
+                      onMouseLeave={() => setLogoutHover(false)}
+                    >
+                      Đăng xuất
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link
+                      to="/dangnhap"
+                      className="nav-link"
+                      onMouseEnter={() => setHoveredLink("/dangnhap")}
+                      onMouseLeave={() => setHoveredLink(null)}
+                    >
+                      Đăng nhập
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/dangky"
+                      className="nav-link"
+                      onMouseEnter={() => setHoveredLink("/dangky")}
+                      onMouseLeave={() => setHoveredLink(null)}
+                    >
+                      Đăng ký
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </nav>
-          <div className="header-actions">
-            <Link to="/giove" className="cart-icon" title="Giỏ vé của bạn">
-              <span className="icon">🛒</span>
-              <span className="badge">0</span>
-            </Link>
-          </div>
         </div>
       </header>
 
+      {/* HERO BANNER */}
       <section className="hero-banner">
         <div className="hero-overlay"></div>
         <div className="hero-content">
-          <h1>Hệ Thống <span className="logo-red">RẠP CHIẾU PHIM</span></h1>
-          <p>Chọn rạp gần bạn nhất để trải nghiệm điện ảnh đỉnh cao cùng Doremi Cinema!</p>
+          <h1>
+            Hệ Thống <span className="logo-red">RẠP CHIẾU PHIM</span>
+          </h1>
+          <p>
+            Chọn rạp gần bạn nhất để trải nghiệm điện ảnh đỉnh cao cùng Doremi Cinema!
+          </p>
         </div>
       </section>
 
@@ -51,100 +132,133 @@ export default function Locations() {
         <section className="movies-section">
           <div className="container">
             <div className="movies-grid">
-
               <article className="movie-card">
                 <div className="movie-image">
-                  <img src="https://th.bing.com/th/id/OIP.d-rWdo6XTgcHkrqvvwZ_3gHaDt?rs=1&pid=ImgDetMain" alt="Hà Nội" />
+                  <img
+                    src="https://th.bing.com/th/id/OIP.d-rWdo6XTgcHkrqvvwZ_3gHaDt?rs=1&pid=ImgDetMain"
+                    alt="Hà Nội"
+                  />
                 </div>
                 <div className="movie-content">
                   <h3 className="movie-title">Hà Nội</h3>
-                  <p className="movie-description"><strong>Địa chỉ:</strong> Số 25 Vũ Ngọc Phan, Láng Hạ, Đống Đa, Hà Nội</p>
-                  <p className="movie-description">Rạp chiếu được trang bị công nghệ màn hình lớn, âm thanh sống động, phục vụ đa dạng thể loại phim mới nhất.</p>
+                  <p className="movie-description">
+                    <strong>Địa chỉ:</strong> Số 25 Vũ Ngọc Phan, Láng Hạ, Đống Đa, Hà Nội
+                  </p>
+                  <p className="movie-description">
+                    Rạp chiếu được trang bị công nghệ màn hình lớn, âm thanh sống động, phục vụ đa dạng thể loại phim mới nhất.
+                  </p>
                 </div>
               </article>
-
               <article className="movie-card">
                 <div className="movie-image">
-                  <img src="https://thumbs.dreamstime.com/b/3d-cinema-15318377.jpg" alt="Vĩnh Phúc" />
+                  <img
+                    src="https://thumbs.dreamstime.com/b/3d-cinema-15318377.jpg"
+                    alt="Vĩnh Phúc"
+                  />
                 </div>
                 <div className="movie-content">
                   <h3 className="movie-title">Vĩnh Phúc</h3>
-                  <p className="movie-description"><strong>Địa chỉ:</strong> Số 88 Hoàng Hoa Thám, Ngọc Thanh, Phúc Yên, Vĩnh Phúc</p>
-                  <p className="movie-description">Không gian thân thiện, dịch vụ chuyên nghiệp, thuận tiện cho gia đình và nhóm bạn.</p>
+                  <p className="movie-description">
+                    <strong>Địa chỉ:</strong> Số 88 Hoàng Hoa Thám, Ngọc Thanh, Phúc Yên, Vĩnh Phúc
+                  </p>
+                  <p className="movie-description">
+                    Không gian thân thiện, dịch vụ chuyên nghiệp, thuận tiện cho gia đình và nhóm bạn.
+                  </p>
                 </div>
               </article>
-
               <article className="movie-card">
                 <div className="movie-image">
-                  <img src="https://smartschoolsolutions.in/wp-content/uploads/2022/08/pim-pr-img27.webp" alt="Đà Nẵng" />
+                  <img
+                    src="https://smartschoolsolutions.in/wp-content/uploads/2022/08/pim-pr-img27.webp"
+                    alt="Đà Nẵng"
+                  />
                 </div>
                 <div className="movie-content">
                   <h3 className="movie-title">Đà Nẵng</h3>
-                  <p className="movie-description"><strong>Địa chỉ:</strong> Tầng 4, TTTM Vincom Đà Nẵng, Ngô Quyền, P. An Hải Bắc, Q. Sơn Trà, Tp. Đà Nẵng</p>
-                  <p className="movie-description">Địa điểm lý tưởng cho các tín đồ điện ảnh, gần trung tâm thành phố, dễ dàng di chuyển.</p>
+                  <p className="movie-description">
+                    <strong>Địa chỉ:</strong> Tầng 4, TTTM Vincom Đà Nẵng, Ngô Quyền, P. An Hải Bắc, Q. Sơn Trà, Tp. Đà Nẵng
+                  </p>
+                  <p className="movie-description">
+                    Địa điểm lý tưởng cho các tín đồ điện ảnh, gần trung tâm thành phố, dễ dàng di chuyển.
+                  </p>
                 </div>
               </article>
-
             </div>
           </div>
         </section>
       </main>
 
-{/* FOOTER */}
-        <footer className="footer">
-          <div className="footer-container">
-            <div className="footer-section">
-              <h3>Doremi Cinema</h3>
-              <p>Tại đây, mỗi suất chiếu không chỉ đơn thuần là một bộ phim – mà là một hành trình cảm xúc sống động, nơi bạn được đắm chìm trong không gian hiện đại, thưởng thức những kiệt tác điện ảnh đỉnh cao và cảm nhận dịch vụ đẳng cấp với sự chăm sóc chu đáo đến từng chi tiết.</p>
+      {/* FOOTER */}
+      <footer className="footer">
+        <div className="footer-container">
+          <div className="footer-section">
+            <h3>Doremi Cinema</h3>
+            <p>
+              Tại đây, mỗi suất chiếu không chỉ đơn thuần là một bộ phim – mà là một hành trình cảm xúc sống động, nơi bạn được đắm chìm trong không gian hiện đại, thưởng thức những kiệt tác điện ảnh đỉnh cao và cảm nhận dịch vụ đẳng cấp với sự chăm sóc chu đáo đến từng chi tiết.
+            </p>
+          </div>
+          <div className="footer-section">
+            <h4>Liên kết nhanh</h4>
+            <ul>
+              <li>
+                <Link to="/">Trang Chủ</Link>
+              </li>
+              <li>
+                <Link to="/locations">Cụm Rạp</Link>
+              </li>
+              <li>
+                <Link to="/about">Giới Thiệu</Link>
+              </li>
+              <li>
+                <Link to="/contact">Liên Hệ</Link>
+              </li>
+              <li>
+                <Link to="/dangnhap">Đăng Nhập</Link>
+              </li>
+              <li>
+                <Link to="/dangky">Đăng Ký</Link>
+              </li>
+            </ul>
+          </div>
+          <div className="footer-section">
+            <h4>Liên hệ</h4>
+            <p>Email: support@doremicinema.com</p>
+            <p>Điện thoại: 0982121680</p>
+            <p>Địa chỉ: Tòa nhà Thủy Lợi 28A Lê Trọng Tấn, Hà Đông, Hà Nội</p>
+          </div>
+          <div className="footer-section">
+            <h4>Theo dõi chúng tôi</h4>
+            <div className="social-links">
+              {/* ...icon SVG như TrangChu.jsx... */}
+              <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Facebook">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+                </svg>
+              </a>
+              <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Twitter">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                </svg>
+              </a>
+              <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.948-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+              </a>
+              <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="YouTube">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+                </svg>
+              </a>
             </div>
-              <div className="footer-section">
-                <h4>Liên kết nhanh</h4>
-                <ul>
-                  <li><Link to="/">Trang Chủ</Link></li>
-                  <li><Link to="/locations">Cụm Rạp</Link></li>
-                  <li><Link to="/about">Giới Thiệu</Link></li>
-                  <li><Link to="/contact">Liên Hệ</Link></li>
-                  <li><Link to="/dangnhap">Đăng Nhập</Link></li>
-                  <li><Link to="/dangky">Đăng Ký</Link></li>
-                </ul>
-              </div>
-              <div className="footer-section">
-                <h4>Liên hệ</h4>
-                <p>Email: support@doremicinema.com</p>
-                <p>Điện thoại: 0982121680</p>
-                <p>Địa chỉ: Tòa nhà Thủy Lợi 28A Lê Trọng Tấn, Hà Đông, Hà Nội</p>
-              </div>
-              <div className="footer-section">
-                <h4>Theo dõi chúng tôi</h4>
-                <div className="social-links">
-                  <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Facebook">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
-                    </svg>
-                  </a>
-                  <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Twitter">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                    </svg>
-                  </a>
-                  <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Instagram">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.948-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                    </svg>
-                  </a>
-                  <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="YouTube">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
-                    </svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="footer-bottom">
-              <p>© 2025 Doremi Cinema. Nơi dâng trào cảm xúc.</p>
-            </div>
-          </footer>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <p>© 2025 Doremi Cinema. Nơi dâng trào cảm xúc.</p>
+        </div>
+      </footer>
 
+      {/* CSS giống TrangChu.jsx */}
       <style>{`
         body {
           font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;

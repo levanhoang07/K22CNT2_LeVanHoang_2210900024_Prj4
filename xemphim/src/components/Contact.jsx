@@ -1,41 +1,116 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "./context/AuthContext";
 
 export default function Contact() {
+  const { user, logout, isAdmin } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hoveredLink, setHoveredLink] = useState(null);
+  const [isLogoutHover, setLogoutHover] = useState(false);
+  const [soLuongVe, setSoLuongVe] = useState(0);
+
+  const nguoiDungId = user?.nguoidung_id || user?.id;
+  useEffect(() => {
+    if (!nguoiDungId) {
+      setSoLuongVe(0);
+      return;
+    }
+    fetch(`http://localhost:3000/api/vedat?nguoidung_id=${nguoiDungId}`)
+      .then(res => res.json())
+      .then(data => setSoLuongVe(data.length))
+      .catch(() => setSoLuongVe(0));
+  }, [nguoiDungId]);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <>
       {/* HEADER */}
       <header className="header">
         <div className="header-container">
-          <Link to="/" className="site-logo" style={{ textDecoration: "none", color: "inherit" }}>
+          <span className="site-logo">
             DOREMI <span className="logo-red">CINEMA</span>
-          </Link>
+          </span>
           <div
             className="mobile-menu-toggle"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter') setIsMenuOpen(!isMenuOpen); }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") setIsMenuOpen(!isMenuOpen);
+            }}
           >
-            <span></span><span></span><span></span>
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
-          <nav className={`main-nav ${isMenuOpen ? 'open' : ''}`}>
+          <nav className={`main-nav ${isMenuOpen ? "open" : ""}`}>
             <ul className="nav-links plain-links">
-              <li><Link to="/">Trang Chủ</Link></li>
-              <li><Link to="/locations">Cụm rạp</Link></li>
-              <li><Link to="/about">Giới Thiệu</Link></li>
-              <li><Link to="/contact">Liên Hệ</Link></li>
+              <li>
+                <Link to="/">Trang Chủ</Link>
+              </li>
+              <li>
+                <Link to="/locations">Cụm rạp</Link>
+              </li>
+              <li>
+                <Link to="/about">Giới Thiệu</Link>
+              </li>
+              <li>
+                <Link to="/contact">Liên Hệ</Link>
+              </li>
+              <li>
+                <Link to="/giove" className="cart-icon" title="Giỏ vé của bạn">
+                  <span className="icon">🛒</span>
+                  <span className="badge">{soLuongVe}</span>
+                </Link>
+              </li>
+              {user && !isAdmin ? (
+                <>
+                  <li>
+                    <span className="greeting">Xin chào, {user.ho_ten}</span>
+                  </li>
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="logout-button"
+                      onMouseEnter={() => setLogoutHover(true)}
+                      onMouseLeave={() => setLogoutHover(false)}
+                    >
+                      Đăng xuất
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link
+                      to="/dangnhap"
+                      className="nav-link"
+                      onMouseEnter={() => setHoveredLink("/dangnhap")}
+                      onMouseLeave={() => setHoveredLink(null)}
+                    >
+                      Đăng nhập
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/dangky"
+                      className="nav-link"
+                      onMouseEnter={() => setHoveredLink("/dangky")}
+                      onMouseLeave={() => setHoveredLink(null)}
+                    >
+                      Đăng ký
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </nav>
-          <div className="header-actions">
-            <Link to="/giove" className="cart-icon" title="Giỏ vé của bạn">
-              <span className="icon">🛒</span>
-              <span className="badge">0</span>
-            </Link>
-          </div>
         </div>
       </header>
 
@@ -49,63 +124,63 @@ export default function Contact() {
       </section>
 
       {/* CONTACT MAIN */}
-<main className="main-content">
-  <section className="contact-section">
-    <div className="container">
-      <h1 className="contact-title">Liên Hệ Với Chúng Tôi</h1>
-      <div className="contact-info-grid">
-        <div className="contact-info-item">
-          <i className="fas fa-building icon"></i>
-          <div>
-            <h3>TRỤ SỞ</h3>
-            <p>Số 28A Lê Trọng Tấn, Phường La Khê, Quận Hà Đông , Tp.Hà Nội</p>
+      <main className="main-content">
+        <section className="contact-section">
+          <div className="container">
+            <h1 className="contact-title">Liên Hệ Với Chúng Tôi</h1>
+            <div className="contact-info-grid">
+              <div className="contact-info-item">
+                <i className="fas fa-building icon"></i>
+                <div>
+                  <h3>TRỤ SỞ</h3>
+                  <p>Số 28A Lê Trọng Tấn, Phường La Khê, Quận Hà Đông , Tp.Hà Nội</p>
+                </div>
+              </div>
+              <div className="contact-info-item">
+                <i className="fas fa-headset icon"></i>
+                <div>
+                  <h3>HỖ TRỢ KHÁCH HÀNG</h3>
+                  <p>Hotline: <a href="02435199999999">024.35199999999</a></p>
+                  <p>Zalo: <a href="https://oa.zalo.me/doremiCinema" target="_blank" rel="noopener noreferrer">https://oa.zalo.me/ttcpqg</a></p>
+                  <p>Giờ làm việc: 8:00 - 22:00<br />Tất cả các ngày bao gồm cả Lễ tết</p>
+                  <p>Email: <a href="mailto:support@doremiCinema.vn">support@doremiCinema.vn</a></p>
+                </div>
+              </div>
+              <div className="contact-info-item">
+                <i className="fas fa-bullhorn icon"></i>
+                <div>
+                  <h3>LIÊN HỆ QUẢNG CÁO, TỔ CHỨC SỰ KIỆN, THUÊ RẠP</h3>
+                  <p>Phòng dịch vụ</p>
+                  <p>Hotline: <a href="tel:0243456789">024.3456789</a></p>
+                  <p>Email: <a href="mailto:Booking@doremiCinema.vn">Booking@doremiCinema.vn</a></p>
+                </div>
+              </div>
+              <div className="contact-info-item">
+                <i className="fas fa-ticket-alt icon"></i>
+                <div>
+                  <h3>LIÊN HỆ MUA VÉ HỢP ĐỒNG</h3>
+                  <p>Phòng Chiếu phim và Trưng bày Điện Ảnh</p>
+                  <p>Hotline: <a href="tel:02435888888">024.35888888</a></p>
+                  <p>Email: <a href="mailto:contact@doremiCinema.vn">contact@doremiCinema.vn</a></p>
+                </div>
+              </div>
+            </div>
+            <h2 className="contact-map-title">Bản Đồ</h2>
+            <div className="map-container">
+              <iframe
+                title="Bản đồ Doremi Cinema"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.624687364105!2d105.7592438!3d20.9630515!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313453ef854da745%3A0x91291de5392ac9ae!2zVMO0YSBUaMO6eSBM4buRdCBUb3dlcg!5e0!3m2!1svi!2s!4v1717320000000!5m2!1svi!2s"
+                width="100%"
+                height="300"
+                style={{ border: 0, borderRadius: '8px' }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
           </div>
-        </div>
-        <div className="contact-info-item">
-          <i className="fas fa-headset icon"></i>
-          <div>
-            <h3>HỖ TRỢ KHÁCH HÀNG</h3>
-            <p>Hotline: <a href="02435199999999">024.35199999999</a></p>
-            <p>Zalo: <a href="https://oa.zalo.me/doremiCinema" target="_blank" rel="noopener noreferrer">https://oa.zalo.me/ttcpqg</a></p>
-            <p>Giờ làm việc: 8:00 - 22:00<br />Tất cả các ngày bao gồm cả Lễ tết</p>
-            <p>Email: <a href="mailto:support@doremiCinema.vn">support@doremiCinema.vn</a></p>
-          </div>
-        </div>
-        <div className="contact-info-item">
-          <i className="fas fa-bullhorn icon"></i>
-          <div>
-            <h3>LIÊN HỆ QUẢNG CÁO, TỔ CHỨC SỰ KIỆN, THUÊ RẠP</h3>
-            <p>Phòng dịch vụ</p>
-            <p>Hotline: <a href="tel:0243456789">024.3456789</a></p>
-            <p>Email: <a href="mailto:Booking@doremiCinema.vn">Booking@doremiCinema.vn</a></p>
-          </div>
-        </div>
-        <div className="contact-info-item">
-          <i className="fas fa-ticket-alt icon"></i>
-          <div>
-            <h3>LIÊN HỆ MUA VÉ HỢP ĐỒNG</h3>
-            <p>Phòng Chiếu phim và Trưng bày Điện Ảnh</p>
-            <p>Hotline: <a href="tel:02435888888">024.35888888</a></p>
-            <p>Email: <a href="mailto:contact@doremiCinema.vn">contact@doremiCinema.vn</a></p>
-          </div>
-        </div>
-      </div>
-      <h2 className="contact-map-title">Bản Đồ</h2>
-      <div className="map-container">
-        <iframe
-          title="Bản đồ Doremi Cinema"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.624687364105!2d105.7592438!3d20.9630515!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313453ef854da745%3A0x91291de5392ac9ae!2zVMO0YSBUaMO6eSBM4buRdCBUb3dlcg!5e0!3m2!1svi!2s!4v1717320000000!5m2!1svi!2s"
-          width="100%"
-          height="300"
-          style={{ border: 0, borderRadius: '8px' }}
-          allowFullScreen=""
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        />
-      </div>
-    </div>
-  </section>
-</main>
+        </section>
+      </main>
 
       {/* FOOTER */}
       <footer className="footer">
@@ -162,14 +237,25 @@ export default function Contact() {
         </div>
       </footer>
 
+      {/* CSS giống Locations.jsx */}
       <style>{`
+        .greeting,
+        .header-actions,
+        .nav-links li,
+        .nav-links.plain-links a {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: inline-block;
+          vertical-align: middle;
+        }
         body {
           font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
           background: #555555;
           color: #222;
         }
         .main-content {
-          background:rgb(45, 41, 41);
+          background: rgb(45, 41, 41);
         }
         .header {
           background: #111;
@@ -203,6 +289,7 @@ export default function Contact() {
         .nav-links {
           display: flex;
           list-style: none;
+          align-items: center;
         }
         .nav-links li {
           margin: 0 0.2rem;
@@ -230,6 +317,31 @@ export default function Contact() {
           background: none !important;
           color: #e53935;
         }
+        .greeting {
+          font-size: 1rem;
+          font-weight: 700;
+          color: #fffde7;
+          text-shadow: 0 0 10px #e53935, 0 1px 0 #fff;
+          letter-spacing: 0.5px;
+          padding: 0.7rem 1.2rem;
+        }
+        .logout-button {
+          background: linear-gradient(90deg, #e53935 60%, #ffb199 100%);
+          color: #fff;
+          border: none;
+          padding: 0.7rem 1.2rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 1rem;
+          font-weight: 700;
+          box-shadow: 0 4px 15px rgba(229,57,53,0.18);
+          transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+        }
+        .logout-button:hover {
+          background: linear-gradient(90deg, #b71c1c 60%, #e57373 100%);
+          box-shadow: 0 6px 20px rgba(183, 28, 28, 0.85);
+          transform: scale(1.05);
+        }
         .header-actions {
           display: flex;
           align-items: center;
@@ -247,8 +359,8 @@ export default function Contact() {
         }
         .cart-icon .badge {
           position: absolute;
-          top: -6px;
-          right: -10px;
+          top: -0px;
+          right: -0px;
           background: #e53935;
           color: white;
           border-radius: 50%;
@@ -300,7 +412,11 @@ export default function Contact() {
             margin: 0.5rem 0;
             text-align: center;
           }
-          .nav-links a {
+          .nav-links a, .logout-button {
+            font-size: 1.5rem;
+            padding: 1rem;
+          }
+          .greeting {
             font-size: 1.5rem;
             padding: 1rem;
           }
@@ -348,74 +464,61 @@ export default function Contact() {
         }
         /* CONTACT SECTION */
         .contact-section {
-          padding: 2rem 0 3rem 0;
-        }
-        .container {
-          max-width: 900px;
-          margin: 0 auto;
-          padding: 0 1rem;
+          padding: 3rem 0 4rem 0;
         }
         .contact-title {
-          text-align: center;
           color: #e53935;
-          font-size: 2rem;
-          font-weight: 700;
+          font-size: 1.5rem;
           margin-bottom: 2rem;
+          text-align: center;
         }
         .contact-info-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 1.5rem;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 2rem 2.5rem;
           margin-bottom: 2.5rem;
         }
         .contact-info-item {
-          background: #fff;
-          border-radius: 12px;
-          box-shadow: 0 2px 10px rgba(229,57,53,0.08);
-          padding: 1.2rem 1rem;
           display: flex;
           align-items: flex-start;
-          gap: 1rem;
-          transition: box-shadow 0.3s, transform 0.3s;
-          /* Thêm dòng này để chữ không bị tràn ra ngoài */
-          word-break: break-word;
-          /* Giới hạn chiều rộng nội dung bên trong */
-          max-width: 100%;
-          box-sizing: border-box;
+          background: rgba(180, 173, 173, 0.10);
+          border-radius: 16px;
+          padding: 1.3rem 1.5rem;
+          box-shadow: 0 2px 16px rgba(144, 54, 54, 0.08);
+          min-height: 140px;
         }
-        .contact-info-item > div {
-          flex: 1 1 0;
-          min-width: 0;
-          /* Đảm bảo nội dung không bị tràn */
-          word-break: break-word;
-          overflow-wrap: break-word;
+        .contact-info-item .icon {
+          font-size: 2.2rem;
+          color: #e53935;
+          margin-right: 1.2rem;
+          min-width: 2.2rem;
         }
-        .contact-info-item p, 
-        .contact-info-item a {
-          font-size: 1rem;
-          color: #444;
+        .contact-info-item h3 {
+          margin: 0 0 0.5rem 0;
+          color: #e53935;
+          font-size: 1.1rem;
+        }
+        .contact-info-item p, .contact-info-item a {
+          color: #fff;
+          font-size: 1.05rem;
+          margin-bottom: 0.2rem;
           text-decoration: none;
-          /* Ngăn chữ dài bị tràn */
-          word-break: break-word;
-          overflow-wrap: break-word;
-          max-width: 100%;
         }
-        @media (max-width: 900px) {
-          .contact-info-item {
-            flex-direction: column;
-            align-items: stretch;
-          }
+        .contact-info-item a:hover {
+          color: #e53935;
+          text-decoration: underline;
         }
         .contact-map-title {
-          margin: 2rem 0 1rem 0;
           color: #e53935;
           font-size: 1.2rem;
-          font-weight: 600;
+          margin: 2.5rem 0 1rem 0;
+          text-align: center;
         }
         .map-container {
+          width: 100%;
           border-radius: 8px;
           overflow: hidden;
-          box-shadow: 0 2px 10px rgba(229,57,53,0.08);
+          box-shadow: 0 2px 16px rgba(144, 54, 54, 0.08);
         }
         /* FOOTER */
         .footer {
@@ -487,16 +590,15 @@ export default function Contact() {
           font-size: 0.98rem;
           color: #bdbdbd;
         }
-        @media (max-width: 768px) {
-          .footer-container {
+        @media (max-width: 1024px) {
+          .contact-info-grid {
             grid-template-columns: 1fr;
-            text-align: center;
           }
-          .social-links {
-            justify-content: center;
-          }
-          .hero-content h1 {
-            font-size: 1.3rem;
+        }
+        @media (max-width: 600px) {
+          .contact-info-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
           }
         }
       `}</style>
