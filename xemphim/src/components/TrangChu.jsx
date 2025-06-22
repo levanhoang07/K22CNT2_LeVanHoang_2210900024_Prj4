@@ -62,7 +62,6 @@ export default function TrangChu() {
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter') setIsMenuOpen(!isMenuOpen); }}
           >
-            <span></span><span></span><span></span>
           </div>
           <nav className={`main-nav ${isMenuOpen ? 'open' : ''}`}>
             <ul className="nav-links plain-links">
@@ -685,6 +684,7 @@ export default function TrangChu() {
         .social-links {
           display: flex;
           gap: 1.1rem;
+          margin-left: 3rem;
         }
         .social-icon {
           color: #e0e0e0;

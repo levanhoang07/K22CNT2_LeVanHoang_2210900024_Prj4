@@ -30,89 +30,75 @@ export default function Contact() {
   return (
     <>
       {/* HEADER */}
-      <header className="header">
-        <div className="header-container">
-          <span className="site-logo">
-            DOREMI <span className="logo-red">CINEMA</span>
-          </span>
-          <div
-            className="mobile-menu-toggle"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") setIsMenuOpen(!isMenuOpen);
-            }}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <nav className={`main-nav ${isMenuOpen ? "open" : ""}`}>
-            <ul className="nav-links plain-links">
-              <li>
-                <Link to="/">Trang Chủ</Link>
-              </li>
-              <li>
-                <Link to="/locations">Cụm rạp</Link>
-              </li>
-              <li>
-                <Link to="/about">Giới Thiệu</Link>
-              </li>
-              <li>
-                <Link to="/contact">Liên Hệ</Link>
-              </li>
-              <li>
-                <Link to="/giove" className="cart-icon" title="Giỏ vé của bạn">
-                  <span className="icon">🛒</span>
-                  <span className="badge">{soLuongVe}</span>
-                </Link>
-              </li>
-              {user && !isAdmin ? (
-                <>
-                  <li>
-                    <span className="greeting">Xin chào, {user.ho_ten}</span>
-                  </li>
-                  <li>
-                    <button
-                      onClick={handleLogout}
-                      className="logout-button"
-                      onMouseEnter={() => setLogoutHover(true)}
-                      onMouseLeave={() => setLogoutHover(false)}
-                    >
-                      Đăng xuất
-                    </button>
-                  </li>
-                </>
-              ) : (
-                <>
-                  <li>
-                    <Link
-                      to="/dangnhap"
-                      className="nav-link"
-                      onMouseEnter={() => setHoveredLink("/dangnhap")}
-                      onMouseLeave={() => setHoveredLink(null)}
-                    >
-                      Đăng nhập
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/dangky"
-                      className="nav-link"
-                      onMouseEnter={() => setHoveredLink("/dangky")}
-                      onMouseLeave={() => setHoveredLink(null)}
-                    >
-                      Đăng ký
-                    </Link>
-                  </li>
-                </>
-              )}
-            </ul>
-          </nav>
-        </div>
-      </header>
+            <header className="header">
+              <div className="header-container">
+                <span className="site-logo">DOREMI <span className="logo-red">CINEMA</span></span>
+                <div
+                  className="mobile-menu-toggle"
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  aria-label="Toggle menu"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter') setIsMenuOpen(!isMenuOpen); }}
+                >
+                </div>
+                <nav className={`main-nav ${isMenuOpen ? 'open' : ''}`}>
+                  <ul className="nav-links plain-links">
+                    <li><Link to="/">Trang Chủ</Link></li>
+                    <li><Link to="/locations">Cụm rạp</Link></li>
+                    <li><Link to="/about">Giới Thiệu</Link></li>
+                    <li><Link to="/contact">Liên Hệ</Link></li>
+                     <div className="header-actions">
+                  <Link to="/giove" className="cart-icon" title="Giỏ vé của bạn">
+                    <span className="icon">🛒</span>
+                    <span className="badge">{soLuongVe}</span>
+                  </Link>
+                </div>
+                    {user && !isAdmin ? (
+                      <>
+                        <li>
+                          <span className="greeting">Xin chào, {user.ho_ten}</span>
+                        </li>
+                        <li>
+                          <button
+                            onClick={handleLogout}
+                            className="logout-button"
+                            onMouseEnter={() => setLogoutHover(true)}
+                            onMouseLeave={() => setLogoutHover(false)}
+                          >
+                            Đăng xuất
+                          </button>
+                        </li>
+                      </>
+                    ) : (
+                      <>
+                        <li>
+                          <Link
+                            to="/dangnhap"
+                            className="nav-link"
+                            onMouseEnter={() => setHoveredLink("/dangnhap")}
+                            onMouseLeave={() => setHoveredLink(null)}
+                          >
+                            Đăng nhập
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/dangky"
+                            className="nav-link"
+                            onMouseEnter={() => setHoveredLink("/dangky")}
+                            onMouseLeave={() => setHoveredLink(null)}
+                          >
+                            Đăng ký
+                          </Link>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                </nav>
+               
+              </div>
+            </header>
 
       {/* HERO BANNER */}
       <section className="hero-banner">
@@ -481,7 +467,7 @@ export default function Contact() {
         .contact-info-item {
           display: flex;
           align-items: flex-start;
-          background: rgba(180, 173, 173, 0.10);
+          background: rgba(88, 86, 86, 0.61);
           border-radius: 16px;
           padding: 1.3rem 1.5rem;
           box-shadow: 0 2px 16px rgba(144, 54, 54, 0.08);
@@ -566,6 +552,7 @@ export default function Contact() {
         .social-links {
           display: flex;
           gap: 1.1rem;
+          margin-left: 3rem;
         }
         .social-icon {
           color: #e0e0e0;

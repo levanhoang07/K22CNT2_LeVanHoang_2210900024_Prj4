@@ -580,6 +580,7 @@ export default function About() {
         .social-links {
           display: flex;
           gap: 1.1rem;
+          margin-left: 3rem;
         }
         .social-icon {
           color: #e0e0e0;

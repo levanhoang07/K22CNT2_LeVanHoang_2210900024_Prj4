@@ -10,7 +10,6 @@ export default function Locations() {
   const [isLogoutHover, setLogoutHover] = useState(false);
   const [soLuongVe, setSoLuongVe] = useState(0);
 
-  // Lấy số lượng vé giống TrangChu.jsx
   const nguoiDungId = user?.nguoidung_id || user?.id;
   useEffect(() => {
     if (!nguoiDungId) {
@@ -300,6 +299,7 @@ export default function Locations() {
         .nav-links {
           display: flex;
           list-style: none;
+          align-items: center;
         }
         .nav-links li {
           margin: 0 0.2rem;
@@ -327,6 +327,31 @@ export default function Locations() {
           background: none !important;
           color: #e53935;
         }
+        .greeting {
+          font-size: 1rem;
+          font-weight: 700;
+          color: #fffde7;
+          text-shadow: 0 0 10px #e53935, 0 1px 0 #fff;
+          letter-spacing: 0.5px;
+          padding: 0.7rem 1.2rem;
+        }
+        .logout-button {
+          background: linear-gradient(90deg, #e53935 60%, #ffb199 100%);
+          color: #fff;
+          border: none;
+          padding: 0.7rem 1.2rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 1rem;
+          font-weight: 700;
+          box-shadow: 0 4px 15px rgba(229,57,53,0.18);
+          transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+        }
+        .logout-button:hover {
+          background: linear-gradient(90deg, #b71c1c 60%, #e57373 100%);
+          box-shadow: 0 6px 20px rgba(183, 28, 28, 0.85);
+          transform: scale(1.05);
+        }
         .header-actions {
           display: flex;
           align-items: center;
@@ -339,13 +364,14 @@ export default function Locations() {
           text-decoration: none;
           transition: transform 0.2s;
         }
+          
         .cart-icon:hover {
           transform: scale(1.15) rotate(-8deg);
         }
         .cart-icon .badge {
           position: absolute;
-          top: -6px;
-          right: -10px;
+          top: -0px;
+          right: -0px;
           background: #e53935;
           color: white;
           border-radius: 50%;
@@ -397,7 +423,11 @@ export default function Locations() {
             margin: 0.5rem 0;
             text-align: center;
           }
-          .nav-links a {
+          .nav-links a, .logout-button {
+            font-size: 1.5rem;
+            padding: 1rem;
+          }
+          .greeting {
             font-size: 1.5rem;
             padding: 1rem;
           }
@@ -406,6 +436,9 @@ export default function Locations() {
           }
           .mobile-menu-toggle {
             display: flex;
+          }
+          .hero-content h1 {
+            font-size: 1.3rem;
           }
         }
         /* HERO BANNER */
@@ -543,6 +576,7 @@ export default function Locations() {
         .social-links {
           display: flex;
           gap: 1.1rem;
+          margin-left: 3rem;
         }
         .social-icon {
           color: #e0e0e0;
