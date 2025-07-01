@@ -139,7 +139,7 @@ export default function QuanLyPhim() {
           <tr>
             <th>Tên Phim</th>
             <th>Tác Giả</th>
-            <th>Thời Lượng</th>
+            <th>Thời Lượng(phút)</th>
             <th>Ảnh</th>
             <th>Mô Tả</th>
             <th>Trailer</th>

@@ -9,7 +9,7 @@ CORS(app)
 def get_db_connection():
     conn_str = (
         "Driver={SQL Server};"
-        "Server=TDV-LAPTOP\DUYVU;"
+        "Server=LEVANHOANG\SQLEXPRESS;"
         "Database=Ve_Xem_Phim;"
         "Trusted_Connection=yes;"
     )
@@ -211,7 +211,7 @@ def xoa_nguoi_dung(nguoidung_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM nguoidung WHERE nguoidung_id = ?", (nguoidung_id,))
+        cursor.execute("DELETE FROM nguoi_dung WHERE nguoidung_id = ?", (nguoidung_id,))
         conn.commit()
         cursor.close()
         conn.close()

@@ -19,7 +19,7 @@ import QuanLyThanhToan from "./components/quantri/QuanLyThanhToan";
 import QuanLyPhongChieu from "./components/quantri/QuanLyPhongChieu";
 import QuanLyGhe from "./components/quantri/QuanLyGhe";
 import QuanLyVeDat from "./components/quantri/QuanLyVeDat";
-
+import InVe from "./components/InVe";
 import "./App.css";
 
 function App() {
@@ -42,9 +42,8 @@ function App() {
               <Route path="/giove" element={<GioVe />} />
               <Route path="/dangnhap" element={<DangNhap />} />
               <Route path="/dangky" element={<DangKy />} />
+              <Route path="/inve/" element={<InVe />} />
           
-              
-
               {/* route phía quản trị */}
               <Route path="/quantri" element={<QuanTri />}>
                 <Route path="phim" element={<QuanLyPhim />} />

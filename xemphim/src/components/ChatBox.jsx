@@ -84,7 +84,7 @@ export default function ChatBox() {
     if (thankWords.some(word => input.trim().toLowerCase().includes(word))) {
       setMessages(prev => [
         ...prev,
-        { sender: 'bot', text: 'Anh em mình cứ thế thôi hẹ hẹ' }
+        { sender: 'bot', text: 'Rất hân hạnh được hỗ trợ bạn! Nếu cần thêm gì, cứ nói nha.😊' }
       ]);
       setInput('');
       return;

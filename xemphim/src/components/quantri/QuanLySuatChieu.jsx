@@ -226,6 +226,8 @@ const QuanLySuatChieu = () => {
         button {
           font-size: 16px;
           cursor: pointer;
+          background: rgb(48, 124, 57);
+          color: #fff;
         }
         .form-cancel {
           background-color: #95a5a6;

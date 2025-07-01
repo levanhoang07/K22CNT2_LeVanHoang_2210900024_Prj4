@@ -207,11 +207,11 @@ const QuanLyPhongChieu = () => {
         }
 
         .input-field:focus {
-          outline-color: #4CAF50;
+          outline-color:rgb(66, 137, 68);
         }
 
         .submit-button {
-          background-color: #4CAF50;
+          background-color:rgb(66, 133, 69);
           color: white;
           border: none;
           cursor: pointer;

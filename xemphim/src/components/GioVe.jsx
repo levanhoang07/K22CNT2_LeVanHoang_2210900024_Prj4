@@ -19,6 +19,10 @@ export default function GioVe() {
   const [hinhThucMap, setHinhThucMap] = useState({}); // { [ve_id]: hinhThuc }
   const [payMsg, setPayMsg] = useState("");
 
+  // Thêm state cho danh sách ngân hàng và ngân hàng đã chọn
+  const [bankList, setBankList] = useState([]);
+  const [selectedBankMap, setSelectedBankMap] = useState({}); // { [ve_id]: bankCode }
+
   // Hàm fetch vé (tách riêng để tái sử dụng)
   const fetchVeList = () => {
     if (!nguoiDungId) return;
@@ -41,6 +45,15 @@ export default function GioVe() {
   useEffect(() => {
     fetchVeList();
   }, [nguoiDungId]);
+
+  // Fetch danh sách ngân hàng khi mở form Banking
+  useEffect(() => {
+    if (showPay !== null && hinhThucMap[showPay] === "Banking" && bankList.length === 0) {
+      axios.get("https://api.vietqr.io/v2/banks")
+        .then(res => setBankList(res.data.data || []))
+        .catch(() => setBankList([]));
+    }
+  }, [showPay, hinhThucMap, bankList.length]);
 
   // Hàm xử lý thanh toán
   const handlePay = async (ve) => {
@@ -219,9 +232,49 @@ export default function GioVe() {
                                 ))}
                               </select>
                             </div>
+                            {/* chọn banking thì hiển thị chọn ngân hàng */}
+                            {hinhThucMap[ve.ve_id] === "Banking" && (
+                              <div className="bank-select-wrap">
+                                <span className="bank-select-label">Chọn ngân hàng:</span>
+                                <select
+                                  className="bank-select"
+                                  value={selectedBankMap[ve.ve_id] || ""}
+                                  onChange={e => setSelectedBankMap(m => ({ ...m, [ve.ve_id]: e.target.value }))}
+                                >
+                                  <option value="">-- Chọn ngân hàng --</option>
+                                  {bankList.map(bank => (
+                                    <option key={bank.code} value={bank.code}>
+                                      {bank.shortName} - {bank.name.length > 24 ? bank.name.slice(0, 24) + "..." : bank.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
                             {hinhThucMap[ve.ve_id] === "Banking" && parseInt(tongTien, 10) > 0 && (
-                              <div style={{ marginTop: 12, textAlign: "center" }}>
-                                {/* Đã bỏ phần tạo và hiển thị QR VietQR */}
+                              <div style={{
+                                background: "#fff",
+                                border: "1.5px solid #e53935",
+                                borderRadius: 8,
+                                padding: "12px 16px",
+                                margin: "0 auto",
+                                maxWidth: 320,
+                                marginTop: 8,
+                                color: "#222",
+                                fontWeight: 500,
+                                fontSize: "1.05rem",
+                                textAlign: "center",
+                                boxShadow: "0 2px 8px rgba(229,57,53,0.07)"
+                              }}>
+                                <div><b>STK:</b> <span style={{ color: "#e53935", fontWeight: 700 }}>6982121680</span></div>
+                                <div><b>Chủ tài khoản:</b> <span style={{ color: "#1976d2", fontWeight: 700 }}>LÊ VĂN HOÀNG</span></div>
+                                <img
+                                  src={`https://img.vietqr.io/image/970407-6982121680-print.png?amount=${tongTien}&addInfo=Thanh toan ve xem phim`}
+                                  alt="QR chuyển khoản"
+                                  style={{ width: 160, margin: "12px auto 0", display: "block", borderRadius: 8, boxShadow: "0 2px 8px #eee" }}
+                                />
+                                <div style={{ fontSize: 13, color: "#888", marginTop: 8 }}>
+                                  Quét mã QR để chuyển khoản nhanh!
+                                </div>
                               </div>
                             )}
                             {hinhThucMap[ve.ve_id] === "Banking" && parseInt(tongTien, 10) <= 0 && (
@@ -366,6 +419,51 @@ export default function GioVe() {
           color: #444;
           border: 1px solid #e0e0e0;
         }
+        .bank-select-wrap {
+          margin-top: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+        }
+
+        .bank-select-label {
+          font-weight: 600;
+          color: #b71c1c;
+          min-width: 120px;
+          text-align: right;
+        }
+
+        .bank-select {
+          flex: 1;
+          min-width: 140px;
+          max-width: 200px;
+          padding: 7px 10px;
+          border-radius: 7px;
+          border: 1.5px solid #e53935;
+          background: #fff;
+          color: #222;
+          font-size: 0.97rem;
+          transition: border 0.2s, box-shadow 0.2s;
+          box-shadow: 0 2px 8px rgba(229,57,53,0.06);
+          outline: none;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+
+        .bank-select:focus {
+          border: 1.5px solid #b71c1c;
+          box-shadow: 0 4px 16px rgba(229,57,53,0.13);
+        }
+
+        .bank-select option {
+          font-size: 0.97rem;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+
         @media (max-width: 600px) {
           .gio-container {
             padding: 10px 2px 10px 2px;
@@ -378,7 +476,17 @@ export default function GioVe() {
             width: 38px;
             height: 52px;
           }
+          .bank-select-wrap {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+          }
+          .bank-select-label {
+            text-align: left;
+            min-width: 0;
+          }
         }
+          
       `}</style>
     </div>
   );

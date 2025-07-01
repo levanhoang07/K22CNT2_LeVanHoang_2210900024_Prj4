@@ -222,8 +222,6 @@ export default function Contact() {
           <p>© 2025 Doremi Cinema. Nơi dâng trào cảm xúc.</p>
         </div>
       </footer>
-
-      {/* CSS giống Locations.jsx */}
       <style>{`
         .greeting,
         .header-actions,

@@ -100,7 +100,7 @@ export default function TrangChu() {
                       onMouseEnter={() => setHoveredLink("/dangnhap")}
                       onMouseLeave={() => setHoveredLink(null)}
                     >
-                      Đăng nhập
+                    Đăng nhập
                     </Link>
                   </li>
                   <li>
@@ -110,7 +110,7 @@ export default function TrangChu() {
                       onMouseEnter={() => setHoveredLink("/dangky")}
                       onMouseLeave={() => setHoveredLink(null)}
                     >
-                      Đăng ký
+                    Đăng ký
                     </Link>
                   </li>
                 </>

@@ -30,27 +30,7 @@ export default function ChiTietPhim() {
       <div className="ct-loading">
         <div className="ct-spinner"></div>
         <p>Đang tải phim ...</p>
-        <style>{`
-          .ct-loading {
-            text-align: center;
-            padding: 60px 0;
-            color: #e53935;
-            font-size: 1.2rem;
-          }
-          .ct-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(229,57,53, 0.2);
-            border-top: 3px solid #e53935;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-          }
-          @keyframes spin {
-            0% { transform: rotate(0deg);}
-            100% { transform: rotate(360deg);}
-          }
-        `}</style>
+        
       </div>
     );
   }
@@ -78,7 +58,7 @@ export default function ChiTietPhim() {
             <div className="ct-info">
               <p><span className="ct-label">Mô tả:</span> {phim.moTa}</p>
               <p><span className="ct-label">Tác giả:</span> {phim.tacGia}</p>
-              <p><span className="ct-label">Thời lượng:</span> {phim.thoiLuong}</p>
+              <p><span className="ct-label">Thời lượng:</span> {phim.thoiLuong} phút</p>
             </div>
             {embedUrl && (
               <div className="ct-trailer">
@@ -102,6 +82,25 @@ export default function ChiTietPhim() {
         </div>
       </div>
       <style>{`
+      .ct-loading {
+            text-align: center;
+            padding: 60px 0;
+            color: #e53935;
+            font-size: 1.2rem;
+          }
+          .ct-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(229,57,53, 0.2);
+            border-top: 3px solid #e53935;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+          }
+          @keyframes spin {
+            0% { transform: rotate(0deg);}
+            100% { transform: rotate(360deg);}
+          }
       .ct-notfound {
             text-align: center;
             padding: 60px 0;
