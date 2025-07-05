@@ -581,9 +581,73 @@ export default function Contact() {
           }
         }
         @media (max-width: 600px) {
+          .contact-section {
+            padding: 1.2rem 0 2rem 0;
+          }
+          .container {
+            padding: 0 0.3rem;
+          }
+          .contact-title {
+            font-size: 1.08rem;
+            margin-bottom: 1rem;
+          }
           .contact-info-grid {
             grid-template-columns: 1fr;
+            gap: 0.7rem;
+            margin-bottom: 1.2rem;
+          }
+          .contact-info-item {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0.8rem 0.7rem;
+            min-height: unset;
+            border-radius: 10px;
+          }
+          .contact-info-item .icon {
+            font-size: 1.5rem;
+            margin-right: 0;
+            margin-bottom: 0.5rem;
+          }
+          .contact-info-item h3 {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+          }
+          .contact-info-item p, .contact-info-item a {
+            font-size: 0.97rem;
+            word-break: break-word;
+          }
+          .contact-map-title {
+            font-size: 1rem;
+            margin: 1.2rem 0 0.5rem 0;
+          }
+          .map-container {
+            height: 180px;
+            min-height: 120px;
+          }
+          .map-container iframe {
+            height: 180px !important;
+            min-height: 120px !important;
+          }
+          .footer-container {
+            grid-template-columns: 1fr;
             gap: 1rem;
+            padding: 0 0.5rem;
+          }
+          .footer-section h3, .footer-section h4 {
+            font-size: 1.08rem;
+            margin-bottom: 0.5rem;
+          }
+          .footer-section p, .footer-section ul li a {
+            font-size: 0.95rem;
+          }
+          .footer-bottom {
+            font-size: 0.95rem;
+            padding: 0.5rem 0 0.3rem 0;
+            margin-top: 1rem;
+          }
+          .social-links {
+            margin-left: 0;
+            gap: 0.7rem;
           }
         }
       `}</style>
