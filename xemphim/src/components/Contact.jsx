@@ -30,75 +30,78 @@ export default function Contact() {
   return (
     <>
       {/* HEADER */}
-            <header className="header">
-              <div className="header-container">
-                <span className="site-logo">DOREMI <span className="logo-red">CINEMA</span></span>
-                <div
-                  className="mobile-menu-toggle"
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  aria-label="Toggle menu"
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => { if (e.key === 'Enter') setIsMenuOpen(!isMenuOpen); }}
-                >
-                </div>
-                <nav className={`main-nav ${isMenuOpen ? 'open' : ''}`}>
-                  <ul className="nav-links plain-links">
-                    <li><Link to="/">Trang Chủ</Link></li>
-                    <li><Link to="/locations">Cụm rạp</Link></li>
-                    <li><Link to="/about">Giới Thiệu</Link></li>
-                    <li><Link to="/contact">Liên Hệ</Link></li>
-                     <div className="header-actions">
-                  <Link to="/giove" className="cart-icon" title="Giỏ vé của bạn">
-                    <span className="icon">🛒</span>
-                    <span className="badge">{soLuongVe}</span>
-                  </Link>
-                </div>
-                    {user && !isAdmin ? (
-                      <>
-                        <li>
-                          <span className="greeting">Xin chào, {user.ho_ten}</span>
-                        </li>
-                        <li>
-                          <button
-                            onClick={handleLogout}
-                            className="logout-button"
-                            onMouseEnter={() => setLogoutHover(true)}
-                            onMouseLeave={() => setLogoutHover(false)}
-                          >
-                            Đăng xuất
-                          </button>
-                        </li>
-                      </>
-                    ) : (
-                      <>
-                        <li>
-                          <Link
-                            to="/dangnhap"
-                            className="nav-link"
-                            onMouseEnter={() => setHoveredLink("/dangnhap")}
-                            onMouseLeave={() => setHoveredLink(null)}
-                          >
-                            Đăng nhập
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/dangky"
-                            className="nav-link"
-                            onMouseEnter={() => setHoveredLink("/dangky")}
-                            onMouseLeave={() => setHoveredLink(null)}
-                          >
-                            Đăng ký
-                          </Link>
-                        </li>
-                      </>
-                    )}
-                  </ul>
-                </nav>
-               
-              </div>
-            </header>
+      <header className="header">
+  <div className="header-container">
+    <span className="site-logo">DOREMI <span className="logo-red">CINEMA</span></span>
+    {/* Hamburger menu icon */}
+    <div
+      className="mobile-menu-toggle"
+      onClick={() => setIsMenuOpen(!isMenuOpen)}
+      aria-label="Toggle menu"
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter') setIsMenuOpen(!isMenuOpen); }}
+    >
+      <span />
+      <span />
+      <span />
+    </div>
+    <nav className={`main-nav ${isMenuOpen ? 'open' : ''}`}>
+      <ul className="nav-links plain-links" onClick={() => setIsMenuOpen(false)}>
+        <li><Link to="/">Trang Chủ</Link></li>
+        <li><Link to="/locations">Cụm rạp</Link></li>
+        <li><Link to="/about">Giới Thiệu</Link></li>
+        <li><Link to="/contact">Liên Hệ</Link></li>
+        <div className="header-actions">
+          <Link to="/giove" className="cart-icon" title="Giỏ vé của bạn">
+            <span className="icon">🛒</span>
+            <span className="badge">{soLuongVe}</span>
+          </Link>
+        </div>
+        {user && !isAdmin ? (
+          <>
+            <li>
+              <span className="greeting">Xin chào, {user.ho_ten}</span>
+            </li>
+            <li>
+              <button
+                onClick={handleLogout}
+                className="logout-button"
+                onMouseEnter={() => setLogoutHover(true)}
+                onMouseLeave={() => setLogoutHover(false)}
+              >
+                Đăng xuất
+              </button>
+            </li>
+          </>
+        ) : (
+          <>
+            <li>
+              <Link
+                to="/dangnhap"
+                className="nav-link"
+                onMouseEnter={() => setHoveredLink("/dangnhap")}
+                onMouseLeave={() => setHoveredLink(null)}
+              >
+                Đăng nhập
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dangky"
+                className="nav-link"
+                onMouseEnter={() => setHoveredLink("/dangky")}
+                onMouseLeave={() => setHoveredLink(null)}
+              >
+                Đăng ký
+              </Link>
+            </li>
+          </>
+        )}
+      </ul>
+    </nav>
+  </div>
+</header>
 
       {/* HERO BANNER */}
       <section className="hero-banner">
@@ -355,34 +358,39 @@ export default function Contact() {
         .mobile-menu-toggle {
           display: none;
           flex-direction: column;
-          justify-content: space-around;
-          width: 28px;
-          height: 28px;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
           cursor: pointer;
+          z-index: 1200;
         }
         .mobile-menu-toggle span {
           display: block;
           width: 100%;
-          height: 3px;
+          height: 4px;
           background: #fff;
           border-radius: 3px;
-          margin-bottom: 4px;
+          margin-bottom: 5px;
+          transition: 0.3s;
         }
         .mobile-menu-toggle span:last-child {
           margin-bottom: 0;
         }
         @media (max-width: 768px) {
+          .mobile-menu-toggle {
+            display: flex;
+          }
           .main-nav {
             position: fixed;
             top: 56px;
             left: 0;
-            width: 100%;
+            width: 100vw;
             height: 100vh;
             background: #111;
             clip-path: circle(0% at 100% 0);
             transition: clip-path 0.6s;
             pointer-events: none;
-            z-index: 999;
+            z-index: 1100;
           }
           .main-nav.open {
             clip-path: circle(150% at 100% 0);
@@ -391,27 +399,18 @@ export default function Contact() {
           .nav-links {
             flex-direction: column;
             margin: 3rem 0 0 0;
+            width: 100%;
+            align-items: flex-start;
+            padding-left: 2rem;
           }
           .nav-links li {
-            margin: 0.5rem 0;
-            text-align: center;
-          }
-          .nav-links a, .logout-button {
-            font-size: 1.5rem;
-            padding: 1rem;
-          }
-          .greeting {
-            font-size: 1.5rem;
-            padding: 1rem;
+            margin: 0.7rem 0;
+            text-align: left;
+            width: 100%;
           }
           .header-actions {
-            display: none;
-          }
-          .mobile-menu-toggle {
-            display: flex;
-          }
-          .hero-content h1 {
-            font-size: 1.3rem;
+            margin-top: 1rem;
+            margin-left: 0;
           }
         }
         /* HERO BANNER */

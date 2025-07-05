@@ -303,12 +303,87 @@ export default function ChatBox() {
         }
         @media (max-width: 600px) {
           .chatbox-container {
-            right: 5px;
-            bottom: 5px;
-            width: 98vw;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            width: 100vw;
+            max-width: 100vw;
+            border-radius: 0;
+            min-width: unset;
+            box-shadow: none;
+            z-index: 3000;
+          }
+          .chatbox-header {
+            padding: 0.6rem 2.2rem 0.6rem 1rem;
+            font-size: 1.08rem;
+            border-radius: 0;
+            min-height: 48px;
+          }
+          .chatbox-toggle-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 1.2rem;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 50%;
+            background: rgba(255,255,255,0.18);
+          }
+          .chatbox-messages {
+            padding: 0.8rem 0.5rem 0.8rem 0.5rem;
+            max-height: 45vh;
+            font-size: 1.05rem;
+            background: rgba(24,24,24,0.98);
+          }
+          .chat-msg {
+            font-size: 1.05rem;
+            padding: 0.7em 1em;
+            border-radius: 14px;
+            margin-bottom: 0.5rem;
+            max-width: 98%;
+          }
+          .chatbox-input {
+            border-radius: 0 0 0 0;
+            padding: 0.2rem 0.2rem 0.2rem 0.5rem;
+            background: #232733;
+          }
+          .chatbox-input input {
+            padding: 0.7rem 0.7rem;
+            font-size: 1.08rem;
+            border-radius: 8px 0 0 8px;
+            background: #181818;
+            color: #fff;
+          }
+          .chatbox-input button {
+            padding: 0 1.1rem;
+            font-size: 1.08rem;
+            border-radius: 0 8px 8px 0;
+            min-width: 60px;
+            height: 44px;
+            margin-left: 0.2rem;
           }
           .chatbox-container.minimized {
-            width: 120px;
+            width: 56px;
+            min-width: 48px;
+            border-radius: 50%;
+            left: unset;
+            right: 10px;
+            bottom: 10px;
+            height: 56px !important;
+            background: #e53935;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+          }
+          .chatbox-container.minimized .chatbox-header {
+            border-radius: 50%;
+            padding: 0;
+            min-height: 56px;
+            font-size: 1.2rem;
+            text-align: center;
+            background: #e53935;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
         }
       `}</style>

@@ -441,6 +441,128 @@ export default function Locations() {
             font-size: 1.3rem;
           }
         }
+        @media (max-width: 600px) {
+          .header-container {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0.5rem 0.5rem;
+          }
+          .site-logo {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+          }
+          .main-nav {
+            margin-left: 0;
+          }
+          .mobile-menu-toggle {
+            display: flex !important;
+            width: 32px;
+            height: 32px;
+            margin-left: auto;
+            margin-right: 0;
+            z-index: 1200;
+          }
+          .mobile-menu-toggle span {
+            height: 4px;
+            margin-bottom: 5px;
+          }
+          .main-nav {
+            position: fixed;
+            top: 48px;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #111;
+            clip-path: circle(0% at 100% 0);
+            transition: clip-path 0.6s;
+            pointer-events: none;
+            z-index: 1100;
+          }
+          .main-nav.open {
+            clip-path: circle(150% at 100% 0);
+            pointer-events: auto;
+          }
+          .nav-links {
+            flex-direction: column;
+            margin: 2rem 0 0 0;
+            width: 100%;
+            align-items: flex-start;
+            padding-left: 1.2rem;
+          }
+          .nav-links li {
+            margin: 0.5rem 0;
+            text-align: left;
+            width: 100%;
+          }
+          .nav-links a, .logout-button {
+            font-size: 1.15rem;
+            padding: 0.8rem 0.5rem;
+            width: 100%;
+            display: block;
+          }
+          .greeting {
+            font-size: 1.1rem;
+            padding: 0.8rem 0.5rem;
+          }
+          .header-actions {
+            margin-top: 1rem;
+            margin-left: 0;
+            display: flex;
+            width: 100%;
+            justify-content: flex-start;
+          }
+          .movies-section {
+            padding: 0 0 1.2rem 0;
+          }
+          .container {
+            padding: 0 0.2rem;
+          }
+          .movies-grid {
+            grid-template-columns: 1fr;
+            gap: 1.1rem;
+          }
+          .movie-card {
+            border-radius: 10px;
+            min-width: 0;
+          }
+          .movie-image {
+            aspect-ratio: 16/9;
+            min-height: 120px;
+          }
+          .movie-content {
+            padding: 0.7rem 0.5rem 0.7rem 0.5rem;
+          }
+          .movie-title {
+            font-size: 1.02rem;
+            margin-bottom: 0.3rem;
+          }
+          .movie-description {
+            font-size: 0.97rem;
+          }
+          .footer-container {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            padding: 0 0.5rem;
+            text-align: center;
+          }
+          .footer-section h3, .footer-section h4 {
+            font-size: 1.08rem;
+            margin-bottom: 0.5rem;
+          }
+          .footer-section p, .footer-section ul li a {
+            font-size: 0.95rem;
+          }
+          .footer-bottom {
+            font-size: 0.95rem;
+            padding: 0.5rem 0 0.3rem 0;
+            margin-top: 1rem;
+          }
+          .social-links {
+            margin-left: 0;
+            gap: 0.7rem;
+            justify-content: center;
+          }
+        }
         /* HERO BANNER */
         .hero-banner {
           position: relative;

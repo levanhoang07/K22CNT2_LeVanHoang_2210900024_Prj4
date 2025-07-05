@@ -62,6 +62,9 @@ export default function TrangChu() {
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter') setIsMenuOpen(!isMenuOpen); }}
           >
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
           <nav className={`main-nav ${isMenuOpen ? 'open' : ''}`}>
             <ul className="nav-links plain-links">
