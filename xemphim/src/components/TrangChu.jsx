@@ -430,6 +430,106 @@ export default function TrangChu() {
             font-size: 1.3rem;
           }
         }
+        @media (max-width: 600px) {
+          .header-container {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0.5rem 0.5rem;
+          }
+          .site-logo {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+          }
+          .main-nav {
+            margin-left: 0;
+          }
+          .nav-links {
+            flex-direction: column;
+            width: 100%;
+            padding: 0;
+          }
+          .nav-links li {
+            margin: 0.2rem 0;
+            width: 100%;
+            text-align: left;
+          }
+          .nav-links a, .logout-button {
+            font-size: 1.1rem;
+            padding: 0.7rem 0.5rem;
+            width: 100%;
+            display: block;
+          }
+          .greeting {
+            font-size: 1.1rem;
+            padding: 0.7rem 0.5rem;
+          }
+          .hero-banner {
+            min-height: 140px;
+            padding: 0;
+          }
+          .hero-content {
+            padding: 1.2rem 0.2rem 1rem 0.2rem;
+          }
+          .hero-content h1 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+          }
+          .search-container {
+            margin-top: 1rem;
+          }
+          .search-bar input {
+            padding: 0.7rem 1rem;
+            font-size: 0.95rem;
+          }
+          .search-btn {
+            right: 0.5rem;
+          }
+          .movies-section {
+            padding: 1.2rem 0 2rem 0;
+          }
+          .container {
+            padding: 0 0.2rem;
+          }
+          .movie-card {
+            min-height: 320px;
+            border-radius: 12px;
+          }
+          .movie-image {
+            min-height: 180px;
+            border-radius: 10px;
+          }
+          .movie-content {
+            padding: 1rem 0.5rem 0.8rem 0.5rem;
+          }
+          .movie-title {
+            font-size: 1.05rem;
+            margin-bottom: 0.4rem;
+          }
+          .movie-description {
+            font-size: 0.97rem;
+          }
+          .footer-container {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            padding: 0 0.5rem;
+          }
+          .footer-section h3, .footer-section h4 {
+            font-size: 1.08rem;
+            margin-bottom: 0.5rem;
+          }
+          .footer-section p, .footer-section ul li a {
+            font-size: 0.95rem;
+          }
+          .footer-bottom {
+            font-size: 0.95rem;
+            padding: 0.5rem 0 0.3rem 0;
+            margin-top: 1rem;
+          }
+          .social-links {
+            margin-left: 0;
+            gap: 0.7rem;
+          }
+        }
         /* HERO BANNER */
         .hero-banner {
           position: relative;
@@ -715,8 +815,103 @@ export default function TrangChu() {
           }
         }
         @media (max-width: 600px) {
-          .movies-grid {
+          .header-container {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0.5rem 0.5rem;
+          }
+          .site-logo {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+          }
+          .main-nav {
+            margin-left: 0;
+          }
+          .nav-links {
+            flex-direction: column;
+            width: 100%;
+            padding: 0;
+          }
+          .nav-links li {
+            margin: 0.2rem 0;
+            width: 100%;
+            text-align: left;
+          }
+          .nav-links a, .logout-button {
+            font-size: 1.1rem;
+            padding: 0.7rem 0.5rem;
+            width: 100%;
+            display: block;
+          }
+          .greeting {
+            font-size: 1.1rem;
+            padding: 0.7rem 0.5rem;
+          }
+          .hero-banner {
+            min-height: 140px;
+            padding: 0;
+          }
+          .hero-content {
+            padding: 1.2rem 0.2rem 1rem 0.2rem;
+          }
+          .hero-content h1 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+          }
+          .search-container {
+            margin-top: 1rem;
+          }
+          .search-bar input {
+            padding: 0.7rem 1rem;
+            font-size: 0.95rem;
+          }
+          .search-btn {
+            right: 0.5rem;
+          }
+          .movies-section {
+            padding: 1.2rem 0 2rem 0;
+          }
+          .container {
+            padding: 0 0.2rem;
+          }
+          .movie-card {
+            min-height: 320px;
+            border-radius: 12px;
+          }
+          .movie-image {
+            min-height: 180px;
+            border-radius: 10px;
+          }
+          .movie-content {
+            padding: 1rem 0.5rem 0.8rem 0.5rem;
+          }
+          .movie-title {
+            font-size: 1.05rem;
+            margin-bottom: 0.4rem;
+          }
+          .movie-description {
+            font-size: 0.97rem;
+          }
+          .footer-container {
             grid-template-columns: 1fr;
+            gap: 1rem;
+            padding: 0 0.5rem;
+          }
+          .footer-section h3, .footer-section h4 {
+            font-size: 1.08rem;
+            margin-bottom: 0.5rem;
+          }
+          .footer-section p, .footer-section ul li a {
+            font-size: 0.95rem;
+          }
+          .footer-bottom {
+            font-size: 0.95rem;
+            padding: 0.5rem 0 0.3rem 0;
+            margin-top: 1rem;
+          }
+          .social-links {
+            margin-left: 0;
+            gap: 0.7rem;
           }
         }
       `}</style>
