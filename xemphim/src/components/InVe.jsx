@@ -5,15 +5,6 @@ const InVe = React.forwardRef(({ ve, phim, suat, gheArr, tongTien, user }, ref) 
     <div
       ref={ref}
       className="inve-container"
-      style={{
-        maxWidth: 420,
-        margin: '0 auto',
-        background: '#fff',
-        borderRadius: 12,
-        boxShadow: '0 2px 12px #eee',
-        padding: 24,
-        fontFamily: 'Arial, sans-serif'
-      }}
     >
       <h2 style={{ color: '#b71c1c', textAlign: 'center', marginBottom: 18 }}>VÉ XEM PHIM</h2>
       <div style={{ marginBottom: 12, textAlign: 'center' }}>
@@ -70,6 +61,15 @@ const InVe = React.forwardRef(({ ve, phim, suat, gheArr, tongTien, user }, ref) 
         </span>
       </div>
       <style>{`
+
+        .inve-container {
+          maxWidth: 420,
+          margin: '0 auto',
+          background: '#fff',
+          borderRadius: 12,
+          boxShadow: '0 2px 12px #eee',
+          padding: 24,
+          fontFamily: 'Arial, sans-serif'
         @media print {
           body * { visibility: hidden; }
           .inve-container, .inve-container * { visibility: visible !important; }
