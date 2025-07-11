@@ -82,7 +82,7 @@ export default function DatVe() {
 
   // Đặt vé
   const handleXacNhanDatVe = async () => {
-    try {
+  try {
       // Tìm suat_chieu_id từ giờ chiếu và phim
       const suatChieuObj = danhSachSuatChieu.find(
         s => (s.gio_bat_dau === suatChieu || s.gio === suatChieu) && s.phim_id === parseInt(id)
@@ -97,43 +97,43 @@ export default function DatVe() {
         });
       });
 
-      if (!suat_chieu_id || gheIdDaChon.length === 0) {
-        setError('Vui lòng chọn đúng suất chiếu và ghế.');
-        return;
-      }
+     if (!suat_chieu_id || gheIdDaChon.length === 0) {
+      setError('Vui lòng chọn đúng suất chiếu và ghế.');
+      return;
+    }
 
       // Gửi 1 lần tất cả ghế lên server
       const veData = {
-        suatChieuId: suat_chieu_id,
-        gheDaChon: gheIdDaChon, // là mảng các ghe_id
-        nguoiDungId: nguoiDungId // Sử dụng id của user đang đăng nhập
-      };
+      suat_chieu_id: suat_chieu_id,
+      ghe_ids: gheIdDaChon,
+      nguoi_dung_id: nguoiDungId,
+      so_luong: gheIdDaChon.length
+    };
 
       const response = await fetch('http://127.0.0.1:3000/api/vedat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(veData),
-      });
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(veData),
+    });
 
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error('Lỗi khi lưu vé: ' + errText);
-      }
-
-      setSuccessMessage('Đặt vé thành công!');
-      setRap('');
-      setSuatChieu('');
-      setGheDaChon([]);
-      // Chuyển sang trang giỏ vé cho user
-      setTimeout(() => {
-        navigate(
-          `/giove?phim=${id}&rap=${encodeURIComponent(rap)}&suat=${encodeURIComponent(suatChieu)}&ghe=${encodeURIComponent(gheDaChon.join(','))}`
-        );
-      }, 1000); // Đợi 1s cho user thấy thông báo
-    } catch (err) {
-      setError(err.message);
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error('Lỗi khi lưu vé: ' + errText);
     }
-  };
+
+    setSuccessMessage('Đặt vé thành công!');
+    setRap('');
+    setSuatChieu('');
+    setGheDaChon([]);
+    setTimeout(() => {
+      navigate(
+        `/giove?phim=${id}&rap=${encodeURIComponent(rap)}&suat=${encodeURIComponent(suatChieu)}&ghe=${encodeURIComponent(gheDaChon.join(','))}`
+      );
+    }, 1000);
+  } catch (err) {
+    setError(err.message);
+  }
+};
 
   if (loading)
     return (

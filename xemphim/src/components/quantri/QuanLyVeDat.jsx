@@ -9,6 +9,7 @@ const QuanLyVeDat = () => {
   const [phimList, setPhimList] = useState([]);
   const [form, setForm] = useState({
     nguoi_dung_id: '',
+    phim_id: '',
     suat_chieu_id: '',
     ghe_id: '',
     thoi_gian_dat: '',
@@ -32,30 +33,53 @@ const QuanLyVeDat = () => {
 
   // Xử lý thay đổi form
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let newForm = { ...form, [name]: value };
+    if (name === 'suat_chieu_id') {
+      const suat = suatChieuList.find(s => s.suat_chieu_id === Number(value));
+      if (suat) newForm.phim_id = suat.phim_id;
+    }
+    if (name === 'phim_id') {
+      // Khi chọn phim, reset suất chiếu nếu không thuộc phim đó
+      if (form.suat_chieu_id) {
+        const suat = suatChieuList.find(s => s.suat_chieu_id === Number(form.suat_chieu_id));
+        if (!suat || String(suat.phim_id) !== String(value)) {
+          newForm.suat_chieu_id = '';
+        }
+      }
+    }
+    setForm(newForm);
   };
 
   // Thêm hoặc cập nhật vé
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      let data = { ...form };
-      // Nếu thêm mới, tự động lấy thời gian hiện tại
-      if (!editing) {
-        const now = new Date();
-        data.thoi_gian_dat = now.toISOString().slice(0, 16); // yyyy-MM-ddTHH:mm
+      // Chuyển đổi định dạng ngày giờ
+      let thoi_gian_dat = form.thoi_gian_dat;
+      if (thoi_gian_dat && thoi_gian_dat.includes('T')) {
+        thoi_gian_dat = thoi_gian_dat.replace('T', ' ') + ':00';
       }
-      if (editing) {
+
+      let data = {
+        nguoi_dung_id: Number(form.nguoi_dung_id),
+        suat_chieu_id: Number(form.suat_chieu_id),
+        ghe_ids: [Number(form.ghe_id)],
+        thoi_gian_dat: thoi_gian_dat,
+        trang_thai: form.trang_thai,
+        so_luong: 1,
+      };
+      if (!editing) {
+        await axios.post('http://127.0.0.1:3000/api/vedat', data);
+      } else {
         await axios.put(`http://127.0.0.1:3000/api/vedat/${currentVe.ve_id}`, data);
         setEditing(false);
         setCurrentVe(null);
-      } else {
-        await axios.post('http://127.0.0.1:3000/api/vedat', data);
       }
-      setForm({ nguoi_dung_id: '', suat_chieu_id: '', ghe_id: '', thoi_gian_dat: '', trang_thai: 'Đã đặt' });
+      setForm({ nguoi_dung_id: '', phim_id: '', suat_chieu_id: '', ghe_id: '', thoi_gian_dat: '', trang_thai: 'Đã đặt' });
       fetchAll();
     } catch (err) {
-      console.error('Lỗi khi thêm hoặc cập nhật vé:', err);
+      console.error('Lỗi khi thêm hoặc cập nhật vé:', err.response ? err.response.data : err);
       alert('Không thể thêm hoặc cập nhật vé.');
     }
   };
@@ -64,11 +88,33 @@ const QuanLyVeDat = () => {
   const handleEdit = (ve) => {
     setEditing(true);
     setCurrentVe(ve);
+    let ghe_id = '';
+    if (Array.isArray(ve.chi_tiet) && ve.chi_tiet.length > 0) {
+      ghe_id = ve.chi_tiet[0].ghe_id;
+    } else if (ve.ghe_id) {
+      ghe_id = ve.ghe_id;
+    }
+
+    let thoi_gian_dat = '';
+    if (ve.thoi_gian_dat) {
+      if (ve.thoi_gian_dat.includes('T')) {
+        thoi_gian_dat = ve.thoi_gian_dat.slice(0, 16);
+      } else {
+        const d = new Date(ve.thoi_gian_dat);
+        if (!isNaN(d.getTime())) {
+          thoi_gian_dat = d.toISOString().slice(0, 16);
+        }
+      }
+    }
+
+    // Lấy phim_id từ suất chiếu
+    const suat = suatChieuList.find(s => s.suat_chieu_id === ve.suat_chieu_id);
     setForm({
       nguoi_dung_id: ve.nguoi_dung_id,
+      phim_id: suat ? suat.phim_id : '',
       suat_chieu_id: ve.suat_chieu_id,
-      ghe_id: ve.ghe_id,
-      thoi_gian_dat: ve.thoi_gian_dat ? ve.thoi_gian_dat.slice(0, 16) : '',
+      ghe_id: ghe_id,
+      thoi_gian_dat: thoi_gian_dat,
       trang_thai: ve.trang_thai,
     });
   };
@@ -77,7 +123,7 @@ const QuanLyVeDat = () => {
   const handleCancelEdit = () => {
     setEditing(false);
     setCurrentVe(null);
-    setForm({ nguoi_dung_id: '', suat_chieu_id: '', ghe_id: '', thoi_gian_dat: '', trang_thai: 'Đã đặt' });
+    setForm({ nguoi_dung_id: '', phim_id: '', suat_chieu_id: '', ghe_id: '', thoi_gian_dat: '', trang_thai: 'Đã đặt' });
   };
 
   // Xóa vé
@@ -113,13 +159,26 @@ const QuanLyVeDat = () => {
           ))}
         </select>
 
-        <select name="suat_chieu_id" value={form.suat_chieu_id} onChange={handleChange} required>
-          <option value="">-- Chọn suất chiếu --</option>
-          {suatChieuList.map(suat => (
-            <option key={suat.suat_chieu_id} value={suat.suat_chieu_id}>
-              {suat.ngay_chieu} {suat.gio_bat_dau}
+        {/* Thêm trường chọn phim */}
+        <select name="phim_id" value={form.phim_id} onChange={handleChange} required>
+          <option value="">-- Chọn phim --</option>
+          {phimList.map(phim => (
+            <option key={phim.phim_id || phim.id} value={phim.phim_id || phim.id}>
+              {phim.ten || phim.ten_phim}
             </option>
           ))}
+        </select>
+
+        {/* Chỉ hiển thị suất chiếu thuộc phim đã chọn */}
+        <select name="suat_chieu_id" value={form.suat_chieu_id} onChange={handleChange} required>
+          <option value="">-- Chọn suất chiếu --</option>
+          {suatChieuList
+            .filter(s => !form.phim_id || String(s.phim_id) === String(form.phim_id))
+            .map(suat => (
+              <option key={suat.suat_chieu_id} value={suat.suat_chieu_id}>
+                {suat.ngay_chieu} {suat.gio_bat_dau}
+              </option>
+            ))}
         </select>
 
         <select name="ghe_id" value={form.ghe_id} onChange={handleChange} required>
@@ -175,7 +234,6 @@ const QuanLyVeDat = () => {
             if (Array.isArray(ve.chi_tiet) && ve.chi_tiet.length > 0) {
               gheStr = ve.chi_tiet
                 .map(g => {
-                  // Nếu API đã trả về so_ghe trong chi_tiet thì dùng luôn, không thì tra cứu
                   if (g.so_ghe) return g.so_ghe;
                   const gheObj = gheList.find(ghe => ghe.ghe_id === g.ghe_id);
                   return gheObj ? gheObj.so_ghe : '';
@@ -198,7 +256,7 @@ const QuanLyVeDat = () => {
                     : 'Không rõ'}
                 </td>
                 <td>{gheStr}</td>
-                <td>{suat ? (suat.gio_bat_dau ? suat.gio_bat_dau.slice(0,5) : '') : ''}</td>
+                <td>{ve.thoi_gian_dat ? ve.thoi_gian_dat.replace('T', ' ').slice(0, 16) : ''}</td>
                 <td>{ve.trang_thai}</td>
                 <td>
                   <button onClick={() => handleEdit(ve)} className="edit-button">Sửa</button>

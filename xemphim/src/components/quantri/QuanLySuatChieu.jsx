@@ -56,36 +56,36 @@ const QuanLySuatChieu = () => {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const data = {
-        phim_id: form.phim_id,
-        phong_id: form.phong_id,
-        ngay_chieu: form.ngay_chieu,
-        gio_bat_dau: form.gio_bat_dau
-      };
-      if (editing) {
-        await axios.put(`${API_BASE_URL}/suatchieu/${currentSuat.suat_chieu_id}`, data);
-        toast.success('Cập nhật suất chiếu thành công!');
-        setEditing(false);
-        setCurrentSuat(null);
-      } else {
-        await axios.post(`${API_BASE_URL}/suatchieu`, data);
-        toast.success('Thêm suất chiếu thành công!');
-      }
-      setForm({
-        phim_id: '',
-        phong_id: '',
-        ngay_chieu: '',
-        gio_bat_dau: ''
-      });
-      fetchSuatChieu();
-    } catch (err) {
-      console.error('Lỗi khi thêm hoặc cập nhật suất chiếu:', err);
-      toast.error('Không thể thêm hoặc cập nhật suất chiếu.');
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const data = {
+      phim_id: Number(form.phim_id),
+      phong_id: Number(form.phong_id),
+      ngay_chieu: form.ngay_chieu,
+      gio_bat_dau: form.gio_bat_dau
+    };
+    if (editing) {
+      await axios.put(`${API_BASE_URL}/suatchieu/${currentSuat.suat_chieu_id}`, data);
+      toast.success('Cập nhật suất chiếu thành công!');
+      setEditing(false);
+      setCurrentSuat(null);
+    } else {
+      await axios.post(`${API_BASE_URL}/suatchieu`, data);
+      toast.success('Thêm suất chiếu thành công!');
     }
-  };
+    setForm({
+      phim_id: '',
+      phong_id: '',
+      ngay_chieu: '',
+      gio_bat_dau: ''
+    });
+    fetchSuatChieu();
+  } catch (err) {
+    console.error('Lỗi khi thêm hoặc cập nhật suất chiếu:', err);
+    toast.error('Không thể thêm hoặc cập nhật suất chiếu.');
+  }
+};
 
   const handleEdit = (suat) => {
     setEditing(true);
